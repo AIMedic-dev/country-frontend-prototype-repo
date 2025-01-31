@@ -42,10 +42,10 @@ const ChatPresentation: React.FC<ChatProps> = ({
   };
 
   return (
-    <div className="absolute h-screen flex flex-col items-center w-full  text-base">
+    <div className="absolute h-screen flex flex-col items-center w-full  text-base pt-14 sm:pt-0">
       <NavBar />
-      <div className="flex flex-grow h-[80%] flex-col text-sm w-11/12 p-3 pt-5 pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="w-full text-base h-full pr-2 pl-2 sm:pr-10 sm:pl-10  overflow-y-auto mb-6">
+      <div className="flex text-base flex-grow h-[80%] flex-col w-11/12 p-3 pt-5 pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
+        <div className="w-full  h-full pr-2 pl-2 sm:pr-10 sm:pl-10  overflow-y-auto mb-6">
           <div
             ref={chatContainerRef}
             className="flex justify-end items-center pr-2 sm:pr-0 cursor-pointer"

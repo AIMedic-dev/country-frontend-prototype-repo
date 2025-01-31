@@ -52,7 +52,7 @@ const InputChat: React.FC<InputChatProps> = ({
         value={value}
         onChange={onChange}
         placeholder="Escribe un mensaje..."
-        className="w-full  flex items-center resize-none max-h-40 bg-transparent outline-none placeholder-white-1/30"
+        className="w-full  flex items-center resize-none max-h-40  bg-transparent outline-none placeholder-white-1/30"
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
         rows={1}
