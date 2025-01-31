@@ -1,0 +1,104 @@
+# nombre del flujo de trabajo
+name: Deploy to Azure App Service
+
+# Especificación de los eventos que activarán el flujo de trabajo
+# push : se activa cuando se realiza un push en la rama main
+# pull_request : se activa cuando se realiza un pull request en la rama main
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+# Configuración de los permisos necesarios para que el flujo de tabajo pueda ejecutar ciertas acciones, en este caso:
+# id-token: write: Permite que se generen tokens de identidad.
+# contents: read: Permite leer el contenido del repositorio.
+permissions:
+  id-token: write
+  contents: read
+
+# Definición de los trabajos que se ejecutarán en el flujo de trabajo
+# build-and-deploy: nombre del trabajo
+# runs-on: sistema operativo en el que se ejecutará el trabajo
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # Lista de pasos que se ejecutarán en el trabajo
+    # name: nombre del paso
+    # uses: actions/checkout@v2: acción que utiliza checkout para clonar el código fuente del repositorio en el runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+        # Autentica el runner en Azure para permitir la interacción con los recursos de Azure
+        # name: Azure Login : nombre del paso
+        # uses: azure/login@v2: acción que permite autenticar el runner en Azure
+        # with: proporciona los detalles de autenticación necesarios para autenticar el runner en Azure obtenidos de los secretos en GitHub (AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID)
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        # Inicia sesión en el registro de contenedores de Azure (ACR), para poder subir la imagen del contenedor al registro
+        # name: Log in to Azure Container Registry : nombre del paso
+        # uses: azure/docker-login@v2: acción que permite iniciar sesión en el registro de contenedores de Azure
+        # with: proporciona los detalles de inicio de sesión necesarios para iniciar sesión en el registro de contenedores de Azure obtenidos de los secretos en GitHub (AZURE_ACR_NAME, ACR_USERNAME, ACR_PASSWORD)
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+        # Construye la imagen del contenedor a partir del dockerfile en el repositorio y la etiqueta para subirla al registro de contenedores de Azure
+        # name: Build Docker image : nombre del paso
+        # run: comando que construye la imagen del contenedor a partir del dockerfile en el repositorio y la etiqueta para subirla al registro de contenedores de Azure
+        # docker build -t {{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} . : construye la imagen del contenedor a partir del dockerfile en el repositorio y la etiqueta para subirla al registro de contenedores de Azure
+        # docker tag {{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/{{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} : etiqueta la imagen del contenedor con la dirección del registro de contenedores de Azure
+      - name: Build Docker image
+        run: |
+          docker build -t ${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} --label "description=${{ vars.DOCKER_IMAGE_DESCRIPTION }}" .
+          docker tag ${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }}
+
+        # Sube la imagen del contenedor al registro de contenedores de Azure
+        # if: ${{ github.event_name == 'push' }}: condición que indica que este paso se ejecutará solo si el evento que activó el flujo de trabajo fue un push
+        # name: Push Docker image : nombre del paso
+        # run: comando que sube la imagen del contenedor al registro de contenedores de Azure
+        # docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} : sube la imagen del contenedor al registro de contenedores de Azure
+      - name: Push Docker image
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }}
+
+        # Nombre del paso, indica que este paso es responsable del despliegue en el Azure App Service
+      - name: Deploy to azure appservice
+
+        # Define que las siguientes líneas son comando que se ejecutarán en el runner de GitHub Actions.
+        # if: ${{ github.event_name == 'push' }}  : condición que indica que este paso se ejecutará solo si el evento que activó el flujo de trabajo fue un push
+        # az web config... comando de Azure CLI para configurar un contenedor Docker en el Azure App Service
+        # --name ${{vars.AZURE_APP_SERVICE_NAME}}: nombre del Azure App Service
+        # --resource-group ${{secrets.AZURE_RESOURCE_GROUP}}: grupo de recursos de Azure
+        # --docker-custom-image-name ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }}: imagen del contenedor que se desplegará en el Azure App Service
+        # --docker-registry-server-url https://${{ secrets.AZURE_ACR_NAME }}.azurecr.io: URL del registro de contenedores de Azure
+        # --docker-registry-server-user ${{ secrets.ACR_USERNAME }}: nombre de usuario del registro de contenedores de Azure
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          az webapp config container set --name ${{vars.AZURE_APP_SERVICE_NAME}} --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --docker-custom-image-name ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/${{vars.DOCKER_IMAGE_NAME}}:${{ vars.DOCKER_IMAGE_VERSION }} --docker-registry-server-url https://${{ secrets.AZURE_ACR_NAME }}.azurecr.io --docker-registry-server-user ${{ secrets.ACR_USERNAME }} --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
+
+        # Ejecuta un script de Azure CLI
+        # name: Azure CLI script : nombre del paso
+        # uses: azure/cli@v2: acción que permite ejecutar un script de Azure CLI
+        # with: proporciona los detalles del script de Azure CLI que se ejecutará
+        # az account show: comando de Azure CLI que muestra la información de la cuenta de Azure
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
