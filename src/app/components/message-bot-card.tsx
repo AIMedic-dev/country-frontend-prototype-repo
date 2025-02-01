@@ -8,7 +8,7 @@ const MessageBotCard = ({ message }: { message: string }) => {
         alt="icono aimedic"
         width={50}
         height={50}
-        className="w-5 h-5"
+        className="w-7 h-7"
       />
       <div className="break-words  max-w-[80%] pt-1">{message}</div>
     </div>

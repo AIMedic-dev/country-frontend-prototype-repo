@@ -46,7 +46,7 @@ const InputChat: React.FC<InputChatProps> = ({
 
   return (
     <section
-      className={`p-1 w-11/12 lg:w-10/12   pl-3 space-x-2 items-center shadow-input justify-center flex flex-row rounded-3xl ${focus ? 'bg-blue-2' : 'bg-blue-2/70'}`}
+      className={`p-1.5 w-11/12 lg:w-10/12   pl-3 space-x-2 items-center shadow-input justify-center flex flex-row rounded-3xl ${focus ? 'bg-blue-2' : 'bg-blue-2/70'}`}
     >
       <textarea
         value={value}
@@ -66,15 +66,13 @@ const InputChat: React.FC<InputChatProps> = ({
       >
         {!waitingResponseBot ? (
           <span
-            style={{
-              fontSize: '18px',
-            }}
+            style={{}}
             className={`material-icons ${disabled ? 'text-white-1/0' : 'text-white-1'}`}
           >
             send
           </span>
         ) : (
-          <DotLoader color={colors.pink[1]} size={18} />
+          <DotLoader color={colors.pink[1]} size={23} />
         )}
       </button>
     </section>

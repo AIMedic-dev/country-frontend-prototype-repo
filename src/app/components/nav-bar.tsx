@@ -10,13 +10,18 @@ const NavBar = () => {
         alt="logo aimedic"
         width={100}
         height={100}
-        className="w-28 h-5"
+        className="w-36 sm:w-48 "
       />
       <div className="flex w-full items-center justify-end space-x-2">
-        <span>
+        <span className="text-lg">
           ¡Bienvenido <span className="text-blue-3">usuario</span>!
         </span>
-        <span className="material-icons text-blue-3 bg-blue-2/50 rounded-full p-1">
+        <span
+          style={{
+            fontSize: '30px',
+          }}
+          className="material-icons text-blue-3 bg-blue-2/50 rounded-full p-1"
+        >
           person
         </span>
       </div>

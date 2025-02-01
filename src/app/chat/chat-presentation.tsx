@@ -7,6 +7,7 @@ import MessageUserCard from '../components/message-user-card';
 import { ChatProps } from '@/resources/types/props';
 import { DotLoader } from 'react-spinners';
 import { colors } from '@/resources/colors';
+import { isMobile } from 'react-device-detect';
 
 const ChatPresentation: React.FC<ChatProps> = ({
   messages,
@@ -42,24 +43,24 @@ const ChatPresentation: React.FC<ChatProps> = ({
   };
 
   return (
-    <div className="absolute h-screen flex flex-col items-center w-full  text-base pt-14 sm:pt-0">
+    <div className="absolute h-screen flex flex-col items-center w-full  text-base ">
       <NavBar />
       <div className="flex text-base flex-grow h-[80%] flex-col w-11/12 p-3 pt-5 pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="w-full  h-full pr-2 pl-2 sm:pr-10 sm:pl-10  overflow-y-auto mb-6">
-          <div
-            ref={chatContainerRef}
-            className="flex justify-end items-center pr-2 sm:pr-0 cursor-pointer"
+        <div className="flex justify-end items-center pr-6   cursor-pointer">
+          <span
+            onClick={clearMessages}
+            style={{
+              fontSize: isMobile ? '30px' : '35px',
+            }}
+            className={`material-icons ${messages.length > 1 && !waitingResponseBot ? 'text-blue-3' : 'text-transparent'}`}
           >
-            <span
-              onClick={clearMessages}
-              style={{
-                fontSize: '25px',
-              }}
-              className="material-icons text-blue-3"
-            >
-              clear_all
-            </span>
-          </div>
+            clear_all
+          </span>
+        </div>
+        <div
+          ref={chatContainerRef}
+          className="w-full  h-full pr-3 pl-3 sm:pr-10 sm:pl-10  overflow-y-auto mb-6"
+        >
           {messages.map((message, index) =>
             message.isBot ? (
               <MessageBotCard key={index} message={message.message} />
