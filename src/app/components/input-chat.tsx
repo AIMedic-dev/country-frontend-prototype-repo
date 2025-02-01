@@ -2,6 +2,7 @@ import { InputChatProps } from '@/resources/types/props';
 import { useState, useEffect, useRef } from 'react';
 import { DotLoader } from 'react-spinners';
 import { colors } from '@/resources/colors';
+import { isMobile } from 'react-device-detect';
 
 const InputChat: React.FC<InputChatProps> = ({
   value,
@@ -62,17 +63,19 @@ const InputChat: React.FC<InputChatProps> = ({
       <button
         disabled={disabled}
         onClick={onSend}
-        className={`flex items-center ${disabled ? '' : 'bg-pink-1 shadow-default hover:bg-pink-1/80 focus:shadow-focus'} mt-auto justify-center p-1.5  rounded-full `}
+        className={`flex items-center ${disabled ? '' : 'bg-pink-1 shadow-default hover:bg-pink-1/80 focus:shadow-focus'} mt-auto justify-center ${isMobile ? 'p-1.5' : 'p-1'} rounded-full `}
       >
         {!waitingResponseBot ? (
           <span
-            style={{}}
+            style={{
+              fontSize: isMobile ? '24px' : '14px',
+            }}
             className={`material-icons ${disabled ? 'text-white-1/0' : 'text-white-1'}`}
           >
             send
           </span>
         ) : (
-          <DotLoader color={colors.pink[1]} size={23} />
+          <DotLoader color={colors.pink[1]} size={isMobile ? 24 : 14} />
         )}
       </button>
     </section>

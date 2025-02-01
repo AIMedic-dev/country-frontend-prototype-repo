@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { isMobile } from 'react-device-detect';
 const NavBar = () => {
   return (
     <nav className="flex w-full items-center pr-4 pl-4 pt-2 pb-2 space-x-2">
@@ -10,15 +11,15 @@ const NavBar = () => {
         alt="logo aimedic"
         width={100}
         height={100}
-        className="w-36 sm:w-48 "
+        className="w-36 sm:w-36 "
       />
       <div className="flex w-full items-center justify-end space-x-2">
-        <span className="text-lg">
+        <span className="text-lg sm:text-base">
           ¡Bienvenido <span className="text-blue-3">usuario</span>!
         </span>
         <span
           style={{
-            fontSize: '30px',
+            fontSize: isMobile ? '30px' : '24px',
           }}
           className="material-icons text-blue-3 bg-blue-2/50 rounded-full p-1"
         >

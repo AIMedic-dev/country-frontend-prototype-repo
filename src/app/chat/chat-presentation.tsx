@@ -43,16 +43,16 @@ const ChatPresentation: React.FC<ChatProps> = ({
   };
 
   return (
-    <div className="absolute h-screen flex flex-col items-center w-full  text-base ">
+    <div className="absolute h-full flex flex-col items-center w-full  ">
       <NavBar />
-      <div className="flex text-base flex-grow h-[80%] flex-col w-11/12 p-3 pt-5 pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="flex justify-end items-center pr-6   cursor-pointer">
+      <div className="flex  flex-grow h-[80%] flex-col w-11/12 p-3 pt-2  pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
+        <div className="flex justify-end items-center pr-6   ">
           <span
             onClick={clearMessages}
             style={{
-              fontSize: isMobile ? '30px' : '35px',
+              fontSize: isMobile ? '30px' : '24px',
             }}
-            className={`material-icons ${messages.length > 1 && !waitingResponseBot ? 'text-blue-3' : 'text-transparent'}`}
+            className={`material-icons select-none ${messages.length > 1 && !waitingResponseBot ? 'text-blue-3 cursor-pointer ' : 'text-transparent'}`}
           >
             clear_all
           </span>

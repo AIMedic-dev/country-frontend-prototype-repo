@@ -27,7 +27,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico?" type="image/x-icon" />
       </head>
       <body
-        className={`${font} text-base text-white-1 bg-gradient-to-br w-screen max-h-screen  h-[100dvh] overflow-hidden from-blue-1  from-40%  to-blue-2 to-100% `}
+        className={`${font} text-base sm:text-sm min-h-full text-white-1 bg-gradient-to-br w-screen max-h-screen  h-[100dvh] overflow-hidden from-blue-1  from-40%  to-blue-2 to-100% `}
         //className={`${font} text-white-1 w-screen max-h-screen  h-screen overflow-hidden  sm:bg-red-200 md:bg-yellow-200 lg:bg-green-200 xl:bg-blue-200 2xl:bg-purple-200`}
       >
         {children}
