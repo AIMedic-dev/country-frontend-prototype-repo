@@ -7,7 +7,7 @@ import MessageUserCard from '../components/message-user-card';
 import { ChatProps } from '@/resources/types/props';
 import { DotLoader } from 'react-spinners';
 import { colors } from '@/resources/colors';
-import { isMobile } from 'react-device-detect';
+import { isMobile as detectedMobile } from 'react-device-detect';
 
 const ChatPresentation: React.FC<ChatProps> = ({
   messages,
@@ -18,6 +18,11 @@ const ChatPresentation: React.FC<ChatProps> = ({
   const [input, setInput] = useState('');
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setIsMobile(detectedMobile);
+  }, []);
 
   useEffect(() => {
     if (!chatContainerRef.current) return;
@@ -45,8 +50,8 @@ const ChatPresentation: React.FC<ChatProps> = ({
   return (
     <div className="absolute h-full flex flex-col items-center w-full  ">
       <NavBar />
-      <div className="flex  flex-grow h-[80%] flex-col w-11/12 p-3 pt-3  pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="flex justify-end items-center pr-3   ">
+      <div className="flex  flex-grow h-[80%] flex-col w-11/12 p-3 pt-2  pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
+        <div className="flex justify-end items-center pr-5   ">
           <span
             onClick={clearMessages}
             style={{

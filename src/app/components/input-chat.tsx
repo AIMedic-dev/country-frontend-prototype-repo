@@ -2,7 +2,7 @@ import { InputChatProps } from '@/resources/types/props';
 import { useState, useEffect, useRef } from 'react';
 import { DotLoader } from 'react-spinners';
 import { colors } from '@/resources/colors';
-import { isMobile } from 'react-device-detect';
+import { isMobile as detectedMobile } from 'react-device-detect';
 
 const InputChat: React.FC<InputChatProps> = ({
   value,
@@ -14,6 +14,11 @@ const InputChat: React.FC<InputChatProps> = ({
   const [disabled, setDisabled] = useState(true);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [textAreaHeight, setTextAreaHeight] = useState<number>(0);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setIsMobile(detectedMobile);
+  }, []);
 
   useEffect(() => {
     if (
@@ -68,7 +73,7 @@ const InputChat: React.FC<InputChatProps> = ({
         {!waitingResponseBot ? (
           <span
             style={{
-              fontSize: '15px',
+              fontSize: '16px',
             }}
             className={`material-icons ${disabled ? 'text-white-1/0' : 'text-white-1'}`}
           >

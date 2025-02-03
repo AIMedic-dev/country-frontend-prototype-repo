@@ -1,8 +1,17 @@
+'use client';
 import Image from 'next/image';
-import { isMobile } from 'react-device-detect';
+import { isMobile as detectedMobile } from 'react-device-detect';
+import { useEffect, useState } from 'react';
+
 const NavBar = () => {
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setIsMobile(detectedMobile);
+  }, []);
+
   return (
-    <nav className="flex w-full items-center pr-4 pl-4 pt-2 pb-2 space-x-2">
+    <nav className="flex w-full max-h-12 items-center pr-4 pl-4 pt-2 pb-2 space-x-2">
       {/* <span className="material-icons cursor-pointer bg-blue-2/50 text-blue-3 p-0.5s rounded-full">
         menu
       </span> */}
