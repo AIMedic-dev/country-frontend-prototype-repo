@@ -51,7 +51,7 @@ const ChatPresentation: React.FC<ChatProps> = ({
     <div className="absolute h-full flex flex-col items-center w-full  ">
       <NavBar />
       <div className="flex  flex-grow h-[80%] flex-col w-11/12 p-3 pt-2  pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="flex justify-end items-center pr-5   ">
+        <div className="flex justify-end items-center pr-4 sm:pr-10">
           <span
             onClick={clearMessages}
             style={{
