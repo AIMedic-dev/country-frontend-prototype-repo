@@ -6,8 +6,7 @@ import { Message } from '@/resources/types/types';
 const ChatContainer = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      message:
-        'Hola, soy Aimedic, tu asistente virtual. ¿En qué puedo ayudarte?',
+      message: 'Hola, soy Hope, tu asistente virtual. ¿En qué puedo ayudarte?',
       isBot: true,
     },
   ]);
@@ -22,10 +21,7 @@ const ChatContainer = () => {
       const response = await sendMessage(message);
 
       if (response) {
-        setMessages(prev => [
-          ...prev,
-          { message: response.result, isBot: true },
-        ]);
+        setMessages(prev => [...prev, { message: response, isBot: true }]);
       } else {
         setMessages(prev => [
           ...prev,
