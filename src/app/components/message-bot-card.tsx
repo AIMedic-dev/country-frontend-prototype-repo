@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 
 const MessageBotCard = ({ message }: { message: string }) => {
   return (
@@ -10,7 +11,9 @@ const MessageBotCard = ({ message }: { message: string }) => {
         height={50}
         className="w-7 sm:w-5"
       />
-      <div className="break-words  max-w-[80%] pt-1">{message}</div>
+      <div className="break-words  max-w-[80%] pt-1">
+        <ReactMarkdown>{message}</ReactMarkdown>
+      </div>
     </div>
   );
 };
