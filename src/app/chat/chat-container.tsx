@@ -19,9 +19,12 @@ const ChatContainer = () => {
 
     try {
       const response = await sendMessage(message);
-
+      console.log(response);
       if (response) {
-        setMessages(prev => [...prev, { message: response, isBot: true }]);
+        setMessages(prev => [
+          ...prev,
+          { message: response.generated_text, isBot: true },
+        ]);
       } else {
         setMessages(prev => [
           ...prev,
