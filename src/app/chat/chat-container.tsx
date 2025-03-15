@@ -1,8 +1,10 @@
 'use client';
 import ChatPresentation from './chat-presentation';
-import { sendMessage } from '@/resources/functions';
 import { useState } from 'react';
 import { Message } from '@/resources/types/types';
+import { useMutation } from '@apollo/client';
+import { SEND_MESSAGE } from '@/services/graphql-request';
+
 const ChatContainer = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -10,21 +12,25 @@ const ChatContainer = () => {
       isBot: true,
     },
   ]);
+  const [sendMessage] = useMutation(SEND_MESSAGE);
   const [waitingResponseBot, setWaitingResponseBot] = useState(false);
 
   const send = async (message: string) => {
-    setMessages(prev => [...prev, { message, isBot: false }]);
+    setMessages((prev: Message[]) => [...prev, { message, isBot: false }]);
 
     setWaitingResponseBot(true);
 
     try {
-      const response = await sendMessage(message);
-      console.log(response);
+      const response = await sendMessage({
+        variables: {
+          content: message,
+        },
+      });
+
       if (response) {
-        setMessages(prev => [
-          ...prev,
-          { message: response.generated_text, isBot: true },
-        ]);
+        console.log('Response:', response);
+        const botMessage = response.data['Chat'].answer;
+        setMessages(prev => [...prev, { message: botMessage, isBot: true }]);
       } else {
         setMessages(prev => [
           ...prev,
@@ -35,7 +41,6 @@ const ChatContainer = () => {
         ]);
       }
     } catch (error) {
-      console.error('Error al enviar el mensaje:', error);
       setMessages(prev => [
         ...prev,
         { message: 'Error de conexión, intenta de nuevo.', isBot: true },

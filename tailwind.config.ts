@@ -52,5 +52,5 @@ export default {
       '-webkit-tap-highlight-color': 'transparent',
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar')],
 } satisfies Config;

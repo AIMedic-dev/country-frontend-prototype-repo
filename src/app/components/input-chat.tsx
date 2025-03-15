@@ -51,14 +51,17 @@ const InputChat: React.FC<InputChatProps> = ({
   };
 
   return (
+    // input principal del chat
     <section
-      className={`p-1.5 w-11/12 lg:w-10/12   pl-3 space-x-2 items-center shadow-input justify-center flex flex-row rounded-3xl ${focus ? 'bg-blue-2' : 'bg-blue-2/70'}`}
+      className={`p-1.5 w-11/12 pl-3 space-x-1 items-center shadow-input justify-center flex flex-row rounded-3xl ${
+        focus ? 'bg-blue-2' : 'bg-blue-2/70'
+      }`}
     >
       <textarea
         value={value}
         onChange={onChange}
         placeholder="Escribe un mensaje..."
-        className="w-full  flex items-center resize-none max-h-40  bg-transparent outline-none placeholder-white-1/30"
+        className="w-full items-center resize-none max-h-32 scrollbar-thin scrollbar-thumb-blue-2/50 scrollbar-track-blue-1 bg-transparent outline-none placeholder-white-1/30"
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
         rows={1}
@@ -68,14 +71,20 @@ const InputChat: React.FC<InputChatProps> = ({
       <button
         disabled={disabled}
         onClick={onSend}
-        className={`flex items-center ${disabled ? '' : 'bg-pink-1 shadow-default hover:bg-pink-1/80 focus:shadow-focus'} mt-auto justify-center ${isMobile ? 'p-2' : 'p-1'} rounded-full `}
+        className={`flex items-center ${
+          disabled
+            ? ''
+            : 'bg-pink-1 shadow-default hover:bg-pink-1/80 focus:shadow-focus'
+        } mt-auto justify-center ${isMobile ? 'p-2' : 'p-1'} rounded-full`}
       >
         {!waitingResponseBot ? (
           <span
             style={{
               fontSize: '16px',
             }}
-            className={`material-icons ${disabled ? 'text-white-1/0' : 'text-white-1'}`}
+            className={`material-icons ${
+              disabled ? 'text-white-1/0' : 'text-white-1'
+            }`}
           >
             send
           </span>

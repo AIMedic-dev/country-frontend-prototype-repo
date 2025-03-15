@@ -13,6 +13,8 @@
     "@types/react-speech-recognition": "^3.9.6",
     "graphql": "^16.10.0",
     "icons": "^1.0.0",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "material-icons": "^1.13.13",
     "microsoft-cognitiveservices-speech-sdk": "^1.42.0",
     "next": "15.1.6",
@@ -20,9 +22,11 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.3",
-    "react-spinners": "^0.15.0"
+    "react-spinners": "^0.15.0",
+    "tailwind-scrollbar": "^3.1.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

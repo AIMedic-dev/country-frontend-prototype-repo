@@ -11,3 +11,15 @@ export type ChatProps = {
   waitingResponseBot: boolean;
   clearMessages: () => void;
 };
+
+export type ItemSideMenuProps = {
+  title: string;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  iconName: string;
+  selected: boolean;
+};
+
+export type SideMenuProps = {
+  setShowMenu: (value: boolean) => void;
+  showMenu: boolean;
+};

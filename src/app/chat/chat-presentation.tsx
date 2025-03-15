@@ -1,5 +1,5 @@
 'use client';
-import NavBar from '../components/nav-bar';
+
 import { useState, useEffect, useRef } from 'react';
 import InputChat from '../components/input-chat';
 import MessageBotCard from '../components/message-bot-card';
@@ -23,19 +23,20 @@ const ChatPresentation: React.FC<ChatProps> = ({
   useEffect(() => {
     setIsMobile(detectedMobile);
   }, []);
-
   useEffect(() => {
     if (!chatContainerRef.current) return;
 
-    const chatContainer = chatContainerRef.current;
     const isAtBottom =
-      chatContainer.scrollHeight - chatContainer.scrollTop <=
-      chatContainer.clientHeight + 50;
+      chatContainerRef.current.scrollHeight -
+        chatContainerRef.current.clientHeight <=
+      chatContainerRef.current.scrollTop;
 
-    if (isAtBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!isAtBottom) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight -
+        chatContainerRef.current.clientHeight;
     }
-  }, [messages, waitingResponseBot]);
+  }, [messages]);
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -48,23 +49,32 @@ const ChatPresentation: React.FC<ChatProps> = ({
   };
 
   return (
-    <div className="absolute h-full flex flex-col items-center w-full  ">
-      <NavBar />
-      <div className="flex  flex-grow h-[80%] flex-col w-11/12 p-3 pt-2  pr-1 pl-1 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout mt-2 mb-6 sm:w-10/12">
-        <div className="flex justify-end items-center pr-4 sm:pr-10">
+    <div
+      className={` flex  h-full flex-col items-center w-full overflow-hidden `}
+    >
+      {/* contenedor que representa el chat completo */}
+      <div className="flex overflow-hidden h-full flex-col w-11/12 md:w-9/12 lg:w-8/12 py-3 bg-blue-1 rounded-3xl border-2 border-blue-2 shadow-layout my-4">
+        {/* contenedor que representa la sección de botones superiores */}
+        <div className="flex justify-start sm:justify-end items-center w-full px-3">
           <span
             onClick={clearMessages}
             style={{
               fontSize: isMobile ? '30px' : '24px',
             }}
-            className={`material-icons select-none ${messages.length > 1 && !waitingResponseBot ? 'text-blue-3 cursor-pointer ' : 'text-transparent'}`}
+            className={`material-icons select-none ${
+              messages.length > 1 && !waitingResponseBot
+                ? 'text-blue-3 cursor-pointer '
+                : 'text-transparent'
+            }`}
           >
             clear_all
           </span>
         </div>
+
+        {/* zona de mensajes del chat */}
         <div
           ref={chatContainerRef}
-          className="w-full  h-full pr-3 pl-3 sm:pr-10 sm:pl-10  overflow-y-auto mb-6"
+          className="scrollbar-thin scrollbar-thumb-blue-2/50 scrollbar-track-blue-1 w-full h-full px-3 sm:px-6  overflow-y-auto space-y-2"
         >
           {messages.map((message, index) =>
             message.isBot ? (
@@ -74,9 +84,12 @@ const ChatPresentation: React.FC<ChatProps> = ({
             )
           )}
           {waitingResponseBot && <DotLoader color={colors.blue[3]} size={30} />}
+
           <div ref={messagesEndRef} />
         </div>
-        <div className="flex items-center justify-center w-full flex-shrink-0">
+
+        {/* contenedor para centrar el input principal del chat */}
+        <div className="flex items-center justify-center w-full">
           <InputChat
             value={input}
             onChange={handleChangeInput}
