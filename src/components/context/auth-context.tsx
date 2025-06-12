@@ -28,11 +28,19 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Estados para manejar la autenticación
+
   const [user, setUser] = useState<TokenPayload | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasVascularAccess, setHasVascularAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const token = saveTokenToCookie(
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhY2llbnRlc0BhaW1lZGljLmNvbS5jbyIsInN1YiI6IjY4NDlmMTc1NDFlOTc4ZDEyODU0NzY4OCIsInByb2plY3RzIjpbImNvdW50cnkiXSwidXNlck5hbWUiOiJwYWNpZW50ZSIsInJvbGUiOiJwYWNpZW50ZSIsImlhdCI6MTc0OTY5NDI5OSwiZXhwIjoxNzUwMjk5MDk5fQ.J6hlwsA1MDi3kcBVDJIMnR5_fkS9dJuKEsZJfdKhwBA'
+    );
+    console.log('token', token);
+  }, []);
 
   // Función para validar y configurar el token
   const validateAndSetToken = (tokenValue: string): boolean => {

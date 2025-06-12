@@ -59,51 +59,68 @@ const ChatLoading = () => {
   );
 };
 
-// Importación del módulo federado
+// Componente de error para fallos del módulo
+const ChatError = () => (
+  <div className="flex flex-col items-center justify-center h-full p-8">
+    <div className="text-center space-y-4">
+      <MessageSquare className="w-16 h-16 text-gray-400 mx-auto" />
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        Chat no disponible
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400">
+        El módulo de chat no pudo cargarse. Por favor, recarga la página.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+      >
+        Recargar página
+      </button>
+    </div>
+  </div>
+);
+
+// SOLUCIÓN: Una sola importación lazy con mejor manejo de errores
 const ChatMicroservice = lazy(() =>
-  import('chat_microservice/chat-country').catch(() => {
-    console.error('Error al cargar el módulo del chat');
-    return { default: () => <ChatLoading /> };
-  })
+  import('chat_microservice/chat-country')
+    .then(module => {
+      console.log('✅ Módulo chat cargado exitosamente');
+      return module;
+    })
+    .catch(error => {
+      console.error('❌ Error al cargar el módulo del chat:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+      // Retornar componente de error en lugar de loading
+      return { default: ChatError };
+    })
 );
 
 const ChatUI = () => {
-  const [isModuleLoaded, setIsModuleLoaded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [moduleLoadAttempted, setModuleLoadAttempted] = useState(false);
 
-  useEffect(() => {
-    const checkModule = async () => {
-      try {
-        await import('chat_microservice/chat-country');
-        setIsModuleLoaded(true);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error al verificar el módulo:', error);
-        setIsModuleLoaded(false);
-        setIsLoading(false);
-      }
-    };
-
-    checkModule();
-  }, []);
+  // ELIMINADO: La verificación duplicada del módulo
+  // Ahora confiamos en el lazy loading y su manejo de errores
 
   // Escuchar el evento de cambio del sidebar
   useEffect(() => {
-    const handleSidebarChange = (event: CustomEvent) => {
+    const handleSidebarChange = (event: any) => {
       setIsSidebarOpen(event.detail.isOpen);
     };
 
-    window.addEventListener(
-      'sidebarChange',
-      handleSidebarChange as EventListener
-    );
+    window.addEventListener('sidebarChange', handleSidebarChange);
     return () => {
-      window.removeEventListener(
-        'sidebarChange',
-        handleSidebarChange as EventListener
-      );
+      window.removeEventListener('sidebarChange', handleSidebarChange);
     };
+  }, []);
+
+  // Marcar que se intentó cargar el módulo
+  useEffect(() => {
+    setModuleLoadAttempted(true);
   }, []);
 
   return (
@@ -111,20 +128,16 @@ const ChatUI = () => {
       <div className="flex-none relative z-0">
         <NavBar
           isSidebarOpen={isSidebarOpen}
-          isLoading={isLoading}
+          isLoading={!moduleLoadAttempted}
           className="pointer-events-auto"
           userProfileClassName="pointer-events-auto"
         />
       </div>
       <main className="flex-1 overflow-hidden relative z-10">
         <Suspense fallback={<ChatLoading />}>
-          {isModuleLoaded ? (
-            <div className="h-full">
-              <ChatMicroservice />
-            </div>
-          ) : (
-            <ChatLoading />
-          )}
+          <div className="h-full">
+            <ChatMicroservice />
+          </div>
         </Suspense>
       </main>
     </div>
