@@ -16,9 +16,9 @@ export default defineConfig({
       shared: [
         'react',
         'react-dom',
-        '@apollo/client',
+        //'@apollo/client',
         'lucide-react',
-        'graphql',
+        //'graphql',
         // 'js-cookie',
         // 'jwt-decode',
       ],
