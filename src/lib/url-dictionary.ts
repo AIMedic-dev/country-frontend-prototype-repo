@@ -1,6 +1,6 @@
 import { UrlEnum } from '../types/enums';
 
-const URL: {
+const URL_MAP: {
   [key in UrlEnum]: string;
 } = {
   [UrlEnum.CARDIOPATIAS]: 'https://congenitas.aimedic.com.co',
@@ -9,4 +9,4 @@ const URL: {
   [UrlEnum.COUNTRY]: 'https://pacientes.aimedic.com.co',
 };
 
-export default URL;
+export default URL_MAP;

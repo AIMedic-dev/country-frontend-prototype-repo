@@ -16,9 +16,9 @@ export default defineConfig({
       shared: [
         'react',
         'react-dom',
-        //'@apollo/client',
+        '@apollo/client',
         'lucide-react',
-        //'graphql',
+        'graphql',
         // 'js-cookie',
         // 'jwt-decode',
       ],
@@ -31,9 +31,8 @@ export default defineConfig({
   },
 
   build: {
-    target: 'esnext', // 👈 Esto es clave para permitir top-level await
-    modulePreload: false,
-    cssCodeSplit: true,
-    minify: true,
+    target: 'es2022', // 👈 Esto es clave para permitir top-level await
+
+    minify: false,
   },
 });

@@ -4,7 +4,6 @@ import { User, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from './context/auth-context';
 
 interface NavBarProps {
-  isSidebarOpen: boolean;
   isLoading: boolean;
   className?: string;
   userProfileClassName?: string;

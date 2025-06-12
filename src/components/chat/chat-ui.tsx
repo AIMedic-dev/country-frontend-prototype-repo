@@ -80,43 +80,53 @@ const ChatError = () => (
   </div>
 );
 
-// SOLUCIÓN: Una sola importación lazy con mejor manejo de errores
-const ChatMicroservice = lazy(() =>
-  import('chat_microservice/chat-country')
+// Función helper para asegurar URL
+const ensureURLConstructor = () => {
+  if (typeof window !== 'undefined') {
+    const originalURL = window.URL || (window as any).webkitURL;
+    if (originalURL) {
+      (globalThis as any).URL = originalURL;
+      (window as any).URL = originalURL;
+      return true;
+    }
+  }
+  return false;
+};
+
+const ChatMicroservice = lazy(() => {
+  // Asegurar URL antes de importar
+  ensureURLConstructor();
+
+  return import('chat_microservice/chat-country')
     .then(module => {
       console.log('✅ Módulo chat cargado exitosamente');
       return module;
     })
     .catch(error => {
       console.error('❌ Error al cargar el módulo del chat:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
-      // Retornar componente de error en lugar de loading
+
+      // Si es error de URL, reintentar una vez
+      if (error.message.includes('URL is not a constructor')) {
+        console.log('🔄 Reintentando carga del módulo...');
+        ensureURLConstructor();
+
+        return import('chat_microservice/chat-country')
+          .then(module => {
+            console.log('✅ Módulo chat cargado exitosamente en reintento');
+            return module;
+          })
+          .catch(retryError => {
+            console.error('❌ Error en reintento:', retryError);
+            return { default: ChatError };
+          });
+      }
+
       return { default: ChatError };
-    })
-);
+    });
+});
 
 const ChatUI = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [moduleLoadAttempted, setModuleLoadAttempted] = useState(false);
-
-  // ELIMINADO: La verificación duplicada del módulo
-  // Ahora confiamos en el lazy loading y su manejo de errores
-
-  // Escuchar el evento de cambio del sidebar
-  useEffect(() => {
-    const handleSidebarChange = (event: any) => {
-      setIsSidebarOpen(event.detail.isOpen);
-    };
-
-    window.addEventListener('sidebarChange', handleSidebarChange);
-    return () => {
-      window.removeEventListener('sidebarChange', handleSidebarChange);
-    };
-  }, []);
 
   // Marcar que se intentó cargar el módulo
   useEffect(() => {
@@ -127,7 +137,6 @@ const ChatUI = () => {
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex-none relative z-0">
         <NavBar
-          isSidebarOpen={isSidebarOpen}
           isLoading={!moduleLoadAttempted}
           className="pointer-events-auto"
           userProfileClassName="pointer-events-auto"

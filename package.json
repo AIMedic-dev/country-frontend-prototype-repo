@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
+    "@originjs/vite-plugin-federation": "^1.4.1",
     "@tailwindcss/vite": "^4.1.8",
+    "graphql": "^16.11.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.514.0",
@@ -20,7 +23,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
-    "@originjs/vite-plugin-federation": "^1.4.1",
     "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

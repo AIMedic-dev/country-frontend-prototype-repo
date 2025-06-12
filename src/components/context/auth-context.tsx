@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import URL from '../../lib/url-dictionary';
+import URL_MAP from '../../lib/url-dictionary';
 
 import {
   removeToken,
@@ -35,12 +35,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [hasVascularAccess, setHasVascularAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const token = saveTokenToCookie(
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhY2llbnRlc0BhaW1lZGljLmNvbS5jbyIsInN1YiI6IjY4NDlmMTc1NDFlOTc4ZDEyODU0NzY4OCIsInByb2plY3RzIjpbImNvdW50cnkiXSwidXNlck5hbWUiOiJwYWNpZW50ZSIsInJvbGUiOiJwYWNpZW50ZSIsImlhdCI6MTc0OTY5NDI5OSwiZXhwIjoxNzUwMjk5MDk5fQ.J6hlwsA1MDi3kcBVDJIMnR5_fkS9dJuKEsZJfdKhwBA'
-    );
-    console.log('token', token);
-  }, []);
+  // useEffect(() => {
+  //   const token = saveTokenToCookie(
+  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhY2llbnRlc0BhaW1lZGljLmNvbS5jbyIsInN1YiI6IjY4NDlmMTc1NDFlOTc4ZDEyODU0NzY4OCIsInByb2plY3RzIjpbImNvdW50cnkiXSwidXNlck5hbWUiOiJwYWNpZW50ZSIsInJvbGUiOiJwYWNpZW50ZSIsImlhdCI6MTc0OTY5NDI5OSwiZXhwIjoxNzUwMjk5MDk5fQ.J6hlwsA1MDi3kcBVDJIMnR5_fkS9dJuKEsZJfdKhwBA'
+  //   );
+  //   console.log('token', token);
+  // }, []);
 
   // Función para validar y configurar el token
   const validateAndSetToken = (tokenValue: string): boolean => {
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsAuthenticated(false);
     setHasVascularAccess(false);
     // Usar window.location.replace para navegar sin historial
-    window.location.replace(URL.login);
+    window.location.replace(URL_MAP.login);
   };
 
   // Efecto para inicializar la autenticación
@@ -116,19 +116,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         if (!existingToken) {
           // No hay token, redirigir al login
-          window.location.replace(URL.login);
+          window.location.replace(URL_MAP.login);
         } else {
           // Validar token existente
           const isValid = validateAndSetToken(existingToken);
 
           if (!isValid) {
             // Token inválido, redirigir al login
-            window.location.replace(URL.login);
+            window.location.replace(URL_MAP.login);
           }
         }
       } catch (error) {
         console.error('Error inicializando autenticación:', error);
-        window.location.replace(URL.login);
+        window.location.replace(URL_MAP.login);
       } finally {
         setIsLoading(false);
       }
