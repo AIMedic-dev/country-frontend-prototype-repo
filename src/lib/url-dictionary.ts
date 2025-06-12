@@ -1,4 +1,4 @@
-import { UrlEnum } from './types/types';
+import { UrlEnum } from '../types/enums';
 
 const URL: {
   [key in UrlEnum]: string;
