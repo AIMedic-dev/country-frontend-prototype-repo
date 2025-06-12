@@ -10,18 +10,17 @@ export default defineConfig({
     federation({
       name: 'host-country',
       remotes: {
-        // nombre_del_remote: 'url_al_remoteEntry.js'
         chat_microservice:
           'https://chat-artifacts-microservice-frontend.azurewebsites.net/assets/remoteEntry.js',
       },
       shared: [
         'react',
         'react-dom',
-        //'js-cookie',
-        // 'jwt-decode',
         '@apollo/client',
         'lucide-react',
         'graphql',
+        // 'js-cookie',
+        // 'jwt-decode',
       ],
     }),
     tailwindcss(),
@@ -29,5 +28,12 @@ export default defineConfig({
 
   server: {
     port: 3000,
+  },
+
+  build: {
+    target: 'esnext', // 👈 Esto es clave para permitir top-level await
+    modulePreload: false,
+    cssCodeSplit: true,
+    minify: true,
   },
 });
