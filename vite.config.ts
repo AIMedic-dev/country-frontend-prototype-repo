@@ -10,8 +10,8 @@ export default defineConfig({
     federation({
       name: 'host-country',
       remotes: {
-        chat_microservice:
-          'https://chat-artifacts-microservice-frontend.azurewebsites.net/assets/remoteEntry.js',
+        chat_microservice: 'https://chat-artifacts-microservice-frontend.azurewebsites.net/assets/remoteEntry.js',
+        login_microfrontend: 'http://localhost:4400/remoteEntry.js',
       },
       shared: [
         'react',

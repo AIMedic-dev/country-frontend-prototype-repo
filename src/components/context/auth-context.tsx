@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import URL_MAP from '../../lib/url-dictionary';
+// import URL_MAP from '../../lib/url-dictionary';
 
 import {
   removeToken,
@@ -103,7 +103,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsAuthenticated(false);
     setHasVascularAccess(false);
     // Usar window.location.replace para navegar sin historial
-    window.location.replace(URL_MAP.login);
+    if (window.location.pathname !== '/login') {
+      window.location.replace('/login');
+    }
   };
 
   // Efecto para inicializar la autenticación
@@ -115,26 +117,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const existingToken = getTokenFromCookie();
 
         if (!existingToken) {
-          // No hay token, redirigir al login
-          window.location.replace(URL_MAP.login);
+          // No hay token, redirigir al login solo si no estamos ya en /login
+          if (window.location.pathname !== '/login') {
+            window.location.replace('/login');
+          }
         } else {
           // Validar token existente
           const isValid = validateAndSetToken(existingToken);
 
           if (!isValid) {
-            // Token inválido, redirigir al login
-            window.location.replace(URL_MAP.login);
+            // Token inválido, redirigir al login solo si no estamos ya en /login
+            if (window.location.pathname !== '/login') {
+              window.location.replace('/login');
+            }
           }
         }
       } catch (error) {
         console.error('Error inicializando autenticación:', error);
-        window.location.replace(URL_MAP.login);
+        if (window.location.pathname !== '/login') {
+          window.location.replace('/login');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeAuth();
+
+    // Listener para login-success desde el microfrontend
+    const handleLoginSuccess = (e: any) => {
+      if (e.detail?.token) {
+        login(e.detail.token);
+        // Redirigir al home después de login
+        window.location.replace('/');
+      }
+    };
+    window.addEventListener('login-success', handleLoginSuccess);
+    return () => window.removeEventListener('login-success', handleLoginSuccess);
   }, []);
 
   // Valor del contexto
