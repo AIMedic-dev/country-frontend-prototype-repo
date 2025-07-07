@@ -1,0 +1,36 @@
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-label {
+    font-size: 0.95rem;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.input-field {
+    background-color: #404050;
+    border: 1px solid #5A5A6A;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #FFFFFF;
+    font-family: system-ui, sans-serif;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-field:focus {
+    border-color: #7B68EE;
+    box-shadow: 0 0 0 2px rgba(123, 104, 238, 0.3);
+}
+
+.input-error {
+    border-color: #FF6B6B;
+}
+
+.input-error-message {
+    font-size: 0.875rem;
+    color: #FF6B6B;
+}

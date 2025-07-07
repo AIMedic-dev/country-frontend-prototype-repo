@@ -1,0 +1,21 @@
+.primary-button {
+    background-color: #7B68EE;
+    color: white;
+    font-weight: 500;
+    padding: 12px 24px;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    transition: filter 0.2s ease;
+    font-family: system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    filter: brightness(1.1);
+}
+
+.primary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
