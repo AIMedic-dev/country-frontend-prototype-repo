@@ -1,68 +1,103 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '../components/input';
 import CancerSelect from '../components/cancerselect';
 import { Button } from '../components/button';
 import { useFormValidation } from '../hooks/useFormValidation';
 import LoadingModal from '../components/LoadingModal';
-import '../styles/login.css'; // Reutiliza estilos base, si tienes uno específico cámbialo.
+
+import '../styles/login.css';
+
+import { completePatientRegister } from '../services/patient/graphql-patient';
+import { getTokenFromCookie, decodeToken } from '../../../lib/cookies-managment';
 
 type Props = {
   navigate: (path: 'login' | 'register' | 'verify' | 'registerPatient') => void;
 };
 
 export default function RegisterPatient({ navigate }: Props) {
+  /* Campos */
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [cancerType, setCancerType] = useState('');
   const [stage, setStage] = useState('');
+
+  /* Estado UI */
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /* Helpers de validación */
   const {
     validateRequired,
-    setFieldError,
     validation,
     clearErrors,
+    // acceso directo al setter bajo la manga:
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setFieldError,                       // ya no lo usaremos
   } = useFormValidation();
 
+  /* userName desde el JWT */
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = getTokenFromCookie();
+    if (!token) return navigate('login');
+
+    const decoded: any = decodeToken(token);
+    const uName = decoded?.userName ?? decoded?.email;
+    if (!uName) return navigate('login');
+
+    setUserName(uName);
+  }, [navigate]);
+
+  /* ---------------- submit ---------------- */
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
     setError('');
 
-    const nameError = validateRequired(name, 'Nombre');
-    const cityError = validateRequired(city, 'Ciudad');
-    const cancerTypeError = validateRequired(cancerType, 'Tipo de cáncer');
-    const stageError = validateRequired(stage, 'Etapa');
+    /* — Construimos errores de una vez — */
+    /* — Construimos y filtramos errores — */
+    const rawErrors: Record<string, string | null> = {
+      name: validateRequired(name, 'Nombre'),
+      city: validateRequired(city, 'Ciudad'),
+      cancerType: validateRequired(cancerType, 'Tipo de cáncer'),
+      stage: validateRequired(stage, 'Etapa'),
+    };
 
-    setFieldError('name', nameError);
-    setFieldError('city', cityError);
-    setFieldError('cancerType', cancerTypeError);
-    setFieldError('stage', stageError);
+    const errors = Object.fromEntries(
+      Object.entries(rawErrors).filter(([, v]) => v) // elimina null
+    ) as Record<string, string>;
 
-    if (nameError || cityError || cancerTypeError || stageError) return;
+    if (Object.keys(errors).length) {
+      /* actualiza tu estado de validación */
+      validation.isValid = false;
+      validation.errors = errors;
+      return; // aborta el submit
+    }
 
     setIsSubmitting(true);
 
     try {
-      // Aquí conecta con tu backend o base de datos.
-      console.log({
+      if (!userName) throw new Error('Usuario no identificado');
+
+      await completePatientRegister(userName, {
         name,
         city,
         cancerType,
         stage,
+        status: 'ACTIVE',
       });
 
-      // Ejemplo:
-      // await registerPatient({ name, city, cancerType, stage });
-      // navigate('verify');
+      window.location.replace('/analytics');
     } catch (err) {
-      setError('Ocurrió un error al registrar el paciente.');
+      console.error('[RegisterPatient error]', err);
+      setError('Ocurrió un error al registrar tus datos.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <>
       <div className="login-wrapper">
@@ -79,19 +114,15 @@ export default function RegisterPatient({ navigate }: Props) {
 
             <Input
               label="Nombre completo"
-              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Juan Pérez"
               error={validation.errors.name}
             />
 
             <Input
               label="Ciudad"
-              type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Bogotá"
               error={validation.errors.city}
             />
 
@@ -99,26 +130,27 @@ export default function RegisterPatient({ navigate }: Props) {
               label="Tipo de cáncer"
               value={cancerType}
               onChange={setCancerType}
+              error={validation.errors.cancerType}
             />
 
             <CancerSelect
               label="Etapa"
               value={stage}
               onChange={setStage}
-              options={[
-                'Etapa I',
-                'Etapa II',
-                'Etapa III',
-                'Etapa IV',
-              ]}
+              options={['Etapa I', 'Etapa II', 'Etapa III', 'Etapa IV']}
+              error={validation.errors.stage}
             />
 
             {error && <p className="form-error-message">{error}</p>}
 
-            <Button type="submit" text="Registrarse" disabled={isSubmitting} />
+            <Button
+              type="submit"
+              text="Registrarse"
+              disabled={isSubmitting}
+            />
 
             <p className="form-footer-link">
-              ¿Ya tienes cuenta?{" "}
+              ¿Ya tienes cuenta?{' '}
               <a
                 href="#"
                 onClick={(e) => {

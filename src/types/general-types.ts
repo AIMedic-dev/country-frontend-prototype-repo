@@ -1,7 +1,7 @@
 export type TokenPayload = {
   email: string;
   sub: string;
-  projects: string[];
+  projects?: string[];
   iat: number;
   exp: number;
   userName?: string;

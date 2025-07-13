@@ -43,43 +43,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // }, []);
 
   // Función para validar y configurar el token
+  // auth-context.tsx  (solo esta función cambia)
   const validateAndSetToken = (tokenValue: string): boolean => {
     try {
-      const decodedToken = decodeToken(tokenValue);
+      const decoded = decodeToken(tokenValue) as TokenPayload | undefined;
+      if (!decoded) return false;
 
-      if (!decodedToken) {
-        console.error('Token no válido');
-        return false;
-      }
-
-      // Verificar si el token ha expirado
-      const currentTime = Math.floor(Date.now() / 1000);
-      if (decodedToken.exp < currentTime) {
-        console.error('Token expirado');
+      // 1. expiración
+      if (decoded.exp < Math.floor(Date.now() / 1000)) {
         removeToken();
         return false;
       }
 
-      // Verificar acceso a "accesos vasculares"
-      const hasAccess = decodedToken.projects.includes('country');
+      // 2. permisos
+      const projects = decoded.projects;               // string[] | undefined
+      const hasAccess =
+        !projects || projects.length === 0              // paciente (sin projects)
+          ? true
+          : projects.includes('country');               // corporativo válido
 
-      if (!hasAccess) {
-        console.error('Sin acceso al proyecto "country"');
-        return false;
-      }
+      if (!hasAccess) return false;
 
-      // Configurar estados
+      // 3. setear estado
       setToken(tokenValue);
-      setUser(decodedToken);
+      setUser(decoded);
       setIsAuthenticated(true);
-      setHasVascularAccess(hasAccess);
-
+      setHasVascularAccess(projects?.includes('country') ?? true); // paciente = true
       return true;
-    } catch (error) {
-      console.error('Error validando token:', error);
+    } catch (err) {
+      console.error('Error validando token:', err);
       return false;
     }
   };
+
 
   // Función de login
   const login = (newToken: string): boolean => {
@@ -148,10 +144,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const handleLoginSuccess = (e: any) => {
       if (e.detail?.token) {
         login(e.detail.token);               // actualiza contexto
-    
-        // 👉 si viene `redirectTo` lo usamos, si no, quedamos como antes
-        const to = e.detail.redirectTo ?? '/';
-        window.location.replace(to);
+
+
+        const to = e.detail.redirectTo;
+        if (to) window.location.replace(to);
       }
     };
     window.addEventListener('login-success', handleLoginSuccess);
