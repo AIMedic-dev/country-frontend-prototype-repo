@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ChatContainer from './components/chat/chat-container';
 import { AuthProvider } from './components/context/auth-context';
 import LoginWrapper from './components/login/LoginWrapper';
+import RegisterPatient from './components/country-login/views/registerpatient';
 
 function App() {
   return (

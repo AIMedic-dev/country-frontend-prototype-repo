@@ -2,8 +2,9 @@ import { useState } from 'react';
 import Login from './views/login';
 import Register from './views/register';
 import VerifyCode from './views/verifycode';
+import RegisterPatient from './views/registerpatient'; 
 
-type View = 'login' | 'register' | 'verify';
+type View = 'login' | 'register' | 'verify' | 'registerPatient'; 
 
 export default function LoginPage() {
   const [view, setView] = useState<View>('login');
@@ -21,6 +22,11 @@ export default function LoginPage() {
       {view === 'verify' && tempUser && (
         <VerifyCode
           tempUser={tempUser}
+          navigate={setView}
+        />
+      )}
+      {view === 'registerPatient' && (
+        <RegisterPatient
           navigate={setView}
         />
       )}

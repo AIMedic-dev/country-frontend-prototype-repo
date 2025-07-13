@@ -1,6 +1,6 @@
 import client from './apollo-client';
 import { gql } from '@apollo/client';
-import type { LoginInput, RegisterInput, AuthResponse } from '../types/types'; // TODO: Cambiar a la ruta correcta
+import type { LoginInput, RegisterInput, AuthResponse } from '../types/types'; 
 
 const LOGIN_MUTATION = gql`
   mutation Login($email: String!, $password: String!) {

@@ -16,8 +16,18 @@ export interface AuthResponse {
     access_token: string;
 }
 
-export enum ProjectEnum {
-    CARDIOPATIAS = 'cardiopatias',
-    ACCESOS = 'accesos vasculares',
-    COUNTRY = 'country',
-}
+
+export interface UpdatePatientInputFront {
+    name?: string;
+    city?: string;
+    cancerType?: string;
+    stage?: string;
+    status?: 'ACTIVE' | 'INACTIVE';
+  }
+  
+
+// export enum ProjectEnum {
+//     CARDIOPATIAS = 'cardiopatias',
+//     ACCESOS = 'accesos vasculares',
+//     COUNTRY = 'country',
+// }

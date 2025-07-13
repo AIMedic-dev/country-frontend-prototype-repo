@@ -1,0 +1,134 @@
+/* Variables del sistema de diseño */
+:root {
+    --color-medical-primary: #1e4a73;
+    --color-medical-accent: #3b7ba8;
+    --color-neutral-white: #ffffff;
+    --color-neutral-off: #f8f9fa;
+    --color-neutral-light: #e8eaed;
+    --color-neutral-medium: #6c757d;
+    --color-neutral-dark: #343a40;
+    --border-radius-curved: 24px;
+    --font-primary: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --spacing-md: 24px;
+  }
+  
+  /* Contenedor */
+  .cs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* spacing.element_gap */
+    position: relative;
+    font-family: var(--font-primary);
+  }
+  
+  /* Etiqueta */
+  .cs-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-medical-primary);
+    letter-spacing: 0.02em;
+  }
+  
+  /* Campo visible (botón) */
+  .cs-input {
+    background-color: var(--color-neutral-white);
+    border: 1px solid var(--color-neutral-medium);
+    border-radius: var(--border-radius-curved);
+    padding: 12px 16px;
+    width: 100%;
+    font-size: 1rem;
+    color: var(--color-neutral-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cs-input:hover,
+  .cs-input:focus-visible {
+    border-color: var(--color-medical-primary);
+    box-shadow: 0 0 0 3px rgba(30, 74, 115, 0.25);
+  }
+  
+  /* Chevron (pseudo flecha) */
+  .cs-chevron {
+    border: solid var(--color-neutral-medium);
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 4px;
+    transform: rotate(45deg);
+    margin-left: 8px;
+  }
+  
+  /* Dropdown */
+  .cs-dropdown {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 4px);
+    width: 100%;
+    background-color: var(--color-neutral-white);
+    border: 1px solid var(--color-neutral-medium);
+    border-radius: var(--border-radius-curved);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Campo de búsqueda */
+  .cs-search {
+    padding: 8px 12px;
+    border: 1px solid var(--color-neutral-light);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+  }
+  .cs-search:focus {
+    border-color: var(--color-medical-primary);
+    box-shadow: 0 0 0 2px rgba(30, 74, 115, 0.2);
+  }
+  
+  /* Lista de opciones */
+  .cs-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .cs-option {
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--color-neutral-dark);
+    transition: background-color 0.15s ease;
+  }
+  .cs-option:hover,
+  .cs-option.selected {
+    background-color: var(--color-medical-accent);
+    color: var(--color-neutral-white);
+  }
+  .cs-empty {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: var(--color-neutral-medium);
+  }
+  
+  /* Scrollbar refinada (opcional) */
+  .cs-options::-webkit-scrollbar {
+    width: 6px;
+  }
+  .cs-options::-webkit-scrollbar-thumb {
+    background: var(--color-neutral-light);
+    border-radius: 6px;
+  }
+  
+  /* Responsive: en móviles rompe la línea si es necesario */
+  @media (max-width: 480px) {
+    .cs-dropdown {
+      font-size: 0.9rem;
+    }
+  }
+  

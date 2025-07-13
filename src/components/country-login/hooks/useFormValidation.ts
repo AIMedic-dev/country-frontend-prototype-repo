@@ -7,10 +7,10 @@ export const useFormValidation = () => {
     errors: {}
   });
 
-  const validateEmail = useCallback((email: string): string | null => {
+  const validateEmail = useCallback((email: string,userType: string): string | null => {
     const emailRegex = /^[^\s@]+@clinicadelcountry\.com$/;
     if (!email) return 'El correo es obligatorio';
-    if (!emailRegex.test(email)) return 'Solo se permiten correos @clinicadelcountry.com';
+    if (!emailRegex.test(email) && userType === 'doctor') return 'Solo se permiten correos @clinicadelcountry.com';
     return null;
   }, []);
 

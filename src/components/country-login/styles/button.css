@@ -1,21 +1,40 @@
-.primary-button {
-    background-color: #7B68EE;
-    color: white;
-    font-weight: 500;
+/* ──────────────────────────────────────────────
+   Variables globales - puedes moverlas a otro
+   lugar si ya las defines en tu proyecto
+   ─────────────────────────────────────────── */
+   :root {
+    --color-medical-primary: #1E4A73;   /* blue_primary */
+    --color-medical-accent:  #3B7BA8;   /* blue_accent (hover) */
+    --color-neutral-white:   #FFFFFF;
+    --border-radius-curved:  24px;
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* ──────────────────────────────────────────────
+     Botón primario
+     ─────────────────────────────────────────── */
+  .primary-button {
+    background-color: var(--color-medical-primary);
+    color: var(--color-neutral-white);
+    font-family: var(--font-primary);
+    font-weight: 600;           /* más énfasis */
     padding: 12px 24px;
     width: 100%;
     border: none;
-    border-radius: 12px;
-    transition: filter 0.2s ease;
-    font-family: system-ui, sans-serif;
+    border-radius: var(--border-radius-curved);
+    transition: background-color 0.2s ease, filter 0.2s ease;
     cursor: pointer;
-}
-
-.primary-button:hover {
-    filter: brightness(1.1);
-}
-
-.primary-button:disabled {
-    opacity: 0.5;
+    box-shadow: 0 2px 4px rgba(30, 74, 115, 0.15); /* sutil */
+  }
+  
+  .primary-button:hover:not(:disabled),
+  .primary-button:focus-visible:not(:disabled) {
+    background-color: var(--color-medical-accent);
+    filter: brightness(1.05);
+  }
+  
+  .primary-button:disabled {
+    opacity: 0.45;
     cursor: not-allowed;
-}
+  }
+  

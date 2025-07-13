@@ -147,9 +147,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Listener para login-success desde el microfrontend
     const handleLoginSuccess = (e: any) => {
       if (e.detail?.token) {
-        login(e.detail.token);
-        // Redirigir al home después de login
-        window.location.replace('/');
+        login(e.detail.token);               // actualiza contexto
+    
+        // 👉 si viene `redirectTo` lo usamos, si no, quedamos como antes
+        const to = e.detail.redirectTo ?? '/';
+        window.location.replace(to);
       }
     };
     window.addEventListener('login-success', handleLoginSuccess);

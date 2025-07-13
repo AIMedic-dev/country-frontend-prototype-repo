@@ -1,82 +1,144 @@
-.login-wrapper {
-    display: flex;
-    height: 100vh;
-    background-color: #3A3A46;
-    font-family: system-ui, sans-serif;
-    flex-direction: row;
+/* ──────────────────────────────────────────────
+   Variables – mantén una sola definición global
+   ─────────────────────────────────────────── */
+:root {
+    --color-medical-primary: #1E4A73;
+    --color-medical-secondary: #2B5F87;
+    --color-medical-accent: #3B7BA8;
+    --color-blue-light: #4A90C2;
+    --color-neutral-white: #FFFFFF;
+    --color-neutral-off: #F8F9FA;
+    --color-neutral-dark: #343A40;
+    --color-neutral-medium: #6C757D;
+    --color-error: #DC3545;
+    --border-radius-curved: 24px;
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --spacing-lg: 32px;
+    /* diseño → containers.padding_lg */
 }
 
+/* ──────────────────────────────────────────────
+     Wrapper
+     ─────────────────────────────────────────── */
+.login-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-neutral-off);
+    font-family: var(--font-primary);
+}
+
+/* ──────────────────────────────────────────────
+     Panel Izquierdo – branding / información
+     ─────────────────────────────────────────── */
 .left-panel {
-    width: 45%;
-    background: linear-gradient(to bottom right, #4A4A58, #2F2F3A);
-    padding: 48px;
-    color: white;
+    flex: 0 0 45%;
+    background: #02569A;
+    padding: var(--spacing-lg);
+    color: var(--color-neutral-white);
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    /* ligero corte geométrico */
 }
 
 .left-title {
     font-size: 2.5rem;
-    font-weight: 300;
+    /* brand_title */
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
     margin-bottom: 16px;
 }
 
 .left-subtitle {
-    color: #B0B0C0;
-    font-size: 0.95rem;
+    color: var(--color-neutral-off);
+    font-size: 1rem;
+    line-height: 1.4;
+    max-width: 24ch;
 }
 
+/* ──────────────────────────────────────────────
+     Panel Derecho – formulario
+     ─────────────────────────────────────────── */
 .right-panel {
-    width: 55%;
-    background-color: #2F2F3A;
+    flex: 0 0 55%;
+    background-color: var(--color-neutral-off);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Fondo geométrico sutil (pseudo-elemento) */
+.right-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(135deg,
+            rgba(30, 74, 115, 0.05) 0px,
+            rgba(30, 74, 115, 0.05) 2px,
+            transparent 2px,
+            transparent 12px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Contenedor del formulario */
 .login-form {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    padding: 48px 40px;
+    background-color: var(--color-neutral-white);
+    border-radius: var(--border-radius-curved);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 48px;
+    gap: 24px;
 }
 
+/* Título del formulario */
 .form-title {
     font-size: 2rem;
-    font-weight: 400;
-    color: #FFFFFF;
-    margin-bottom: 8px;
-}
-
-.form-error-message {
-    color: #FF6B6B;
-    font-size: 0.875rem;
-}
-
-.form-footer-link {
-    margin-top: 12px;
-    font-size: 0.875rem; /* caption size */
-    color: #A0A0B0;       /* interactive.link */
+    font-weight: 700;
+    color: var(--color-medical-primary);
     text-align: center;
-    opacity: 0.9;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+}
+
+/* Mensaje de error general */
+.form-error-message {
+    color: var(--color-error);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+/* Enlace de pie de formulario */
+.form-footer-link {
+    font-size: 0.875rem;
+    color: var(--color-neutral-medium);
+    text-align: center;
+    opacity: 0.92;
     transition: color 0.2s ease;
 }
 
 .form-footer-link a {
-    color: #7B68EE;       /* interactive.button_primary */
+    color: var(--color-medical-accent);
     text-decoration: underline;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .form-footer-link a:hover {
-    color: #6B58DE;       /* interactive.hover */
+    color: var(--color-medical-primary);
 }
 
-
-/* ✅ Responsive: stack panels vertically on mobile */
+/* ──────────────────────────────────────────────
+     Responsivo
+     ─────────────────────────────────────────── */
 @media screen and (max-width: 768px) {
     .login-wrapper {
         flex-direction: column;
@@ -84,15 +146,26 @@
 
     .left-panel,
     .right-panel {
+        flex: 0 0 auto;
         width: 100%;
-        padding: 32px;
+        padding: 40px 24px;
+        clip-path: none;
     }
 
     .left-title {
         font-size: 2rem;
+        text-align: center;
+    }
+
+    .left-subtitle {
+        text-align: center;
+        margin-inline: auto;
     }
 
     .login-form {
-        padding: 32px 24px;
+        padding: 40px 32px;
+        border-radius: 0;
+        max-width: none;
+        box-shadow: none;
     }
 }

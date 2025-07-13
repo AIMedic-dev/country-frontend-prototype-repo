@@ -1,0 +1,75 @@
+/* Medical / Clinical DS – Variables básicas */
+:root {
+    --color-medical-primary: #1E4A73;
+    --color-medical-accent:  #3B7BA8;
+    --color-neutral-white:   #FFFFFF;
+    --color-neutral-dark:    #343A40;
+    --border-radius-curved:  24px;
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --spacing-medical: 32px;
+  }
+  
+  /* ───────── Overlay ───────── */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: rgba(52, 58, 64, 0.45);  /* dark_gray con opacidad */
+    backdrop-filter: blur(2px);                /* sutil desenfoque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* ───────── Caja modal ───────── */
+  .loading-modal {
+    background-color: var(--color-neutral-white);
+    border-radius: var(--border-radius-curved);
+    padding: var(--spacing-medical) calc(var(--spacing-medical) * 0.75);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  
+  /* ───────── Spinner circular ───────── */
+  .loading-spinner {
+    width: 64px;
+    height: 64px;
+    border: 6px solid var(--color-medical-accent);
+    border-top-color: var(--color-medical-primary);
+    border-radius: 50%;
+    animation: loading-spin 1s linear infinite;
+  }
+  
+  /* ───────── Texto ───────── */
+  .loading-text {
+    font-family: var(--font-primary);
+    font-size: 1rem;   /* typography.body */
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-medical-primary);
+  }
+  
+  /* ───────── Animación ───────── */
+  @keyframes loading-spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* ───────── Responsive ───────── */
+  @media (max-width: 480px) {
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border-width: 5px;
+    }
+    .loading-modal {
+      gap: 16px;
+      padding: 24px 20px;
+    }
+  }
+  
