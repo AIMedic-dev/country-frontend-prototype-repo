@@ -1,0 +1,35 @@
+[33m9d8e547[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #5 from AIMedic-dev/dv-35-2
+[33m7c57227[m[33m ([m[1;31morigin/dv-35-2[m[33m, [m[1;32mdv-35-2[m[33m)[m quitando proteccion a la ruta del chat
+[33m2757997[m Merge pull request #4 from AIMedic-dev/dv-35-2
+[33m75d5aef[m solucionando errores en nginx.conf
+[33m42d07ce[m Merge pull request #3 from AIMedic-dev/dv-35-2
+[33m9502278[m agregando config nginx
+[33m6f2a2ed[m Merge pull request #2 from AIMedic-dev/dv-35-2
+[33md0e8a12[m agregando url back
+[33md2c28df[m Merge pull request #1 from AIMedic-dev/dv-35-2
+[33mf057941[m solucionando errores faltantes
+[33m50f74e6[m solucionando errores loginmodal
+[33md3a006c[m corrigiendo validaciones
+[33md4c260b[m login para pacientes realizado
+[33m9f9daef[m flujo de registro actualizado
+[33m6aa1c86[m agregando login
+[33mc0bb788[m[33m ([m[1;32mdv-35[m[33m)[m estructura y logica para microfront
+[33md1c33f6[m google analitycs incorporado
+[33m4373629[m funcionó
+[33m6a2ca15[m intentando solucionar problemas de librerías
+[33m5d87d35[m prueba
+[33mbf13203[m solucionando problema de host
+[33mdad802f[m añadiendo dockerfile
+[33mdee0e0c[m implementando navbar y traida de chat
+[33m3b220f3[m actuailizando diccionario de urls
+[33meb8c014[m implementando autorización con usuario registrado
+[33ma184312[m conectando nuevo modelo
+[33m525c91e[m implementando renderizado de markdown en mensaje del bot
+[33m0bf426d[m conectando el modelo Hope
+[33m5e6974f[m actualizando tamaño de fuente en responsive
+[33m0cfe955[m solucionando problema de renderizado, servidor vs cliente con la librería de dectección de pantalla mobile
+[33mf94febd[m solucionando problemas de responsive del botón de envío
+[33m63ec626[m solucionando problemas de responsive
+[33m656c0fd[m solucionando problemas de responsive mobile y tamño de letra
+[33m109a440[m actualizando podding superior del chat
+[33mf282def[m implementando tarea de chat para country
