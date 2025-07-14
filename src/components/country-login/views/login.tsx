@@ -80,10 +80,12 @@ export default function Login({ navigate }: Props) {
             } else {
                 window.dispatchEvent(
                     new CustomEvent('login-success', {
-                        detail: { token: auth.access_token, redirectTo: '/analytics' },
+                        // detail: { token: auth.access_token, redirectTo: '/analytics' },
+                        detail: { token: auth.access_token, redirectTo: '/' },
                     }),
                 );
-                window.location.replace('/analytics');
+                // window.location.replace('/analytics');
+                window.location.replace('/');
             }
         } catch {
             setError('Correo o contraseña incorrectos');
