@@ -15,8 +15,8 @@ FROM nginx:alpine
 # Copia el build generado desde la etapa anterior
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Opcional: Configuración personalizada de Nginx
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# ✅ Copia tu configuración personalizada de NGINX
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
