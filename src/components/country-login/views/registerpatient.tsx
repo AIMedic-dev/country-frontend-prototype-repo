@@ -32,7 +32,6 @@ export default function RegisterPatient({ navigate }: Props) {
     clearErrors,
     // acceso directo al setter bajo la manga:
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setFieldError,                       // ya no lo usaremos
   } = useFormValidation();
 
   /* userName desde el JWT */
