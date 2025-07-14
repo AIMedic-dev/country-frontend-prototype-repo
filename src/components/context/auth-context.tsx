@@ -56,19 +56,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       // 2. permisos
-      const projects = decoded.projects;               // string[] | undefined
       const hasAccess =
-        !projects || projects.length === 0              // paciente (sin projects)
-          ? true
-          : projects.includes('country');               // corporativo válido
-
-      if (!hasAccess) return false;
+      Array.isArray(decoded.projects) &&
+      decoded.projects.includes('country');
 
       // 3. setear estado
       setToken(tokenValue);
       setUser(decoded);
       setIsAuthenticated(true);
-      setHasVascularAccess(projects?.includes('country') ?? true); // paciente = true
+      setHasVascularAccess(hasAccess); // paciente = true
       return true;
     } catch (err) {
       console.error('Error validando token:', err);

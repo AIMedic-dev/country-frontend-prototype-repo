@@ -19,7 +19,7 @@ export const useFormValidation = () => {
     if (password.length < 8) return 'Debe tener al menos 8 caracteres';
     if (!/(?=.*[a-z])/.test(password)) return 'Debe incluir al menos una letra minúscula';
     if (!/(?=.*[A-Z])/.test(password)) return 'Debe incluir al menos una letra mayúscula';
-    if (!/(?=.*\d)/.test(password)) return 'Debe incluir al menos un número';
+    // if (!/(?=.*\d)/.test(password)) return 'Debe incluir al menos un número';
     return null;
   }, []);
 
