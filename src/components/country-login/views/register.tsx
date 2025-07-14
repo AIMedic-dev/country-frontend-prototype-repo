@@ -4,7 +4,7 @@ import { Button } from '../components/button';
 import { sendVerificationCode } from '../services/serviceAuthCode';
 import { useFormValidation } from '../hooks/useFormValidation';
 import '../styles/login.css';
-import LoadingModal from '../components/LoadingModal';
+import LoadingModal from '../components/loadingModal';
 
 type Props = {
   navigate: (path: 'login' | 'register' | 'verify' | 'registerPatient') => void;

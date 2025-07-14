@@ -3,7 +3,7 @@ import { Input } from '../components/input';
 import CancerSelect from '../components/cancerselect';
 import { Button } from '../components/button';
 import { useFormValidation } from '../hooks/useFormValidation';
-import LoadingModal from '../components/LoadingModal';
+import LoadingModal from '../components/loadingModal';
 
 import '../styles/login.css';
 

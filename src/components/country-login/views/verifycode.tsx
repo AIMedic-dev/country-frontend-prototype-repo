@@ -5,7 +5,7 @@ import { verifyCode } from '../services/serviceAuthCode';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { registerUser } from '../services/graphql-request';
 import '../styles/login.css';
-import LoadingModal from '../components/LoadingModal';
+import LoadingModal from '../components/loadingModal';
 
 
 type Props = {

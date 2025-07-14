@@ -6,7 +6,7 @@ import { fetchPatientStatus } from '../services/patient/graphql-patient';   // c
 import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { useFormValidation } from '../hooks/useFormValidation';
-import LoadingModal from '../components/LoadingModal';
+import LoadingModal from '../components/loadingModal';
 
 import '../styles/login.css';
 import { saveTokenToCookie } from '../../../lib/cookies-managment';
