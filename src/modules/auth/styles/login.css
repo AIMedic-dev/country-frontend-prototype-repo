@@ -1,0 +1,486 @@
+/* ──────────────────────────────────────────────
+   Variables
+   ─────────────────────────────────────────── */
+:root{
+  --color-medical-primary:#0E3192;
+  --color-medical-secondary:#062045;
+  --color-medical-accent:#42A2CA;
+  --brand-blue:#7FBED8;
+  
+  --white:#FFFFFF;
+  --off-white:#F8F9FA;
+  --bg-light:#F3F7FC;
+  --dark:#343A40;
+  --muted:#6C757D;
+
+  --radius-card:20px;
+  --radius-soft:16px;
+  --font: 'Helvetica Neue LT Std', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ──────────────────────────────────────────────
+   Layout principal
+   ─────────────────────────────────────────── */
+.login-wrapper{
+  height:100vh;
+  display:flex;
+  background:var(--off-white);
+  font-family:var(--font);
+  overflow-y:auto; /* Habilita scroll horizontal */
+}
+
+/* ──────────────────────────────────────────────
+   PANEL IZQUIERDO - Imágenes
+   ─────────────────────────────────────────── */
+.left-panel{
+  flex:0 0 48%;
+  background:var(--white);
+  padding:60px 48px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:auto;
+  /* overflow-y:auto; */
+}
+
+.left-content{
+  display:flex; 
+  flex-direction:column; 
+  gap:24px;
+  width:100%;
+  max-width:490px;
+  margin:0 auto;
+}
+
+/* Tarjetas de imagen */
+.left-media{ 
+  display:flex; 
+  flex-direction:column; 
+  gap:20px;
+  width:100%;
+}
+
+.left-image-card{
+  margin:0;
+  background:var(--white);
+  border-radius:var(--radius-soft);
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  border:1px solid rgba(0,0,0,.06);
+  width:100%;
+  aspect-ratio:16/9;
+}
+
+.left-image-card img{
+  width:100%; 
+  height:100%; 
+  display:block; 
+  object-fit:cover;
+}
+
+/* ──────────────────────────────────────────────
+   PANEL DERECHO - Formulario
+   ─────────────────────────────────────────── */
+.right-panel{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:110px 32px;
+  background:var(--bg-light);
+  /* overflow-y:auto; */
+}
+
+/* Patrón de fondo diagonal */
+.right-panel::before{
+  content:''; 
+  position:absolute; 
+  inset:0;
+  background:repeating-linear-gradient(
+    135deg,
+    rgba(30,74,115,.03) 0 2px,
+    transparent 2px 12px
+  );
+  pointer-events:none;
+}
+
+/* Logos en el panel derecho */
+.brand-bar-right{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin-bottom:16px; /* Reducido para acercar al título */
+  position:relative;
+  z-index:2;
+}
+
+.brand-sep-dark{ 
+  width:1px; 
+  height:32px; 
+  background-color:rgba(0,0,0,.12);
+}
+
+.brand-logo-country{
+  height:82px; /* Más grande que antes */
+  object-fit:contain;
+}
+
+.brand-logo{
+  height:40px; /* Más pequeño que Country */
+  object-fit:contain;
+}
+
+/* Contenedor del formulario centrado */
+.right-stack{
+  position:relative; 
+  z-index:1;
+  display:flex; 
+  flex-direction:column; 
+  align-items:center;
+  justify-content:center;
+  gap:18px; /* Reducido para acercar elementos */
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  flex:1;
+  min-height: auto;
+}
+
+/* Encabezado */
+.right-hero{ 
+  text-align:center;
+  width:100%;
+}
+
+.right-hero-title{
+  margin:0;
+  font-size:2.4rem;
+  font-weight:900;
+  color:var(--color-medical-primary);
+  margin-bottom:8px;
+}
+
+.right-hero-title::after{
+  content:'';
+  display:block;
+  width:80px; 
+  height:4px;
+  margin:12px auto 0;
+  border-radius:999px;
+  background:var(--color-medical-primary);
+}
+
+.right-hero-subtitle{
+  margin-top:12px;
+  font-size:1.1rem;
+  font-weight:600;
+  color:var(--color-medical-primary);
+}
+
+/* Card de login */
+.login-form{
+  width:100%; 
+  max-width:480px;
+  padding:40px 36px;
+  background:var(--white);
+  border-radius:var(--radius-card);
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  display:flex; 
+  flex-direction:column; 
+  gap:20px;
+}
+
+.form-title{
+  font-size:1.9rem; 
+  font-weight:800;
+  color:var(--color-medical-primary);
+  margin-bottom:8px;
+}
+
+/* Checkboxes */
+.form-checks{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.checkbox{ 
+  display:flex; 
+  align-items:flex-start; 
+  gap:10px; 
+  color:var(--dark); 
+  font-size:.95rem; 
+}
+
+.checkbox input[type="checkbox"]{ 
+  margin-top:3px; 
+  accent-color:var(--color-medical-secondary); 
+}
+
+.checkbox.terms{ 
+  color:var(--muted); 
+  font-size:.88rem; 
+  line-height:1.5; 
+}
+
+.checkbox a{ 
+  color:var(--color-medical-accent); 
+  text-decoration:underline; 
+  font-weight:600; 
+}
+
+.checkbox a:hover{
+  color:var(--color-medical-primary);
+}
+
+.secure-note{ 
+  margin-top:4px; 
+  text-align:center; 
+  font-size:.85rem; 
+  color:#8a96a3; 
+}
+
+/* ──────────────────────────────────────────────
+   RESPONSIVE
+   ─────────────────────────────────────────── */
+
+/* Tablets landscape */
+@media (max-width:1200px){
+  .left-panel{
+    padding:50px 36px;
+  }
+  
+  .brand-logo-country{
+    height:66px; /* Proporcionalmente más grande */
+  }
+  
+  .brand-logo{
+    height:38px;
+  }
+}
+
+/* Tablets portrait */
+@media (max-width:900px){
+  .login-wrapper{
+    flex-direction:column;
+  }
+  
+  .left-panel, .right-panel{
+    flex:none;
+    width:100%;
+  }
+  
+  .left-panel{
+    padding:40px 24px;
+    min-height:auto;
+  }
+  
+  .right-panel{
+    padding:32px 24px 40px;
+  }
+  
+  .left-content{
+    max-width:600px;
+  }
+  
+  .left-media{
+    gap:18px;
+  }
+  
+  .brand-bar-right{
+    margin-bottom:20px; /* Ajustado para tablet */
+  }
+  
+  .brand-logo-country{
+    height:64px; /* Más grande que Aimedic */
+  }
+  
+  .brand-logo{
+    height:36px;
+  }
+  
+  .right-hero-title{
+    font-size:2rem;
+  }
+  
+  .right-hero-subtitle{
+    font-size:1.02rem;
+  }
+  
+  .login-form{
+    max-width:100%;
+    padding:36px 32px;
+  }
+}
+
+/* Móviles grandes */
+@media (max-width:600px){
+  .left-panel{
+    padding:32px 20px;
+  }
+  
+  .right-panel{
+    padding:28px 20px 36px;
+  }
+  
+  .left-media{
+    gap:16px;
+  }
+  
+  .left-image-card{
+    border-radius:14px;
+  }
+  
+  .brand-bar-right{
+    margin-bottom:18px; /* Más cerca del título */
+    gap:14px;
+  }
+  
+  .brand-logo-country{
+    height:58px; /* Más grande en móvil */
+  }
+  
+  .brand-logo{
+    height:34px;
+  }
+  
+  .brand-sep-dark{
+    height:28px;
+  }
+  
+  .right-hero-title{
+    font-size:1.8rem;
+  }
+  
+  .right-hero-title::after{
+    width:70px;
+    height:3px;
+  }
+  
+  .right-hero-subtitle{
+    font-size:.98rem;
+  }
+  
+  .login-form{
+    padding:32px 24px;
+    border-radius:18px;
+  }
+  
+  .form-title{
+    font-size:1.7rem;
+  }
+}
+
+/* Móviles medianos */
+@media (max-width:480px){
+
+  .login-wrapper{
+    height: 100%;
+     overflow-y: auto;
+  }
+
+  .left-panel{
+    padding:28px 16px;
+  }
+  
+  .right-panel{
+    padding:24px 16px 32px;
+  }
+  
+  .left-media{
+    gap:14px;
+  }
+  
+  .brand-logo-country{
+    height:54px; /* Mantiene proporción */
+  }
+  
+  .brand-logo{
+    height:32px;
+  }
+  
+  .right-hero-title{
+    font-size:1.65rem;
+  }
+  
+  .right-hero-subtitle{
+    font-size:.95rem;
+  }
+  
+  .login-form{
+    padding:28px 20px;
+    border-radius:16px;
+  }
+  
+  .form-title{
+    font-size:1.6rem;
+  }
+  
+  .checkbox{
+    font-size:.92rem;
+  }
+  
+  .checkbox.terms{
+    font-size:.86rem;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width:380px){
+  .left-panel{
+    padding:24px 14px;
+  }
+  
+  .right-panel{
+    padding:20px 14px 28px;
+  }
+  
+  .left-media{
+    gap:12px;
+  }
+  
+  .left-image-card{
+    border-radius:12px;
+  }
+  
+  .brand-bar-right{
+    gap:12px;
+    margin-bottom:16px; /* Más cerca en móvil pequeño */
+  }
+  
+  .brand-logo-country{
+    height:50px; /* Proporcionalmente más grande */
+  }
+  
+  .brand-logo{
+    height:30px;
+  }
+  
+  .brand-sep-dark{
+    height:24px;
+  }
+  
+  .right-hero-title{
+    font-size:1.5rem;
+  }
+  
+  .right-hero-title::after{
+    width:60px;
+  }
+  
+  .right-hero-subtitle{
+    font-size:.92rem;
+  }
+  
+  .login-form{
+    padding:24px 18px;
+    border-radius:14px;
+    gap:18px;
+  }
+  
+  .form-title{
+    font-size:1.5rem;
+  }
+}

@@ -1,0 +1,102 @@
+/* src/styles/fonts.css */
+
+/* ══════════════════════════════════════════════
+   HELVETICA NEUE LT STD
+   ══════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std';
+  src: url('/fonts/Helvetica_Neue/Helvetica_Neue/HelveticaNeueLTStd-Roman.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std';
+  src: url('/fonts/Helvetica_Neue/Helvetica_Neue/HelveticaNeueLTStd-Md.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std';
+  src: url('/fonts/Helvetica_Neue/Helvetica_Neue/HelveticaNeueLTStd-Blk.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ══════════════════════════════════════════════
+   GOTHAM
+   ══════════════════════════════════════════════ */
+
+/* Light (300) */
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Book/Regular (400) */
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-BookItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Medium (500) */
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Bold (700) */
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Black (900) - Opcional */
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham/Gotham-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}

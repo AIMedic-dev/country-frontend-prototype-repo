@@ -1,38 +1,21 @@
-// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import federation from '@originjs/vite-plugin-federation';
-import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    federation({
-      name: 'host-country',
-      remotes: {
-        chat_microservice: 'https://chat-artifacts-microservice-frontend.azurewebsites.net/assets/remoteEntry.js',
-        login_microfrontend: 'http://localhost:4400/remoteEntry.js',
-      },
-      shared: [
-        'react',
-        'react-dom',
-        '@apollo/client',
-        'lucide-react',
-        'graphql',
-        // 'js-cookie',
-        // 'jwt-decode',
-      ],
-    }),
-    tailwindcss(),
-  ],
-
-  server: {
-    port: 3000,
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@/shared': path.resolve(__dirname, './src/shared'),
+      '@/modules': path.resolve(__dirname, './src/modules'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      '@/styles': path.resolve(__dirname, './src/styles'),
+    },
   },
-
-  build: {
-    target: 'es2022', // 👈 Esto es clave para permitir top-level await
-
-    minify: false,
+  server: {
+    port: 5173,
+    open: true,
+    allowedHosts: true
   },
 });

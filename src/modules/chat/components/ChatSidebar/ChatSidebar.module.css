@@ -1,0 +1,386 @@
+.sidebar {
+  width: var(--ds-sidebar-width);
+  height: 100vh;
+  background-color: var(--ds-surface-alt);
+  border-right: var(--ds-border-hairline);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform var(--ds-duration-base) var(--ds-easing-standard);
+}
+
+/* ============================================
+   LOGOS EN LA PARTE SUPERIOR
+   ============================================ */
+
+.logosContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: var(--ds-spacing-6) var(--ds-spacing-4);
+  border-bottom: var(--ds-border-hairline);
+  background-color: var(--ds-surface);
+}
+
+.logoAimedic {
+  height: 18px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logoCountry {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logosDivider {
+  color: var(--ds-border);
+  font-size: 24px;
+  font-weight: 300;
+  margin: 0 4px;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ds-spacing-8);
+  border-bottom: var(--ds-border-hairline);
+}
+
+.title {
+  font-size: var(--ds-text-title-size);
+  font-weight: var(--ds-text-title-weight);
+  color: var(--ds-text-primary);
+  margin: 0;
+}
+
+/* Container para los botones del header */
+.headerButtons {
+  display: flex;
+  gap: var(--ds-spacing-2);
+}
+
+.newChatButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-full);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-icon);
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+}
+
+.newChatButton:hover {
+  background-color: var(--ds-selection);
+  color: var(--ds-primary);
+}
+
+.newChatButton:active {
+  transform: scale(var(--ds-press-scale));
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ds-spacing-4);
+}
+
+/* ============================================
+   USER INFO SECTION
+   ============================================ */
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ds-spacing-4);
+  margin: var(--ds-spacing-4) var(--ds-spacing-4) var(--ds-spacing-4) var(--ds-spacing-4);
+  background: var(--ds-blue-900);
+  border-radius: var(--ds-radius-lg, 12px);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.userDetails {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-full);
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.userRole {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* ✨ AGREGAR: Contenedor para botones de acciones */
+.userActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ✨ AGREGAR: Botón de estadísticas */
+.statsButton {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.statsButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.statsButton:active {
+  transform: translateY(0) scale(var(--ds-press-scale));
+}
+
+.logoutButton {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.logoutButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.logoutButton:active {
+  transform: translateY(0) scale(var(--ds-press-scale));
+}
+
+
+/* ============================================
+   BOTONES MOBILE
+   ============================================ */
+
+.closeButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-full);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-icon);
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+}
+
+.closeButton:hover {
+  background-color: var(--ds-selection);
+  color: var(--ds-primary);
+}
+
+.closeButton:active {
+  transform: scale(var(--ds-press-scale));
+}
+
+.overlay {
+  display: none;
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE (< 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: var(--ds-elevation-3);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: var(--ds-scrim);
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .userInfo {
+    margin: var(--ds-spacing-3) var(--ds-spacing-3) var(--ds-spacing-3) var(--ds-spacing-3);
+    padding: var(--ds-spacing-3);
+  }
+
+  .userAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .userName {
+    font-size: 0.875rem;
+  }
+
+  .userRole {
+    font-size: 0.6875rem;
+    padding: 0.0625rem 0.375rem;
+  }
+
+  .logoutButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .closeButton {
+    display: flex;
+  }
+
+  /* Ajustar tamaño de logos en mobile */
+  .logoAmedic,
+  .logoCountry {
+    height: 28px;
+  }
+
+  .logosContainer {
+    padding: var(--ds-spacing-4);
+    gap: 10px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE PEQUEÑO (< 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 85vw;
+    max-width: 320px;
+  }
+
+  /* Logos más pequeños en pantallas muy pequeñas */
+  .logoAmedic,
+  .logoCountry {
+    height: 24px;
+  }
+
+  .logosContainer {
+    padding: var(--ds-spacing-3);
+    gap: 8px;
+  }
+
+  .logosDivider {
+    font-size: 20px;
+  }
+  .userInfo {
+    margin: var(--ds-spacing-2) var(--ds-spacing-2) var(--ds-spacing-3) var(--ds-spacing-2);
+  }
+
+  .userAvatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .userName {
+    font-size: 0.8125rem;
+  }
+
+  .userRole {
+    font-size: 0.625rem;
+  }
+
+  .logoutButton {
+    width: 30px;
+    height: 30px;
+  }
+
+  .logoutButton svg {
+    width: 16px;
+    height: 16px;
+  }
+}

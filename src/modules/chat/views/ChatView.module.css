@@ -1,0 +1,11 @@
+.chatView {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+
+/* ============================================
+   RESPONSIVE - MOBILE (< 768px)
+   ============================================ */

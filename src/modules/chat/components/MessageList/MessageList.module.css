@@ -1,0 +1,845 @@
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  padding: var(--ds-spacing-4) var(--ds-spacing-6);
+}
+
+/* Contenedor centrado de mensajes */
+.messagesContainer {
+  width: 100%;
+  max-width: 768px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.loadingContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-spacing-4);
+}
+
+.loadingText {
+  font-size: var(--ds-text-body-size);
+  color: var(--ds-text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   STREAMING (RESPUESTA EN TIEMPO REAL)
+   ============================================ */
+
+/* Contenedor del streaming */
+.streamingContainer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: slideInFromLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Avatar de la IA */
+.aiAvatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #125894;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 
+    0 2px 8px rgba(18, 88, 148, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aiAvatar:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 
+    0 4px 12px rgba(18, 88, 148, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Contenido del streaming */
+.streamingContent {
+  flex: 1;
+  min-height: 24px;
+  display: flex;
+  align-items: flex-start; /* Cambiar a flex-start para alinear arriba */
+  gap: 4px;
+  padding: 4px 0;
+}
+
+/* ============================================
+   ESTILOS MARKDOWN PARA STREAMING
+   ============================================ */
+
+.streamingContent .markdown {
+  color: var(--ds-text-primary, #1f2937);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  word-wrap: break-word;
+  width: 100%;
+  display: inline; /* Importante para que el cursor quede en línea */
+}
+
+/* Cursor dentro del markdown */
+.streamingContent .markdown .cursor {
+  display: inline;
+  margin-left: 2px;
+  color: #125894;
+  animation: blink 1s step-end infinite;
+  font-weight: 600;
+}
+
+/* Párrafos inline para streaming */
+.streamingContent .markdown p {
+  display: inline;
+  margin: 0;
+}
+
+.streamingContent .markdown p:not(:last-child) {
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Headers */
+.streamingContent .markdown h1,
+.streamingContent .markdown h2,
+.streamingContent .markdown h3,
+.streamingContent .markdown h4 {
+  display: block;
+  margin: 16px 0 12px 0;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.streamingContent .markdown h1 { font-size: 1.5em; }
+.streamingContent .markdown h2 { font-size: 1.3em; }
+.streamingContent .markdown h3 { font-size: 1.15em; }
+.streamingContent .markdown h4 { font-size: 1em; }
+
+/* Listas */
+.streamingContent .markdown ul,
+.streamingContent .markdown ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.streamingContent .markdown li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+/* Énfasis */
+.streamingContent .markdown strong {
+  font-weight: 600;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.streamingContent .markdown em {
+  font-style: italic;
+}
+
+/* Links */
+.streamingContent .markdown a {
+  color: #125894;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.streamingContent .markdown a:hover {
+  opacity: 0.8;
+}
+
+/* Código inline */
+.streamingContent .markdown code {
+  background: var(--ds-elevated, #f3f4f6);
+  color: #125894;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Bloques de código */
+.streamingContent .markdown pre {
+  background: var(--ds-elevated, #f3f4f6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.streamingContent .markdown pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* Citas */
+.streamingContent .markdown blockquote {
+  border-left: 3px solid #125894;
+  padding-left: 16px;
+  margin: 12px 0;
+  color: var(--ds-text-secondary, #6b7280);
+  font-style: italic;
+}
+
+/* ============================================
+   DOTS DE "PENSANDO..."
+   ============================================ */
+
+.thinkingDots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.thinkingDots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #125894;
+  animation: bounce 1.4s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.thinkingDots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.thinkingDots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+
+.messageList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messageList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messageList::-webkit-scrollbar-thumb {
+  background: var(--ds-border);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.messageList::-webkit-scrollbar-thumb:hover {
+  background: var(--ds-text-tertiary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .messagesContainer {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .messageList {
+    padding: var(--ds-spacing-3) var(--ds-spacing-4);
+  }
+
+  .messagesContainer {
+    max-width: 100%;
+    gap: 24px;
+  }
+
+  .streamingContainer {
+    gap: 10px;
+  }
+
+  .aiAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .streamingContent .markdown {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Ajustes markdown mobile */
+  .streamingContent .markdown h1 { font-size: 1.4em; }
+  .streamingContent .markdown h2 { font-size: 1.25em; }
+  .streamingContent .markdown h3 { font-size: 1.1em; }
+  
+  .streamingContent .markdown ul,
+  .streamingContent .markdown ol {
+    padding-left: 20px;
+  }
+
+  .streamingContent .markdown pre {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageList {
+    padding: var(--ds-spacing-2) var(--ds-spacing-3);
+  }
+
+  .messagesContainer {
+    gap: 20px;
+  }
+
+  .streamingContainer {
+    gap: 8px;
+  }
+
+  .aiAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .streamingContent .markdown {
+    font-size: 14px;
+  }
+
+  .streamingContent .markdown h1 { font-size: 1.3em; }
+  .streamingContent .markdown h2 { font-size: 1.2em; }
+  .streamingContent .markdown h3 { font-size: 1.05em; }
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .aiAvatar {
+    background: #125894;
+    box-shadow: 
+      0 2px 8px rgba(18, 88, 148, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .aiAvatar:hover {
+    box-shadow: 
+      0 4px 12px rgba(18, 88, 148, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .streamingContent .markdown {
+    color: var(--ds-text-primary, #e5e7eb);
+  }
+
+  .streamingContent .markdown h1,
+  .streamingContent .markdown h2,
+  .streamingContent .markdown h3,
+  .streamingContent .markdown h4 {
+    color: var(--ds-text-primary, #f3f4f6);
+  }
+
+  .streamingContent .markdown code {
+    background: rgba(255, 255, 255, 0.1);
+    color: #3b94d9;
+  }
+
+  .streamingContent .markdown pre {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .streamingContent .markdown blockquote {
+    border-left-color: #3b94d9;
+    color: var(--ds-text-secondary, #9ca3af);
+  }
+
+  .streamingContent .markdown a {
+    color: #3b94d9;
+  }
+
+  .cursor {
+    color: #3b94d9;
+  }
+
+  .thinkingDots span {
+    background-color: #3b94d9;
+  }
+}/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  padding: var(--ds-spacing-4) var(--ds-spacing-6);
+}
+
+/* Contenedor centrado de mensajes */
+.messagesContainer {
+  width: 100%;
+  max-width: 768px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.loadingContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-spacing-4);
+}
+
+.loadingText {
+  font-size: var(--ds-text-body-size);
+  color: var(--ds-text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   STREAMING (RESPUESTA EN TIEMPO REAL)
+   ============================================ */
+
+/* Contenedor del streaming */
+.streamingContainer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: slideInFromLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Avatar de la IA */
+.aiAvatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #125894;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 
+    0 2px 8px rgba(18, 88, 148, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aiAvatar:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 
+    0 4px 12px rgba(18, 88, 148, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Contenido del streaming */
+.streamingContent {
+  flex: 1;
+  min-height: 24px;
+  display: flex;
+  align-items: flex-start; /* Cambiar a flex-start para alinear arriba */
+  gap: 4px;
+  padding: 4px 0;
+}
+
+/* ============================================
+   ESTILOS MARKDOWN PARA STREAMING
+   ============================================ */
+
+.streamingContent .markdown {
+  color: var(--ds-text-primary, #1f2937);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  word-wrap: break-word;
+  width: 100%;
+  display: inline; /* Importante para que el cursor quede en línea */
+}
+
+/* Cursor dentro del markdown */
+.streamingContent .markdown .cursor {
+  display: inline;
+  margin-left: 2px;
+  color: #125894;
+  animation: blink 1s step-end infinite;
+  font-weight: 600;
+}
+
+/* Párrafos inline para streaming */
+.streamingContent .markdown p {
+  display: inline;
+  margin: 0;
+}
+
+.streamingContent .markdown p:not(:last-child) {
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Headers */
+.streamingContent .markdown h1,
+.streamingContent .markdown h2,
+.streamingContent .markdown h3,
+.streamingContent .markdown h4 {
+  display: block;
+  margin: 16px 0 12px 0;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.streamingContent .markdown h1 { font-size: 1.5em; }
+.streamingContent .markdown h2 { font-size: 1.3em; }
+.streamingContent .markdown h3 { font-size: 1.15em; }
+.streamingContent .markdown h4 { font-size: 1em; }
+
+/* Listas */
+.streamingContent .markdown ul,
+.streamingContent .markdown ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.streamingContent .markdown li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+/* Énfasis */
+.streamingContent .markdown strong {
+  font-weight: 600;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.streamingContent .markdown em {
+  font-style: italic;
+}
+
+/* Links */
+.streamingContent .markdown a {
+  color: #125894;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.streamingContent .markdown a:hover {
+  opacity: 0.8;
+}
+
+/* Código inline */
+.streamingContent .markdown code {
+  background: var(--ds-elevated, #f3f4f6);
+  color: #125894;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Bloques de código */
+.streamingContent .markdown pre {
+  background: var(--ds-elevated, #f3f4f6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.streamingContent .markdown pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* Citas */
+.streamingContent .markdown blockquote {
+  border-left: 3px solid #125894;
+  padding-left: 16px;
+  margin: 12px 0;
+  color: var(--ds-text-secondary, #6b7280);
+  font-style: italic;
+}
+
+/* ============================================
+   DOTS DE "PENSANDO..."
+   ============================================ */
+
+.thinkingDots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.thinkingDots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #125894;
+  animation: bounce 1.4s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.thinkingDots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.thinkingDots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+
+.messageList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messageList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messageList::-webkit-scrollbar-thumb {
+  background: var(--ds-border);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.messageList::-webkit-scrollbar-thumb:hover {
+  background: var(--ds-text-tertiary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .messagesContainer {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .messageList {
+    padding: var(--ds-spacing-3) var(--ds-spacing-4);
+  }
+
+  .messagesContainer {
+    max-width: 100%;
+    gap: 24px;
+  }
+
+  .streamingContainer {
+    gap: 10px;
+  }
+
+  .aiAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .streamingContent .markdown {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Ajustes markdown mobile */
+  .streamingContent .markdown h1 { font-size: 1.4em; }
+  .streamingContent .markdown h2 { font-size: 1.25em; }
+  .streamingContent .markdown h3 { font-size: 1.1em; }
+  
+  .streamingContent .markdown ul,
+  .streamingContent .markdown ol {
+    padding-left: 20px;
+  }
+
+  .streamingContent .markdown pre {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageList {
+    padding: var(--ds-spacing-2) var(--ds-spacing-3);
+  }
+
+  .messagesContainer {
+    gap: 20px;
+  }
+
+  .streamingContainer {
+    gap: 8px;
+  }
+
+  .aiAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .streamingContent .markdown {
+    font-size: 14px;
+  }
+
+  .streamingContent .markdown h1 { font-size: 1.3em; }
+  .streamingContent .markdown h2 { font-size: 1.2em; }
+  .streamingContent .markdown h3 { font-size: 1.05em; }
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .aiAvatar {
+    background: #125894;
+    box-shadow: 
+      0 2px 8px rgba(18, 88, 148, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .aiAvatar:hover {
+    box-shadow: 
+      0 4px 12px rgba(18, 88, 148, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .streamingContent .markdown {
+    color: var(--ds-text-primary, #e5e7eb);
+  }
+
+  .streamingContent .markdown h1,
+  .streamingContent .markdown h2,
+  .streamingContent .markdown h3,
+  .streamingContent .markdown h4 {
+    color: var(--ds-text-primary, #f3f4f6);
+  }
+
+  .streamingContent .markdown code {
+    background: rgba(255, 255, 255, 0.1);
+    color: #3b94d9;
+  }
+
+  .streamingContent .markdown pre {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .streamingContent .markdown blockquote {
+    border-left-color: #3b94d9;
+    color: var(--ds-text-secondary, #9ca3af);
+  }
+
+  .streamingContent .markdown a {
+    color: #3b94d9;
+  }
+
+  .cursor {
+    color: #3b94d9;
+  }
+
+  .thinkingDots span {
+    background-color: #3b94d9;
+  }
+}
