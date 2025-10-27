@@ -4,7 +4,7 @@ import type { Message } from '@/shared/types/common.types';
 import type { SendMessageRequest } from '../types/chat.types';
 
 interface UseSendMessageReturn {
-  sendMessage: (content: string) => Promise<void>; // ❌ Eliminar n
+  sendMessage: (content: string) => Promise<void>;
   isSending: boolean;
   error: string | null;
 }
@@ -19,7 +19,7 @@ export const useSendMessage = (
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = async (content: string, n: number = 5): Promise<void> => {
+  const sendMessage = async (content: string): Promise<void> => {
     if (!content.trim()) {
       setError('El mensaje no puede estar vacío');
       return;

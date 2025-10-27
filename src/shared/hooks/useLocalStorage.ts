@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 /**
  * Hook para manejar localStorage de forma reactiva
  */
-export const useLocalStorage = <T,>(
+export const useLocalStorage = <T>(
   key: string,
   initialValue: T
 ): [T, (value: T) => void, () => void] => {

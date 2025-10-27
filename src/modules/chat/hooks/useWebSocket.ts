@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 interface StreamingMessage {
@@ -18,7 +18,7 @@ interface UseWebSocketReturn {
  * @param serverUrl - URL del servidor WebSocket (default: http://localhost:3000)
  */
 export const useWebSocket = (
-  serverUrl = process.env.BACK_WS_URL
+  serverUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3000'
 ): UseWebSocketReturn => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [streamingResponse, setStreamingResponse] = useState('');
@@ -57,18 +57,21 @@ export const useWebSocket = (
     });
 
     // Evento: Chunk de respuesta en tiempo real
-    newSocket.on('ai-response-chunk', (data: { chatId: string; chunk: string }) => {
-      console.log('📝 Chunk recibido:', data.chunk);
-      setStreamingResponse((prev) => prev + data.chunk);
-    });
+    newSocket.on(
+      'ai-response-chunk',
+      (data: { chatId: string; chunk: string }) => {
+        console.log('📝 Chunk recibido:', data.chunk);
+        setStreamingResponse(prev => prev + data.chunk);
+      }
+    );
 
     // Evento: Fin del streaming
     newSocket.on('ai-response-end', (data: StreamingMessage) => {
       console.log('✅ Streaming finalizado para chat:', data.chatId);
-      
+
       // Limpiar inmediatamente para respuestas largas
       setIsStreaming(false);
-      
+
       // Limpiar el texto después de un momento
       setTimeout(() => {
         setStreamingResponse('');
@@ -90,12 +93,6 @@ export const useWebSocket = (
       newSocket.close();
     };
   }, [serverUrl]);
-
-  // Método para limpiar el streaming manualmente
-  const clearStreaming = useCallback(() => {
-    setStreamingResponse('');
-    setIsStreaming(false);
-  }, []);
 
   return {
     socket,

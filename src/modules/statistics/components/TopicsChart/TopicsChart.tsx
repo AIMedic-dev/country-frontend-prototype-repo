@@ -67,8 +67,11 @@ export const TopicsChart: React.FC<TopicsChartProps> = ({ data }) => {
             formatter={(value: number) => [`${value}%`, 'Frecuencia']}
           />
           <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {data.map((_, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
             ))}
           </Bar>
         </BarChart>
