@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { ENV } from '@/shared/config/env';
 
 interface StreamingMessage {
   chatId: string;
@@ -18,7 +19,7 @@ interface UseWebSocketReturn {
  * @param serverUrl - URL del servidor WebSocket (default: http://localhost:3000)
  */
 export const useWebSocket = (
-  serverUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3000'
+  serverUrl = ENV.WEBSOCKET_URL
 ): UseWebSocketReturn => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [streamingResponse, setStreamingResponse] = useState('');
