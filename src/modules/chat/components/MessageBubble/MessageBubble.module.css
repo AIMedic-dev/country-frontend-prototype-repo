@@ -1,0 +1,506 @@
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+
+.messageGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 8px 0;
+}
+
+/* ============================================
+   MENSAJE DEL USUARIO
+   ============================================ */
+
+.userMessageContainer {
+  display: flex;
+  justify-content: flex-end;
+  animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.userBubble {
+  max-width: 75%;
+  padding: 14px 20px;
+  background: #062045;
+  border-radius: 20px;
+  border-bottom-right-radius: 6px;
+  box-shadow:
+    0 1px 2px rgba(6, 32, 69, 0.1),
+    0 4px 12px rgba(6, 32, 69, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.userBubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.userBubble:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgba(18, 88, 148, 0.15),
+    0 8px 24px rgba(18, 88, 148, 0.2);
+}
+
+.userText {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* ============================================
+   RESPUESTA DE LA IA
+   ============================================ */
+
+.aiMessageContainer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: slideInFromLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Avatar moderno */
+.aiAvatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #125894;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow:
+    0 2px 8px rgba(18, 88, 148, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 36px;
+  min-height: 36px;
+  overflow: hidden;
+}
+
+.aiAvatar:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow:
+    0 4px 12px rgba(18, 88, 148, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.avatarImage {
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+/* Contenido de la IA */
+.aiContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.aiBubble {
+  padding: 4px 0;
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   ESTILOS MARKDOWN
+   ============================================ */
+
+.markdown {
+  color: var(--ds-text-primary, #1f2937);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  word-wrap: break-word;
+}
+
+/* Párrafos */
+.markdown p {
+  margin: 0 0 12px 0;
+}
+
+.markdown p:last-child {
+  margin-bottom: 0;
+}
+
+/* Headers */
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  margin: 16px 0 12px 0;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.markdown h1 {
+  font-size: 1.5em;
+}
+
+.markdown h2 {
+  font-size: 1.3em;
+}
+
+.markdown h3 {
+  font-size: 1.15em;
+}
+
+.markdown h4 {
+  font-size: 1em;
+}
+
+/* Listas */
+.markdown ul,
+.markdown ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.markdown li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+.markdown li>p {
+  margin: 4px 0;
+}
+
+/* Lista dentro de lista */
+.markdown ul ul,
+.markdown ol ol,
+.markdown ul ol,
+.markdown ol ul {
+  margin: 4px 0;
+}
+
+/* Énfasis */
+.markdown strong {
+  font-weight: 600;
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.markdown em {
+  font-style: italic;
+}
+
+/* Links */
+.markdown a {
+  color: #125894;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.markdown a:hover {
+  opacity: 0.8;
+}
+
+/* Código inline */
+.markdown code {
+  background: var(--ds-elevated, #f3f4f6);
+  color: #125894;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Bloques de código */
+.markdown pre {
+  background: var(--ds-elevated, #f3f4f6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* Citas */
+.markdown blockquote {
+  border-left: 3px solid #125894;
+  padding-left: 16px;
+  margin: 12px 0;
+  color: var(--ds-text-secondary, #6b7280);
+  font-style: italic;
+}
+
+/* Línea horizontal */
+.markdown hr {
+  border: none;
+  border-top: 1px solid var(--ds-border, #e5e7eb);
+  margin: 20px 0;
+}
+
+/* Tablas */
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+.markdown th,
+.markdown td {
+  padding: 8px 12px;
+  border: 1px solid var(--ds-border, #e5e7eb);
+  text-align: left;
+}
+
+.markdown th {
+  background: var(--ds-elevated, #f3f4f6);
+  font-weight: 600;
+}
+
+/* Timestamp discreto */
+.aiTimestamp {
+  font-size: 12px;
+  color: var(--ds-text-tertiary, #9ca3af);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  margin-top: 2px;
+}
+
+.aiMessageContainer:hover .aiTimestamp {
+  opacity: 1;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .messageGroup {
+    gap: 24px;
+    padding: 4px 0;
+  }
+
+  .userBubble {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .userText,
+  .markdown {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .aiAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .avatarImage {
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+  }
+
+  .aiMessageContainer {
+    gap: 10px;
+  }
+
+  .aiTimestamp {
+    font-size: 11px;
+  }
+
+  /* Ajustes markdown mobile */
+  .markdown h1 {
+    font-size: 1.4em;
+  }
+
+  .markdown h2 {
+    font-size: 1.25em;
+  }
+
+  .markdown h3 {
+    font-size: 1.1em;
+  }
+
+  .markdown ul,
+  .markdown ol {
+    padding-left: 20px;
+  }
+
+  .markdown pre {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageGroup {
+    gap: 20px;
+  }
+
+  .userBubble {
+    max-width: 90%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .userText,
+  .markdown {
+    font-size: 14px;
+  }
+
+  .aiAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .avatarImage {
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+  }
+
+  .aiMessageContainer {
+    gap: 8px;
+  }
+
+  .markdown h1 {
+    font-size: 1.3em;
+  }
+
+  .markdown h2 {
+    font-size: 1.2em;
+  }
+
+  .markdown h3 {
+    font-size: 1.05em;
+  }
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .userBubble {
+    background: #125894;
+    box-shadow:
+      0 1px 2px rgba(18, 88, 148, 0.2),
+      0 4px 12px rgba(18, 88, 148, 0.25);
+  }
+
+  .userBubble:hover {
+    box-shadow:
+      0 2px 4px rgba(18, 88, 148, 0.25),
+      0 8px 24px rgba(18, 88, 148, 0.3);
+  }
+
+  .aiAvatar {
+    background: #125894;
+    box-shadow:
+      0 2px 8px rgba(18, 88, 148, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .aiAvatar:hover {
+    box-shadow:
+      0 4px 12px rgba(18, 88, 148, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .markdown {
+    color: var(--ds-text-primary, #e5e7eb);
+  }
+
+  .markdown h1,
+  .markdown h2,
+  .markdown h3,
+  .markdown h4 {
+    color: var(--ds-text-primary, #f3f4f6);
+  }
+
+  .markdown code {
+    background: rgba(255, 255, 255, 0.1);
+    color: #3b94d9;
+  }
+
+  .markdown pre {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .markdown blockquote {
+    border-left-color: #3b94d9;
+    color: var(--ds-text-secondary, #9ca3af);
+  }
+
+  .markdown a {
+    color: #3b94d9;
+  }
+
+  .aiTimestamp {
+    color: var(--ds-text-tertiary, #6b7280);
+  }
+}

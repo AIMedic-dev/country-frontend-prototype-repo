@@ -1,0 +1,197 @@
+
+.chatInput {
+  padding: var(--ds-spacing-6) var(--ds-spacing-8);
+  background-color: var(--ds-surface);
+  display: flex;
+  justify-content: center;
+}
+
+/* Variante centrada para EmptyChat */
+.chatInput.centered {
+  padding: 0;
+  background-color: transparent;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-3);
+  width: 100%;
+  max-width: 720px;
+  background-color: var(--ds-elevated);
+  border: var(--ds-border-hairline);
+  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-spacing-3) var(--ds-spacing-5);
+  box-shadow: var(--ds-elevation-1);
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+  min-height: 48px;
+}
+
+/* Input más alto para variante centrada */
+.centered .inputContainer {
+  min-height: 64px; /* Más alto */
+  padding: var(--ds-spacing-5) var(--ds-spacing-6);
+  box-shadow: var(--ds-elevation-2);
+  border-width: 1.5px;
+}
+
+.inputContainer:hover {
+  box-shadow: var(--ds-elevation-2);
+}
+
+.inputContainer:focus-within {
+  border-color: var(--ds-primary);
+  box-shadow: var(--ds-elevation-2);
+  background-color: var(--ds-surface);
+}
+
+.centered .inputContainer:focus-within {
+  box-shadow: var(--ds-elevation-3);
+  transform: translateY(-1px);
+}
+
+/* Botones de herramientas */
+.toolsButton {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-icon);
+  transition: all var(--ds-duration-fast) var(--ds-easing-standard);
+  flex-shrink: 0;
+}
+
+.centered .toolsButton {
+  width: 40px;
+  height: 40px;
+}
+
+.toolsButton:hover {
+  background-color: var(--ds-selection);
+  color: var(--ds-primary);
+}
+
+.toolsButton:active {
+  transform: scale(0.95);
+}
+
+/* Textarea */
+.textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-text-body-size);
+  line-height: var(--ds-text-body-line);
+  color: var(--ds-text-primary);
+  resize: none;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--ds-spacing-2) 0;
+  min-height: 24px;
+}
+
+/* Textarea más grande para variante centrada */
+.centered .textarea {
+  font-size: 16px;
+  line-height: 1.5;
+  padding: var(--ds-spacing-3) 0;
+  min-height: 32px;
+}
+
+.textarea::placeholder {
+  color: var(--ds-text-secondary);
+}
+
+.textarea:disabled {
+  opacity: var(--ds-opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Scrollbar del textarea */
+.textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.textarea::-webkit-scrollbar-thumb {
+  background: var(--ds-gray-400);
+  border-radius: var(--ds-radius-full);
+}
+
+/* Botón de enviar */
+.sendButton {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md);
+  background-color: transparent;
+  color: var(--ds-icon);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--ds-duration-fast) var(--ds-easing-standard);
+}
+
+/* Botón más grande para variante centrada */
+.centered .sendButton {
+  width: 40px;
+  height: 40px;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: var(--ds-selection);
+}
+
+.sendButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Botón activo cuando hay texto */
+.sendButton.active {
+  background-color: var(--ds-primary);
+  color: white;
+}
+
+.sendButton.active:hover:not(:disabled) {
+  background-color: var(--ds-primary-hover);
+}
+
+.sendButton.active:active:not(:disabled) {
+  background-color: var(--ds-primary-active);
+}
+
+.sendButton:disabled {
+  opacity: var(--ds-opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inputContainer {
+    max-width: 100%;
+    margin: 0 var(--ds-spacing-4);
+  }
+
+  .centered .inputContainer {
+    min-height: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .centered .inputContainer {
+    min-height: 52px;
+    padding: var(--ds-spacing-4) var(--ds-spacing-5);
+  }
+}

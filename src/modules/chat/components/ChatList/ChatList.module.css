@@ -1,0 +1,106 @@
+.chatList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-2);
+}
+
+.loadingContainer,
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-spacing-12);
+  text-align: center;
+}
+
+.emptyText {
+  font-size: var(--ds-text-subtitle-size);
+  font-weight: var(--ds-text-subtitle-weight);
+  color: var(--ds-text-primary);
+  margin: 0 0 var(--ds-spacing-2) 0;
+}
+
+.emptySubtext {
+  font-size: var(--ds-text-body-size);
+  color: var(--ds-text-secondary);
+  margin: 0;
+}
+
+/* Chat Item */
+.chatItem {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-3);
+  padding: var(--ds-spacing-5);
+  border-radius: var(--ds-radius-sm);
+  cursor: pointer;
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+  position: relative;
+  background-color: transparent;
+}
+
+.chatItem:hover {
+  background-color: var(--ds-blue-600);
+}
+
+.chatItem.active {
+  background-color: var(--ds-blue-600);
+}
+
+.chatContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatPreview {
+  font-size: var(--ds-text-body-size);
+  color: var(--ds-text-primary); /* 🎨 COLOR DEL TEXTO DEL PREVIEW (estado normal) */
+  margin: 0 0 var(--ds-spacing-1) 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatTime {
+  font-size: var(--ds-text-caption-size);
+  color: var(--ds-text-secondary); /* 🎨 COLOR DEL TIEMPO (estado normal) */
+}
+
+/* Colores cuando está en hover */
+.chatItem:hover .chatPreview {
+  color: white; /* 🎨 COLOR DEL TEXTO DEL PREVIEW en hover */
+}
+
+.chatItem:hover .chatTime {
+  color: rgba(255, 255, 255, 0.8); /* 🎨 COLOR DEL TIEMPO en hover */
+}
+
+/* Colores cuando está activo */
+.chatItem.active .chatPreview {
+  color: white; /* 🎨 COLOR DEL TEXTO DEL PREVIEW cuando está activo */
+}
+
+.chatItem.active .chatTime {
+  color: rgba(255, 255, 255, 0.8); /* 🎨 COLOR DEL TIEMPO cuando está activo */
+}
+
+.deleteButton {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ds-radius-full);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-gray-600);
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+  flex-shrink: 0;
+}
+
+.deleteButton:hover {
+  background-color: var(--ds-red-500);
+  color: white;
+}

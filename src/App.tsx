@@ -1,12 +1,10 @@
-import ChatContainer from './components/chat/chat-container';
-import { AuthProvider } from './components/context/auth-context';
+import { AppRouter } from './router/AppRouter';
+import './styles/fonts.css';
+import './styles/variables.css';
+import './styles/globals.css';
 
 function App() {
-  return (
-    <AuthProvider>
-      <ChatContainer />
-    </AuthProvider>
-  );
+  return <AppRouter />;
 }
 
 export default App;

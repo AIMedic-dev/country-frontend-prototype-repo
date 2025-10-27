@@ -22,6 +22,14 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/modules/*": ["./src/modules/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/styles/*": ["./src/styles/*"]
+    },
+
     /* Type Declarations */
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },

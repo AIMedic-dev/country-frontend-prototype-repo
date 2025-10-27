@@ -1,0 +1,105 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ds-spacing-6) var(--ds-spacing-8);
+  border-bottom: var(--ds-border-hairline);
+  background-color: var(--ds-surface);
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-1);
+}
+
+.title {
+  font-size: var(--ds-text-title-size);
+  font-weight: var(--ds-text-title-weight);
+  color: var(--ds-text-primary);
+  margin: 0;
+}
+
+.count {
+  font-size: var(--ds-text-caption-size);
+  color: var(--ds-text-secondary);
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-2);
+  padding: var(--ds-spacing-3) var(--ds-spacing-5);
+  border-radius: var(--ds-radius-full);
+  background-color: transparent;
+  border: var(--ds-border-hairline);
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-text-body-size);
+  cursor: pointer;
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+}
+
+.clearButton:hover {
+  background-color: var(--ds-selection);
+  color: var(--ds-danger);
+  border-color: var(--ds-danger);
+}
+
+/* ============================================
+   BOTÓN HAMBURGUESA - MOBILE
+   ============================================ */
+
+/* Oculto por defecto en desktop */
+.menuButton {
+  display: none;
+}
+
+/* Visible solo en mobile */
+@media (max-width: 768px) {
+  .menuButton {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--ds-radius-full);
+    background-color: var(--ds-elevated);
+    border: var(--ds-border-hairline);
+    box-shadow: var(--ds-elevation-1);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--ds-icon);
+    transition: all var(--ds-duration-base) var(--ds-easing-standard);
+    flex-shrink: 0;
+  }
+
+  .menuButton:hover {
+    background-color: var(--ds-primary);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .menuButton:active {
+    transform: scale(0.95);
+  }
+
+  /* Ajustar el header para incluir el botón */
+  .header {
+    gap: var(--ds-spacing-4);
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  @media (max-width: 768px) {
+    .menuButton {
+      background-color: var(--ds-elevated);
+      color: var(--ds-icon);
+    }
+
+    .menuButton:hover {
+      background-color: var(--ds-primary);
+      color: white;
+    }
+  }
+}
