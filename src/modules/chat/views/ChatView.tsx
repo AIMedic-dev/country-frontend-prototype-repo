@@ -49,7 +49,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     streamingResponse, 
     isStreaming, 
     isConnected 
-  } = useWebSocket(import.meta.env.VITE_WS_URL || 'http://localhost:3000');
+  } = useWebSocket();
 
   // Combinar mensajes reales con mensaje pendiente
   const displayMessages: Message[] = React.useMemo(() => {

@@ -1,7 +1,10 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosError } from 'axios';
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosError,
+} from 'axios';
 import { ENV } from '../config/env';
 import { type ApiError } from '../types/api.types';
-
 
 class ApiService {
   private axiosInstance: AxiosInstance;
@@ -22,7 +25,7 @@ class ApiService {
   private setupInterceptors(): void {
     // Request interceptor
     this.axiosInstance.interceptors.request.use(
-      (config) => {
+      (config: any) => {
         // ✨ MODIFICAR: Agregar token JWT automáticamente
         const token = localStorage.getItem('auth_token');
         if (token) {
@@ -30,14 +33,14 @@ class ApiService {
         }
         return config;
       },
-      (error) => {
+      (error: any) => {
         return Promise.reject(error);
       }
     );
 
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
+      (response: any) => response,
       (error: AxiosError<ApiError>) => {
         // ✨ AGREGAR: Manejar error 401 (no autorizado)
         if (error.response?.status === 401) {
@@ -63,17 +66,29 @@ class ApiService {
     return response.data;
   }
 
-  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.post<T>(url, data, config);
     return response.data;
   }
 
-  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.patch<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.axiosInstance.put<T>(url, data, config);
     return response.data;
   }

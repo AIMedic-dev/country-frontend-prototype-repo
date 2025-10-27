@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/CreateAuthCode.css';
 // import { sendVerificationCode } from '../services/serviceAuthCode'; // ajusta la ruta real
-import LoadingModal from '../loadingModal/loadingModal';
+import LoadingModal from '../loadingModal/LoadingModal';
 
 export default function CreateAuthCode() {
   const [email, setEmail] = useState('');
@@ -36,7 +36,8 @@ export default function CreateAuthCode() {
     <div className="authcode-wrapper">
       <h1 className="authcode-title">Generar Código</h1>
       <p className="authcode-subtitle">
-        Ingresa el correo electrónico del paciente para generar y enviar un código de autenticación.
+        Ingresa el correo electrónico del paciente para generar y enviar un
+        código de autenticación.
       </p>
 
       <form onSubmit={handleGenerateCode} className="authcode-form">
@@ -46,7 +47,7 @@ export default function CreateAuthCode() {
           className="authcode-input"
           placeholder="paciente@gmail.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
         />
 
         {errorMessage && <p className="authcode-error">{errorMessage}</p>}
