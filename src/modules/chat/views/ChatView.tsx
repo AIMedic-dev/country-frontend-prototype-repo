@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatSidebar } from '../components/ChatSidebar/ChatSidebar';
 import { ChatWindow } from '../components/ChatWindow/ChatWindow';
@@ -18,46 +18,68 @@ interface ChatViewProps {
 export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  // Estado temporal para mostrar el mensaje del usuario inmediatamente
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
 
-  // Hooks existentes
-  const { 
-    chats, 
-    isLoading: isLoadingList, 
-    createNewChat, 
-    deleteChat 
+  // ✅ 1. PRIMERO: Declarar todos los hooks
+  const {
+    chats,
+    isLoading: isLoadingList,
+    createNewChat,
+    deleteChat
   } = useChatList(userId);
-  
-  const { 
-    messages, 
-    isLoading: isLoadingChat, 
-    refetch 
+
+  const {
+    messages,
+    isLoading: isLoadingChat,
+    refetch
   } = useChat(chatId);
 
   const { sendMessage, isSending } = useSendMessage(chatId, async () => {
-    // 1. PRIMERO hacer refetch y esperar que termine
     await refetch();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // 2. DESPUÉS limpiar el mensaje pendiente
-    setPendingUserMessage(null);
   });
 
   // WebSocket para streaming
-  const { 
-    streamingResponse, 
-    isStreaming, 
-    isConnected 
+  const {
+    streamingResponse,
+    isStreaming,
+    isConnected
   } = useWebSocket();
 
-  // Combinar mensajes reales con mensaje pendiente
+  // ✅ 2. DESPUÉS: useEffect (UN SOLO useEffect, no duplicado)
+  useEffect(() => {
+    // Cuando el streaming termina y hay un mensaje pendiente
+    if (!isStreaming && pendingUserMessage && messages.length > 0) {
+      // Verificar si el último mensaje ya tiene la pregunta
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.content === pendingUserMessage) {
+        // Limpiar después de un pequeño delay para transición suave
+        const timer = setTimeout(() => {
+          setPendingUserMessage(null);
+        }, 100);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isStreaming, pendingUserMessage, messages]);
+
+  // ✅ 3. DESPUÉS: useMemo para displayMessages
   const displayMessages: Message[] = React.useMemo(() => {
     if (pendingUserMessage) {
-      // Crear mensaje temporal
+      // Verificar si el último mensaje ya es este
+      const lastMessage = messages[messages.length - 1];
+      const isDuplicate =
+        lastMessage &&
+        lastMessage.content.trim() === pendingUserMessage.trim();
+
+      // Si ya existe en la DB, no mostrar el temporal
+      if (isDuplicate) {
+        return messages;
+      }
+
+      // Crear mensaje temporal solo si no está duplicado
       const tempMessage: Message = {
         content: pendingUserMessage,
-        answer: '', // Vacío porque aún no hay respuesta
+        answer: '',
         timestamp: new Date().toISOString(),
       };
       return [...messages, tempMessage];
@@ -65,7 +87,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     return messages;
   }, [messages, pendingUserMessage]);
 
-  // Handlers de navegación
+  // ✅ 4. Handlers
   const handleChatSelect = (selectedChatId: string) => {
     navigate(`/chat/${selectedChatId}`);
   };
@@ -80,7 +102,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
 
   const handleDeleteChat = async (chatIdToDelete: string) => {
     await deleteChat(chatIdToDelete);
-    
+
     if (chatIdToDelete === chatId && chats.length > 1) {
       const nextChat = chats.find((c) => c.id !== chatIdToDelete);
       if (nextChat) {
@@ -102,17 +124,16 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     }
   };
 
-  // Handler para enviar mensajes (con mensaje inmediato)
   const handleSendMessage = useCallback(
     async (content: string) => {
       try {
         // 1. Mostrar mensaje del usuario inmediatamente
         setPendingUserMessage(content);
-        
+
         // 2. Enviar mensaje al backend
         await sendMessage(content);
-        
-        // El callback de useSendMessage limpiará pendingUserMessage y hará refetch
+
+        // El useEffect limpiará pendingUserMessage cuando termine el streaming
       } catch (error) {
         console.error('Error sending message:', error);
         // Limpiar mensaje pendiente si hay error

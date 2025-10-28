@@ -6,6 +6,7 @@ interface UseChatReturn {
   chat: Chat | null;
   messages: Message[];
   isLoading: boolean;
+  isRefetching: boolean; // ✨ AGREGAR
   error: string | null;
   refetch: () => Promise<void>;
 }
@@ -17,14 +18,21 @@ export const useChat = (chatId: string): UseChatReturn => {
   const [chat, setChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefetching, setIsRefetching] = useState(false); // ✨ AGREGAR
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar chat y sus mensajes
-  const fetchChat = useCallback(async () => {
+  // ✨ CAMBIAR: Agregar parámetro para diferenciar
+  const fetchChat = useCallback(async (isInitialLoad = true) => {
     if (!chatId) return;
 
     try {
-      setIsLoading(true);
+      // ✨ CAMBIAR: Solo mostrar spinner completo en carga inicial
+      if (isInitialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsRefetching(true);
+      }
+      
       setError(null);
       const data = await chatService.getChatById(chatId);
       setChat(data);
@@ -34,18 +42,21 @@ export const useChat = (chatId: string): UseChatReturn => {
       setError('Error al cargar el chat');
     } finally {
       setIsLoading(false);
+      setIsRefetching(false);
     }
   }, [chatId]);
 
+  // ✨ Carga inicial
   useEffect(() => {
-    fetchChat();
+    fetchChat(true); // Carga inicial = spinner completo
   }, [fetchChat]);
 
   return {
     chat,
     messages,
     isLoading,
+    isRefetching, // ✨ EXPORTAR
     error,
-    refetch: fetchChat,
+    refetch: () => fetchChat(false), // ✨ Refetch = sin spinner completo
   };
 };
