@@ -29,7 +29,8 @@ export const MessageList: React.FC<MessageListProps> = ({
     scrollToBottom();
   }, [messages, streamingResponse]);
 
-  if (isLoading) {
+  // Solo mostrar spinner si NO hay mensajes
+  if (isLoading && messages.length === 0) {
     return (
       <div className={styles.loadingContainer}>
         <Spinner size="lg" color="primary" />

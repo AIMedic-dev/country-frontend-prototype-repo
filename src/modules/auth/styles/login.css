@@ -246,6 +246,289 @@
    RESPONSIVE
    ─────────────────────────────────────────── */
 
+/* ──────────────────────────────────────────────
+   NUEVAS MEDIA QUERIES PARA LAPTOPS
+   ─────────────────────────────────────────── */
+
+/* Laptops estándar (1200px - 1400px) */
+@media (max-width:1400px) and (min-width:901px){
+  .left-panel{
+    flex:0 0 44%;
+    padding:40px 32px;
+  }
+  
+  .left-content{
+    max-width:420px;
+    gap:20px;
+  }
+  
+  .left-media{
+    gap:16px;
+  }
+  
+  .left-image-card{
+    aspect-ratio:16/10;
+  }
+  
+  .right-panel{
+    padding:70px 24px;
+  }
+  
+  .brand-bar-right{
+    margin-bottom:14px;
+    gap:14px;
+  }
+  
+  .brand-logo-country{
+    height:70px;
+  }
+  
+  .brand-logo{
+    height:36px;
+  }
+  
+  .brand-sep-dark{
+    height:28px;
+  }
+  
+  .right-stack{
+    gap:16px;
+    max-width:460px;
+  }
+  
+  .right-hero-title{
+    font-size:2.1rem;
+    margin-bottom:6px;
+  }
+  
+  .right-hero-title::after{
+    width:70px;
+    height:3px;
+    margin:10px auto 0;
+  }
+  
+  .right-hero-subtitle{
+    font-size:1.05rem;
+    margin-top:10px;
+  }
+  
+  .login-form{
+    max-width:440px;
+    padding:34px 30px;
+    gap:18px;
+  }
+  
+  .form-title{
+    font-size:1.75rem;
+    margin-bottom:6px;
+  }
+  
+  .form-checks{
+    gap:12px;
+  }
+}
+
+/* Laptops pequeños (1024px - 1200px) */
+@media (max-width:1200px) and (min-width:901px){
+  .left-panel{
+    flex:0 0 42%;
+    padding:32px 24px;
+  }
+  
+  .left-content{
+    max-width:380px;
+    gap:16px;
+  }
+  
+  .left-media{
+    gap:14px;
+  }
+  
+  .left-image-card{
+    aspect-ratio:16/11;
+    border-radius:14px;
+  }
+  
+  .right-panel{
+    padding:50px 24px;
+  }
+  
+  .brand-bar-right{
+    margin-bottom:12px;
+    gap:12px;
+  }
+  
+  .brand-logo-country{
+    height:64px;
+  }
+  
+  .brand-logo{
+    height:34px;
+  }
+  
+  .brand-sep-dark{
+    height:26px;
+  }
+  
+  .right-stack{
+    gap:14px;
+    max-width:420px;
+  }
+  
+  .right-hero-title{
+    font-size:1.95rem;
+  }
+  
+  .right-hero-title::after{
+    width:65px;
+    margin:8px auto 0;
+  }
+  
+  .right-hero-subtitle{
+    font-size:1rem;
+    margin-top:8px;
+  }
+  
+  .login-form{
+    max-width:400px;
+    padding:30px 26px;
+    gap:16px;
+    border-radius:18px;
+  }
+  
+  .form-title{
+    font-size:1.65rem;
+  }
+  
+  .checkbox{
+    font-size:.93rem;
+  }
+  
+  .checkbox.terms{
+    font-size:.86rem;
+  }
+}
+
+/* Laptops con altura limitada */
+@media (max-height:800px) and (min-width:1024px){
+  .left-panel{
+    padding:30px 24px;
+  }
+  
+  .left-content{
+    gap:14px;
+  }
+  
+  .left-media{
+    gap:12px;
+  }
+  
+  .left-image-card{
+    aspect-ratio:16/11;
+  }
+  
+  .right-panel{
+    padding:40px 24px;
+  }
+  
+  .brand-logo-country{
+    height:60px;
+  }
+  
+  .brand-logo{
+    height:32px;
+  }
+  
+  .right-stack{
+    gap:12px;
+  }
+  
+  .right-hero-title{
+    font-size:1.85rem;
+    margin-bottom:4px;
+  }
+  
+  .right-hero-title::after{
+    margin:8px auto 0;
+  }
+  
+  .right-hero-subtitle{
+    font-size:.98rem;
+    margin-top:6px;
+  }
+  
+  .login-form{
+    padding:28px 24px;
+    gap:14px;
+  }
+  
+  .form-title{
+    font-size:1.6rem;
+    margin-bottom:4px;
+  }
+}
+
+/* Laptops muy pequeños con poca altura */
+@media (max-height:700px) and (min-width:1024px){
+  .left-panel{
+    padding:24px 20px;
+  }
+  
+  .left-content{
+    gap:12px;
+  }
+  
+  .left-media{
+    gap:10px;
+  }
+  
+  .left-image-card{
+    aspect-ratio:16/12;
+  }
+  
+  .right-panel{
+    padding:32px 20px;
+  }
+  
+  .brand-logo-country{
+    height:56px;
+  }
+  
+  .brand-logo{
+    height:30px;
+  }
+  
+  .brand-bar-right{
+    margin-bottom:10px;
+  }
+  
+  .right-stack{
+    gap:10px;
+  }
+  
+  .right-hero-title{
+    font-size:1.75rem;
+  }
+  
+  .right-hero-subtitle{
+    font-size:.95rem;
+    margin-top:6px;
+  }
+  
+  .login-form{
+    padding:24px 22px;
+    gap:12px;
+  }
+  
+  .form-title{
+    font-size:1.55rem;
+  }
+  
+  .form-checks{
+    gap:10px;
+  }
+}
+
 /* Tablets landscape */
 @media (max-width:1200px){
   .left-panel{
