@@ -41,51 +41,19 @@ export default function Login() {
 
   return (
     <div className="login-wrapper">
-      {/* PANEL IZQUIERDO - Imágenes */}
+      {/* PANEL IZQUIERDO - Imagen completa */}
       <section className="left-panel">
-        <div className="left-content">
-          <div className="left-media">
-            <figure className="left-image-card">
-              <img
-                src="images/imagen1.jpg"
-                alt="Entender el cáncer de mama, unir la voz salva vidas"
-              />
-            </figure>
-
-            <figure className="left-image-card">
-              <img
-                src="images/imagen2.jpg"
-                alt="Manos unidas"
-              />
-            </figure>
-
-            <figure className="left-image-card">
-              <img
-                src="images/imagen3-V2(1).jpg"
-                alt="Entender el cáncer de mama, multiplicar la fuerza salva vidas"
-              />
-            </figure>
-          </div>
+        <div className="left-image-container">
+          <img
+            src="images/imagen-completa2.jpg"
+            alt="Clínica del Country - Centro de Oncología"
+            className="left-background-image"
+          />
         </div>
       </section>
 
-      {/* PANEL DERECHO - Logos y Formulario */}
+      {/* PANEL DERECHO - Formulario */}
       <section className="right-panel">
-        {/* Logos arriba */}
-        <div className="brand-bar-right">
-          <img
-            className="brand-logo-country"
-            src="images/logos/country-logo (1).png"
-            alt="Clínica del Country"
-          />
-          <span className="brand-sep-dark" aria-hidden="true" />
-          <img
-            className="brand-logo"
-            src="images/logos/amedic-oscuro.svg"
-            alt="AIMEDIC"
-          />
-        </div>
-
         {/* Contenido centrado */}
         <div className="right-stack">
           <header className="right-hero">
@@ -152,6 +120,15 @@ export default function Login() {
             />
             <p className="secure-note">Conexión segura · Datos protegidos</p>
           </form>
+
+          {/* Logo de AIMEDIC debajo del formulario */}
+          <div className="brand-footer">
+            <img
+              className="brand-logo-footer"
+              src="images/logos/amedic-oscuro.svg"
+              alt="AIMEDIC"
+            />
+          </div>
         </div>
       </section>
     </div>
