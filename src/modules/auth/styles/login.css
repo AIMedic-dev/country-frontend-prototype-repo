@@ -26,57 +26,33 @@
   display:flex;
   background:var(--off-white);
   font-family:var(--font);
-  overflow-y:auto; /* Habilita scroll horizontal */
+  overflow-y:auto;
 }
 
 /* ──────────────────────────────────────────────
-   PANEL IZQUIERDO - Imágenes
+   PANEL IZQUIERDO - Imagen completa
    ─────────────────────────────────────────── */
 .left-panel{
   flex:0 0 48%;
-  background:var(--white);
-  padding:60px 48px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  height:auto;
-  /* overflow-y:auto; */
-}
-
-.left-content{
-  display:flex; 
-  flex-direction:column; 
-  gap:24px;
-  width:100%;
-  max-width:490px;
-  margin:0 auto;
-}
-
-/* Tarjetas de imagen */
-.left-media{ 
-  display:flex; 
-  flex-direction:column; 
-  gap:20px;
-  width:100%;
-}
-
-.left-image-card{
-  margin:0;
-  background:var(--white);
-  border-radius:var(--radius-soft);
+  position:relative;
   overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-  border:1px solid rgba(0,0,0,.06);
-  width:100%;
-  aspect-ratio:16/9;
+  background:var(--color-medical-primary);
 }
 
-.left-image-card img{
-  width:100%; 
-  height:100%; 
-  display:block; 
-  object-fit:cover;
+/* Contenedor de la imagen que ocupa todo el espacio */
+.left-image-container{
+  width:100%;
+  height:100%;
+  position:relative;
+}
+
+/* Imagen de fondo que cubre todo el panel */
+.left-background-image{
+  width:100%;
+  height:100%;
+  object-fit:cover; /* Cubre todo el espacio sin dejar bordes blancos */
+  object-position:center;
+  display:block;
 }
 
 /* ──────────────────────────────────────────────
@@ -87,9 +63,8 @@
   flex:1;
   display:flex;
   flex-direction:column;
-  padding:110px 32px;
+  padding:60px 32px;
   background:var(--bg-light);
-  /* overflow-y:auto; */
 }
 
 /* Patrón de fondo diagonal */
@@ -105,33 +80,6 @@
   pointer-events:none;
 }
 
-/* Logos en el panel derecho */
-.brand-bar-right{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:16px;
-  margin-bottom:16px; /* Reducido para acercar al título */
-  position:relative;
-  z-index:2;
-}
-
-.brand-sep-dark{ 
-  width:1px; 
-  height:32px; 
-  background-color:rgba(0,0,0,.12);
-}
-
-.brand-logo-country{
-  height:82px; /* Más grande que antes */
-  object-fit:contain;
-}
-
-.brand-logo{
-  height:40px; /* Más pequeño que Country */
-  object-fit:contain;
-}
-
 /* Contenedor del formulario centrado */
 .right-stack{
   position:relative; 
@@ -140,12 +88,11 @@
   flex-direction:column; 
   align-items:center;
   justify-content:center;
-  gap:18px; /* Reducido para acercar elementos */
+  gap:24px;
   width:100%;
   max-width:520px;
   margin:0 auto;
   flex:1;
-  min-height: auto;
 }
 
 /* Encabezado */
@@ -242,57 +189,36 @@
   color:#8a96a3; 
 }
 
-/* ──────────────────────────────────────────────
-   RESPONSIVE
-   ─────────────────────────────────────────── */
+/* Logo de AIMEDIC en el footer */
+.brand-footer{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:16px;
+  width:100%;
+}
+
+.brand-logo-footer{
+  height:36px;
+  object-fit:contain;
+}
 
 /* ──────────────────────────────────────────────
-   NUEVAS MEDIA QUERIES PARA LAPTOPS
+   RESPONSIVE
    ─────────────────────────────────────────── */
 
 /* Laptops estándar (1200px - 1400px) */
 @media (max-width:1400px) and (min-width:901px){
   .left-panel{
     flex:0 0 44%;
-    padding:40px 32px;
-  }
-  
-  .left-content{
-    max-width:420px;
-    gap:20px;
-  }
-  
-  .left-media{
-    gap:16px;
-  }
-  
-  .left-image-card{
-    aspect-ratio:16/10;
   }
   
   .right-panel{
-    padding:70px 24px;
-  }
-  
-  .brand-bar-right{
-    margin-bottom:14px;
-    gap:14px;
-  }
-  
-  .brand-logo-country{
-    height:70px;
-  }
-  
-  .brand-logo{
-    height:36px;
-  }
-  
-  .brand-sep-dark{
-    height:28px;
+    padding:50px 24px;
   }
   
   .right-stack{
-    gap:16px;
+    gap:20px;
     max-width:460px;
   }
   
@@ -326,52 +252,24 @@
   .form-checks{
     gap:12px;
   }
+  
+  .brand-logo-footer{
+    height:34px;
+  }
 }
 
 /* Laptops pequeños (1024px - 1200px) */
 @media (max-width:1200px) and (min-width:901px){
   .left-panel{
     flex:0 0 42%;
-    padding:32px 24px;
-  }
-  
-  .left-content{
-    max-width:380px;
-    gap:16px;
-  }
-  
-  .left-media{
-    gap:14px;
-  }
-  
-  .left-image-card{
-    aspect-ratio:16/11;
-    border-radius:14px;
   }
   
   .right-panel{
-    padding:50px 24px;
-  }
-  
-  .brand-bar-right{
-    margin-bottom:12px;
-    gap:12px;
-  }
-  
-  .brand-logo-country{
-    height:64px;
-  }
-  
-  .brand-logo{
-    height:34px;
-  }
-  
-  .brand-sep-dark{
-    height:26px;
+    padding:40px 24px;
   }
   
   .right-stack{
-    gap:14px;
+    gap:18px;
     max-width:420px;
   }
   
@@ -407,40 +305,20 @@
   .checkbox.terms{
     font-size:.86rem;
   }
+  
+  .brand-logo-footer{
+    height:32px;
+  }
 }
 
 /* Laptops con altura limitada */
 @media (max-height:800px) and (min-width:1024px){
-  .left-panel{
-    padding:30px 24px;
-  }
-  
-  .left-content{
-    gap:14px;
-  }
-  
-  .left-media{
-    gap:12px;
-  }
-  
-  .left-image-card{
-    aspect-ratio:16/11;
-  }
-  
   .right-panel{
-    padding:40px 24px;
-  }
-  
-  .brand-logo-country{
-    height:60px;
-  }
-  
-  .brand-logo{
-    height:32px;
+    padding:32px 24px;
   }
   
   .right-stack{
-    gap:12px;
+    gap:16px;
   }
   
   .right-hero-title{
@@ -466,44 +344,24 @@
     font-size:1.6rem;
     margin-bottom:4px;
   }
+  
+  .brand-footer{
+    margin-top:12px;
+  }
+  
+  .brand-logo-footer{
+    height:30px;
+  }
 }
 
 /* Laptops muy pequeños con poca altura */
 @media (max-height:700px) and (min-width:1024px){
-  .left-panel{
+  .right-panel{
     padding:24px 20px;
   }
   
-  .left-content{
-    gap:12px;
-  }
-  
-  .left-media{
-    gap:10px;
-  }
-  
-  .left-image-card{
-    aspect-ratio:16/12;
-  }
-  
-  .right-panel{
-    padding:32px 20px;
-  }
-  
-  .brand-logo-country{
-    height:56px;
-  }
-  
-  .brand-logo{
-    height:30px;
-  }
-  
-  .brand-bar-right{
-    margin-bottom:10px;
-  }
-  
   .right-stack{
-    gap:10px;
+    gap:12px;
   }
   
   .right-hero-title{
@@ -527,24 +385,17 @@
   .form-checks{
     gap:10px;
   }
-}
-
-/* Tablets landscape */
-@media (max-width:1200px){
-  .left-panel{
-    padding:50px 36px;
+  
+  .brand-footer{
+    margin-top:10px;
   }
   
-  .brand-logo-country{
-    height:66px; /* Proporcionalmente más grande */
-  }
-  
-  .brand-logo{
-    height:38px;
+  .brand-logo-footer{
+    height:28px;
   }
 }
 
-/* Tablets portrait */
+/* Tablets portrait y móviles */
 @media (max-width:900px){
   .login-wrapper{
     flex-direction:column;
@@ -556,32 +407,15 @@
   }
   
   .left-panel{
-    padding:40px 24px;
-    min-height:auto;
+    min-height:280px; /* Altura mínima en móvil */
   }
   
   .right-panel{
     padding:32px 24px 40px;
   }
   
-  .left-content{
-    max-width:600px;
-  }
-  
-  .left-media{
-    gap:18px;
-  }
-  
-  .brand-bar-right{
-    margin-bottom:20px; /* Ajustado para tablet */
-  }
-  
-  .brand-logo-country{
-    height:64px; /* Más grande que Aimedic */
-  }
-  
-  .brand-logo{
-    height:36px;
+  .right-stack{
+    gap:22px;
   }
   
   .right-hero-title{
@@ -596,41 +430,24 @@
     max-width:100%;
     padding:36px 32px;
   }
+  
+  .brand-logo-footer{
+    height:34px;
+  }
 }
 
 /* Móviles grandes */
 @media (max-width:600px){
   .left-panel{
-    padding:32px 20px;
+    min-height:240px;
   }
   
   .right-panel{
     padding:28px 20px 36px;
   }
   
-  .left-media{
-    gap:16px;
-  }
-  
-  .left-image-card{
-    border-radius:14px;
-  }
-  
-  .brand-bar-right{
-    margin-bottom:18px; /* Más cerca del título */
-    gap:14px;
-  }
-  
-  .brand-logo-country{
-    height:58px; /* Más grande en móvil */
-  }
-  
-  .brand-logo{
-    height:34px;
-  }
-  
-  .brand-sep-dark{
-    height:28px;
+  .right-stack{
+    gap:20px;
   }
   
   .right-hero-title{
@@ -654,34 +471,29 @@
   .form-title{
     font-size:1.7rem;
   }
+  
+  .brand-logo-footer{
+    height:32px;
+  }
 }
 
 /* Móviles medianos */
 @media (max-width:480px){
-
   .login-wrapper{
     height: 100%;
-     overflow-y: auto;
+    overflow-y: auto;
   }
 
   .left-panel{
-    padding:28px 16px;
+    min-height:220px;
   }
   
   .right-panel{
     padding:24px 16px 32px;
   }
   
-  .left-media{
-    gap:14px;
-  }
-  
-  .brand-logo-country{
-    height:54px; /* Mantiene proporción */
-  }
-  
-  .brand-logo{
-    height:32px;
+  .right-stack{
+    gap:18px;
   }
   
   .right-hero-title{
@@ -708,41 +520,28 @@
   .checkbox.terms{
     font-size:.86rem;
   }
+  
+  .brand-footer{
+    margin-top:14px;
+  }
+  
+  .brand-logo-footer{
+    height:30px;
+  }
 }
 
 /* Móviles pequeños */
 @media (max-width:380px){
   .left-panel{
-    padding:24px 14px;
+    min-height:200px;
   }
   
   .right-panel{
     padding:20px 14px 28px;
   }
   
-  .left-media{
-    gap:12px;
-  }
-  
-  .left-image-card{
-    border-radius:12px;
-  }
-  
-  .brand-bar-right{
-    gap:12px;
-    margin-bottom:16px; /* Más cerca en móvil pequeño */
-  }
-  
-  .brand-logo-country{
-    height:50px; /* Proporcionalmente más grande */
-  }
-  
-  .brand-logo{
-    height:30px;
-  }
-  
-  .brand-sep-dark{
-    height:24px;
+  .right-stack{
+    gap:16px;
   }
   
   .right-hero-title{
@@ -765,5 +564,13 @@
   
   .form-title{
     font-size:1.5rem;
+  }
+  
+  .brand-footer{
+    margin-top:12px;
+  }
+  
+  .brand-logo-footer{
+    height:28px;
   }
 }
