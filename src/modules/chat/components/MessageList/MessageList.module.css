@@ -1,3 +1,5 @@
+/* MessageList.module.css */
+
 /* ============================================
    CONTENEDOR PRINCIPAL
    ============================================ */
@@ -9,6 +11,12 @@
   display: flex;
   justify-content: center;
   padding: var(--ds-spacing-4) var(--ds-spacing-6);
+  
+  min-height: 0;
+  height: 100%;
+  
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Contenedor centrado de mensajes */
@@ -17,7 +25,9 @@
   max-width: 768px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
+  padding-top: var(--ds-spacing-4);
+  padding-bottom: 70vh; /* 👈 ESTE es el secreto - espacio inferior grande */
 }
 
 /* ============================================
@@ -43,7 +53,6 @@
    STREAMING (RESPUESTA EN TIEMPO REAL)
    ============================================ */
 
-/* Contenedor del streaming */
 .streamingContainer {
   display: flex;
   gap: 12px;
@@ -51,7 +60,6 @@
   animation: slideInFromLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Avatar de la IA */
 .aiAvatar {
   flex-shrink: 0;
   width: 36px;
@@ -75,19 +83,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Contenido del streaming */
 .streamingContent {
   flex: 1;
   min-height: 24px;
   display: flex;
-  align-items: flex-start; /* Cambiar a flex-start para alinear arriba */
+  align-items: flex-start;
   gap: 4px;
   padding: 4px 0;
 }
-
-/* ============================================
-   ESTILOS MARKDOWN PARA STREAMING
-   ============================================ */
 
 .streamingContent .markdown {
   color: var(--ds-text-primary, #1f2937);
@@ -97,10 +100,9 @@
   letter-spacing: 0.01em;
   word-wrap: break-word;
   width: 100%;
-  display: inline; /* Importante para que el cursor quede en línea */
+  display: inline;
 }
 
-/* Cursor dentro del markdown */
 .streamingContent .markdown .cursor {
   display: inline;
   margin-left: 2px;
@@ -109,7 +111,6 @@
   font-weight: 600;
 }
 
-/* Párrafos inline para streaming */
 .streamingContent .markdown p {
   display: inline;
   margin: 0;
@@ -120,7 +121,6 @@
   margin-bottom: 12px;
 }
 
-/* Headers */
 .streamingContent .markdown h1,
 .streamingContent .markdown h2,
 .streamingContent .markdown h3,
@@ -137,7 +137,6 @@
 .streamingContent .markdown h3 { font-size: 1.15em; }
 .streamingContent .markdown h4 { font-size: 1em; }
 
-/* Listas */
 .streamingContent .markdown ul,
 .streamingContent .markdown ol {
   margin: 12px 0;
@@ -149,7 +148,6 @@
   line-height: 1.6;
 }
 
-/* Énfasis */
 .streamingContent .markdown strong {
   font-weight: 600;
   color: var(--ds-text-primary, #1f2937);
@@ -159,7 +157,6 @@
   font-style: italic;
 }
 
-/* Links */
 .streamingContent .markdown a {
   color: #125894;
   text-decoration: underline;
@@ -170,7 +167,6 @@
   opacity: 0.8;
 }
 
-/* Código inline */
 .streamingContent .markdown code {
   background: var(--ds-elevated, #f3f4f6);
   color: #125894;
@@ -180,7 +176,6 @@
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-/* Bloques de código */
 .streamingContent .markdown pre {
   background: var(--ds-elevated, #f3f4f6);
   padding: 12px 16px;
@@ -195,7 +190,6 @@
   font-size: 0.9em;
 }
 
-/* Citas */
 .streamingContent .markdown blockquote {
   border-left: 3px solid #125894;
   padding-left: 16px;
@@ -203,10 +197,6 @@
   color: var(--ds-text-secondary, #6b7280);
   font-style: italic;
 }
-
-/* ============================================
-   DOTS DE "PENSANDO..."
-   ============================================ */
 
 .thinkingDots {
   display: flex;
@@ -230,10 +220,6 @@
 .thinkingDots span:nth-child(2) {
   animation-delay: -0.16s;
 }
-
-/* ============================================
-   ANIMACIONES
-   ============================================ */
 
 @keyframes slideInFromLeft {
   from {
@@ -266,10 +252,6 @@
   }
 }
 
-/* ============================================
-   SCROLLBAR PERSONALIZADO
-   ============================================ */
-
 .messageList::-webkit-scrollbar {
   width: 8px;
 }
@@ -288,10 +270,6 @@
   background: var(--ds-text-tertiary);
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
 @media (max-width: 1024px) {
   .messagesContainer {
     max-width: 90%;
@@ -301,11 +279,15 @@
 @media (max-width: 768px) {
   .messageList {
     padding: var(--ds-spacing-3) var(--ds-spacing-4);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
   .messagesContainer {
     max-width: 100%;
     gap: 24px;
+    padding-bottom: 60vh;
   }
 
   .streamingContainer {
@@ -318,12 +300,16 @@
     border-radius: 10px;
   }
 
+  .aiAvatar img {
+    width: 20px;
+    height: 20px;
+  }
+
   .streamingContent .markdown {
     font-size: 14px;
     line-height: 1.6;
   }
 
-  /* Ajustes markdown mobile */
   .streamingContent .markdown h1 { font-size: 1.4em; }
   .streamingContent .markdown h2 { font-size: 1.25em; }
   .streamingContent .markdown h3 { font-size: 1.1em; }
@@ -335,6 +321,11 @@
 
   .streamingContent .markdown pre {
     padding: 10px 12px;
+    overflow-x: auto;
+  }
+
+  .messageList::-webkit-scrollbar {
+    width: 4px;
   }
 }
 
@@ -345,6 +336,7 @@
 
   .messagesContainer {
     gap: 20px;
+    padding-bottom: 50vh;
   }
 
   .streamingContainer {
@@ -357,6 +349,11 @@
     border-radius: 8px;
   }
 
+  .aiAvatar img {
+    width: 18px;
+    height: 18px;
+  }
+
   .streamingContent .markdown {
     font-size: 14px;
   }
@@ -364,63 +361,40 @@
   .streamingContent .markdown h1 { font-size: 1.3em; }
   .streamingContent .markdown h2 { font-size: 1.2em; }
   .streamingContent .markdown h3 { font-size: 1.05em; }
-}
-
-/* ============================================
-   MODO OSCURO
-   ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  .aiAvatar {
-    background: #125894;
-    box-shadow: 
-      0 2px 8px rgba(18, 88, 148, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
-
-  .aiAvatar:hover {
-    box-shadow: 
-      0 4px 12px rgba(18, 88, 148, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-
-  .streamingContent .markdown {
-    color: var(--ds-text-primary, #e5e7eb);
-  }
-
-  .streamingContent .markdown h1,
-  .streamingContent .markdown h2,
-  .streamingContent .markdown h3,
-  .streamingContent .markdown h4 {
-    color: var(--ds-text-primary, #f3f4f6);
-  }
-
-  .streamingContent .markdown code {
-    background: rgba(255, 255, 255, 0.1);
-    color: #3b94d9;
-  }
 
   .streamingContent .markdown pre {
-    background: rgba(255, 255, 255, 0.05);
+    font-size: 13px;
   }
 
-  .streamingContent .markdown blockquote {
-    border-left-color: #3b94d9;
-    color: var(--ds-text-secondary, #9ca3af);
+  .messageList::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .messageList {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .messagesContainer {
+      padding-bottom: calc(60vh + env(safe-area-inset-bottom, 0));
+    }
+  }
+}
+
+@media (max-width: 768px) and (min-height: 700px) {
+  .messageList {
+    padding-top: var(--ds-spacing-4);
   }
 
-  .streamingContent .markdown a {
-    color: #3b94d9;
+  .messagesContainer {
+    gap: 28px;
   }
+}/* MessageList.module.css */
 
-  .cursor {
-    color: #3b94d9;
-  }
-
-  .thinkingDots span {
-    background-color: #3b94d9;
-  }
-}/* ============================================
+/* ============================================
    CONTENEDOR PRINCIPAL
    ============================================ */
 
@@ -431,6 +405,12 @@
   display: flex;
   justify-content: center;
   padding: var(--ds-spacing-4) var(--ds-spacing-6);
+  
+  min-height: 0;
+  height: 100%;
+  
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Contenedor centrado de mensajes */
@@ -439,7 +419,9 @@
   max-width: 768px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
+  padding-top: var(--ds-spacing-4);
+  padding-bottom: 70vh; /* 👈 ESTE es el secreto - espacio inferior grande */
 }
 
 /* ============================================
@@ -465,7 +447,6 @@
    STREAMING (RESPUESTA EN TIEMPO REAL)
    ============================================ */
 
-/* Contenedor del streaming */
 .streamingContainer {
   display: flex;
   gap: 12px;
@@ -473,7 +454,6 @@
   animation: slideInFromLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Avatar de la IA */
 .aiAvatar {
   flex-shrink: 0;
   width: 36px;
@@ -497,19 +477,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Contenido del streaming */
 .streamingContent {
   flex: 1;
   min-height: 24px;
   display: flex;
-  align-items: flex-start; /* Cambiar a flex-start para alinear arriba */
+  align-items: flex-start;
   gap: 4px;
   padding: 4px 0;
 }
-
-/* ============================================
-   ESTILOS MARKDOWN PARA STREAMING
-   ============================================ */
 
 .streamingContent .markdown {
   color: var(--ds-text-primary, #1f2937);
@@ -519,10 +494,9 @@
   letter-spacing: 0.01em;
   word-wrap: break-word;
   width: 100%;
-  display: inline; /* Importante para que el cursor quede en línea */
+  display: inline;
 }
 
-/* Cursor dentro del markdown */
 .streamingContent .markdown .cursor {
   display: inline;
   margin-left: 2px;
@@ -531,7 +505,6 @@
   font-weight: 600;
 }
 
-/* Párrafos inline para streaming */
 .streamingContent .markdown p {
   display: inline;
   margin: 0;
@@ -542,7 +515,6 @@
   margin-bottom: 12px;
 }
 
-/* Headers */
 .streamingContent .markdown h1,
 .streamingContent .markdown h2,
 .streamingContent .markdown h3,
@@ -559,7 +531,6 @@
 .streamingContent .markdown h3 { font-size: 1.15em; }
 .streamingContent .markdown h4 { font-size: 1em; }
 
-/* Listas */
 .streamingContent .markdown ul,
 .streamingContent .markdown ol {
   margin: 12px 0;
@@ -571,7 +542,6 @@
   line-height: 1.6;
 }
 
-/* Énfasis */
 .streamingContent .markdown strong {
   font-weight: 600;
   color: var(--ds-text-primary, #1f2937);
@@ -581,7 +551,6 @@
   font-style: italic;
 }
 
-/* Links */
 .streamingContent .markdown a {
   color: #125894;
   text-decoration: underline;
@@ -592,7 +561,6 @@
   opacity: 0.8;
 }
 
-/* Código inline */
 .streamingContent .markdown code {
   background: var(--ds-elevated, #f3f4f6);
   color: #125894;
@@ -602,7 +570,6 @@
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-/* Bloques de código */
 .streamingContent .markdown pre {
   background: var(--ds-elevated, #f3f4f6);
   padding: 12px 16px;
@@ -617,7 +584,6 @@
   font-size: 0.9em;
 }
 
-/* Citas */
 .streamingContent .markdown blockquote {
   border-left: 3px solid #125894;
   padding-left: 16px;
@@ -625,10 +591,6 @@
   color: var(--ds-text-secondary, #6b7280);
   font-style: italic;
 }
-
-/* ============================================
-   DOTS DE "PENSANDO..."
-   ============================================ */
 
 .thinkingDots {
   display: flex;
@@ -652,10 +614,6 @@
 .thinkingDots span:nth-child(2) {
   animation-delay: -0.16s;
 }
-
-/* ============================================
-   ANIMACIONES
-   ============================================ */
 
 @keyframes slideInFromLeft {
   from {
@@ -688,10 +646,6 @@
   }
 }
 
-/* ============================================
-   SCROLLBAR PERSONALIZADO
-   ============================================ */
-
 .messageList::-webkit-scrollbar {
   width: 8px;
 }
@@ -710,10 +664,6 @@
   background: var(--ds-text-tertiary);
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
 @media (max-width: 1024px) {
   .messagesContainer {
     max-width: 90%;
@@ -723,11 +673,15 @@
 @media (max-width: 768px) {
   .messageList {
     padding: var(--ds-spacing-3) var(--ds-spacing-4);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
   .messagesContainer {
     max-width: 100%;
     gap: 24px;
+    padding-bottom: 60vh;
   }
 
   .streamingContainer {
@@ -740,12 +694,16 @@
     border-radius: 10px;
   }
 
+  .aiAvatar img {
+    width: 20px;
+    height: 20px;
+  }
+
   .streamingContent .markdown {
     font-size: 14px;
     line-height: 1.6;
   }
 
-  /* Ajustes markdown mobile */
   .streamingContent .markdown h1 { font-size: 1.4em; }
   .streamingContent .markdown h2 { font-size: 1.25em; }
   .streamingContent .markdown h3 { font-size: 1.1em; }
@@ -757,6 +715,11 @@
 
   .streamingContent .markdown pre {
     padding: 10px 12px;
+    overflow-x: auto;
+  }
+
+  .messageList::-webkit-scrollbar {
+    width: 4px;
   }
 }
 
@@ -767,6 +730,7 @@
 
   .messagesContainer {
     gap: 20px;
+    padding-bottom: 50vh;
   }
 
   .streamingContainer {
@@ -779,6 +743,11 @@
     border-radius: 8px;
   }
 
+  .aiAvatar img {
+    width: 18px;
+    height: 18px;
+  }
+
   .streamingContent .markdown {
     font-size: 14px;
   }
@@ -786,60 +755,35 @@
   .streamingContent .markdown h1 { font-size: 1.3em; }
   .streamingContent .markdown h2 { font-size: 1.2em; }
   .streamingContent .markdown h3 { font-size: 1.05em; }
-}
-
-/* ============================================
-   MODO OSCURO
-   ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  .aiAvatar {
-    background: #125894;
-    box-shadow: 
-      0 2px 8px rgba(18, 88, 148, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
-
-  .aiAvatar:hover {
-    box-shadow: 
-      0 4px 12px rgba(18, 88, 148, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-
-  .streamingContent .markdown {
-    color: var(--ds-text-primary, #e5e7eb);
-  }
-
-  .streamingContent .markdown h1,
-  .streamingContent .markdown h2,
-  .streamingContent .markdown h3,
-  .streamingContent .markdown h4 {
-    color: var(--ds-text-primary, #f3f4f6);
-  }
-
-  .streamingContent .markdown code {
-    background: rgba(255, 255, 255, 0.1);
-    color: #3b94d9;
-  }
 
   .streamingContent .markdown pre {
-    background: rgba(255, 255, 255, 0.05);
+    font-size: 13px;
   }
 
-  .streamingContent .markdown blockquote {
-    border-left-color: #3b94d9;
-    color: var(--ds-text-secondary, #9ca3af);
+  .messageList::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .messageList {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .messagesContainer {
+      padding-bottom: calc(60vh + env(safe-area-inset-bottom, 0));
+    }
+  }
+}
+
+@media (max-width: 768px) and (min-height: 700px) {
+  .messageList {
+    padding-top: var(--ds-spacing-4);
   }
 
-  .streamingContent .markdown a {
-    color: #3b94d9;
-  }
-
-  .cursor {
-    color: #3b94d9;
-  }
-
-  .thinkingDots span {
-    background-color: #3b94d9;
+  .messagesContainer {
+    gap: 28px;
   }
 }

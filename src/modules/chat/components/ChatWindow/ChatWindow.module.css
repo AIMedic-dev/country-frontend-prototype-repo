@@ -1,8 +1,18 @@
+/* ChatWindow.module.css */
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+
 .chatWindow {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  
+  /* CRÍTICO: NO usar 100vh aquí, debe heredar del padre */
+  height: 100%;
+  width: 100%;
+  
   background: 
     radial-gradient(
       ellipse at 50% 0%,
@@ -35,7 +45,10 @@
   z-index: 0;
 }
 
-/* Layout normal con mensajes */
+/* ============================================
+   LAYOUT NORMAL CON MENSAJES
+   ============================================ */
+
 .content {
   flex: 1;
   overflow: hidden;
@@ -43,9 +56,14 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
+  /* Asegurar que ocupe el espacio disponible correctamente */
+  min-height: 0;
 }
 
-/* Layout corregido para EmptyChat */
+/* ============================================
+   LAYOUT PARA EMPTYCHAT
+   ============================================ */
+
 .emptyContainer {
   flex: 1;
   display: flex;
@@ -56,38 +74,90 @@
   z-index: 1;
   padding: var(--ds-spacing-8);
   gap: 0;
+  /* Asegurar que ocupe el espacio disponible */
+  min-height: 0;
 }
 
-/* Wrapper del input centrado - IMPORTANTE */
+/* Wrapper del input centrado */
 .centeredInputWrapper {
   width: 100%;
-  max-width: 768px; /* Mismo ancho que los mensajes */
+  max-width: 768px;
   margin-top: var(--ds-spacing-6);
 }
 
-/* Responsive */
+/* ============================================
+   RESPONSIVE - TABLET
+   ============================================ */
+
 @media (max-width: 1024px) {
   .centeredInputWrapper {
     max-width: 90%;
   }
 }
 
+/* ============================================
+   RESPONSIVE - MOBILE (< 768px)
+   ============================================ */
+
 @media (max-width: 768px) {
-  .emptyContainer {
-    padding: var(--ds-spacing-6);
+  .chatWindow {
+    /* Asegurar que el layout funcione en móviles */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
-  .centeredInputWrapper {
-    max-width: 95%;
-  }
-}
-
-@media (max-width: 480px) {
   .emptyContainer {
-    padding: var(--ds-spacing-4);
+    padding: var(--ds-spacing-6) var(--ds-spacing-4);
+    justify-content: flex-start;
+    padding-top: max(var(--ds-spacing-8), env(safe-area-inset-top, 0));
   }
 
   .centeredInputWrapper {
     max-width: 100%;
+    padding: 0 var(--ds-spacing-4);
+  }
+
+  .content {
+    /* Asegurar que el scroll funcione correctamente */
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE PEQUEÑO (< 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+  .emptyContainer {
+    padding: var(--ds-spacing-4) var(--ds-spacing-3);
+    padding-top: max(var(--ds-spacing-6), env(safe-area-inset-top, 0));
+  }
+
+  .centeredInputWrapper {
+    max-width: 100%;
+    padding: 0 var(--ds-spacing-3);
+    margin-top: var(--ds-spacing-4);
+  }
+}
+
+/* ============================================
+   FIX ESPECÍFICO PARA iOS
+   ============================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari específico */
+  .chatWindow {
+    height: 100%;
+    min-height: -webkit-fill-available;
+  }
+
+  @media (max-width: 768px) {
+    .content {
+      /* Mejorar scroll en iOS */
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }

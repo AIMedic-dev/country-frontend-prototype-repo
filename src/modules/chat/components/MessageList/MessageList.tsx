@@ -18,18 +18,50 @@ export const MessageList: React.FC<MessageListProps> = ({
   streamingResponse = '',
   isStreaming = false,
 }) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(messages.length);
 
-  // Auto-scroll al último mensaje
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // 🔥 SCROLL FORZADO cuando hay un mensaje NUEVO
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, streamingResponse]);
+    // Solo hacer scroll si aumentó el número de mensajes
+    if (messages.length > prevMessagesLengthRef.current) {
+      prevMessagesLengthRef.current = messages.length;
+      
+      // Esperar a que React termine de renderizar + un poco más
+      const scrollTimer = setTimeout(() => {
+        if (messageListRef.current) {
+          const container = messageListRef.current;
+          
+          // FORZAR scroll al final
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth'
+          });
+          
+          // Por si acaso, hacerlo de nuevo
+          setTimeout(() => {
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'smooth'
+            });
+          }, 100);
+        }
+      }, 300); // Delay más largo para asegurar que el DOM esté listo
 
-  // Solo mostrar spinner si NO hay mensajes
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [messages.length]); // Solo cuando cambia la cantidad
+
+  // Scroll durante streaming
+  useEffect(() => {
+    if (isStreaming && streamingResponse && messageListRef.current) {
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [streamingResponse, isStreaming]);
+
   if (isLoading && messages.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -40,9 +72,8 @@ export const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div className={styles.messageList}>
+    <div ref={messageListRef} className={styles.messageList}>
       <div className={styles.messagesContainer}>
-        {/* Mensajes guardados */}
         {messages.map((message, index) => (
           <MessageBubble
             key={`${message.timestamp}-${index}`}
@@ -52,10 +83,8 @@ export const MessageList: React.FC<MessageListProps> = ({
           />
         ))}
 
-        {/* Mensaje en streaming (tiempo real) */}
         {isStreaming && (
           <div className={styles.streamingContainer}>
-            {/* Avatar de la IA */}
             <div className={styles.aiAvatar}>
               <img
                 src="/images/logos/country-icono.png"
@@ -65,7 +94,6 @@ export const MessageList: React.FC<MessageListProps> = ({
               />
             </div>
 
-            {/* Contenido del streaming con Markdown */}
             <div className={styles.streamingContent}>
               {streamingResponse ? (
                 <div className={styles.markdown}>
@@ -82,8 +110,6 @@ export const MessageList: React.FC<MessageListProps> = ({
             </div>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
     </div>
   );

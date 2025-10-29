@@ -1,11 +1,122 @@
+/* ChatView.module.css */
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+
 .chatView {
   display: flex;
-  height: 100vh;
+  /* CRÍTICO: Usar height dinámica que considera barras del navegador */
+  height: 100vh; /* Fallback para navegadores antiguos */
+  height: 100dvh; /* Dynamic viewport height - considera barras móviles */
+  
+  /* Soporte alternativo para iOS */
+  min-height: -webkit-fill-available;
+  
   overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
+/* Indicador de conexión WebSocket */
+.connectionStatus {
+  position: fixed;
+  top: var(--ds-spacing-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--ds-spacing-3) var(--ds-spacing-5);
+  background-color: var(--ds-warning);
+  color: white;
+  border-radius: var(--ds-radius-full);
+  box-shadow: var(--ds-elevation-3);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-2);
+  z-index: 1000;
+  font-size: var(--ds-text-caption-size);
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
 
 /* ============================================
    RESPONSIVE - MOBILE (< 768px)
    ============================================ */
+
+@media (max-width: 768px) {
+  .chatView {
+    /* IMPORTANTE: En móviles, asegurar que use todo el espacio disponible */
+    height: 100vh;
+    height: 100dvh; /* Considera barras de navegación */
+    
+    /* iOS: Considerar safe-area (notch, barra inferior) */
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    
+    /* Prevenir scroll en el contenedor principal */
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .connectionStatus {
+    /* Ajustar para safe-area en iOS */
+    top: calc(var(--ds-spacing-4) + env(safe-area-inset-top, 0));
+    font-size: var(--ds-text-caption-size);
+    padding: var(--ds-spacing-2) var(--ds-spacing-4);
+  }
+
+  .statusDot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .connectionStatus {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+/* ============================================
+   FIX PARA iOS Safari
+   ============================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Específico para iOS Safari */
+  .chatView {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+}

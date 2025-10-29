@@ -76,7 +76,7 @@ export const useWebSocket = (
       // Limpiar el texto después de un momento
       setTimeout(() => {
         setStreamingResponse('');
-      }, 200);
+      }, 1000);
     });
 
     // Evento: Error
