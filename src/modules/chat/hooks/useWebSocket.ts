@@ -40,19 +40,19 @@ export const useWebSocket = (
 
     // Evento: Conexión exitosa
     newSocket.on('connect', () => {
-      console.log('✅ WebSocket conectado');
+      // console.log('✅ WebSocket conectado');
       setIsConnected(true);
     });
 
     // Evento: Desconexión
     newSocket.on('disconnect', () => {
-      console.log('❌ WebSocket desconectado');
+      // console.log('❌ WebSocket desconectado');
       setIsConnected(false);
     });
 
     // Evento: Inicio del streaming
     newSocket.on('ai-response-start', (data: { chatId: string }) => {
-      console.log('🚀 Iniciando streaming para chat:', data.chatId);
+      // console.log('🚀 Iniciando streaming para chat:', data.chatId);
       setIsStreaming(true);
       setStreamingResponse('');
     });
@@ -61,14 +61,14 @@ export const useWebSocket = (
     newSocket.on(
       'ai-response-chunk',
       (data: { chatId: string; chunk: string }) => {
-        console.log('📝 Chunk recibido:', data.chunk);
+        // console.log('📝 Chunk recibido:', data.chunk);
         setStreamingResponse(prev => prev + data.chunk);
       }
     );
 
     // Evento: Fin del streaming
     newSocket.on('ai-response-end', (data: StreamingMessage) => {
-      console.log('✅ Streaming finalizado para chat:', data.chatId);
+      // console.log('✅ Streaming finalizado para chat:', data.chatId);
 
       // Limpiar inmediatamente para respuestas largas
       setIsStreaming(false);
@@ -76,12 +76,12 @@ export const useWebSocket = (
       // Limpiar el texto después de un momento
       setTimeout(() => {
         setStreamingResponse('');
-      }, 1000);
+      }, 1500);
     });
 
     // Evento: Error
     newSocket.on('error', (data: { chatId: string; error: string }) => {
-      console.error('❌ Error en WebSocket:', data.error);
+      // console.error('❌ Error en WebSocket:', data.error);
       setIsStreaming(false);
       setStreamingResponse('');
     });
@@ -90,7 +90,7 @@ export const useWebSocket = (
 
     // Cleanup: Desconectar al desmontar
     return () => {
-      console.log('🔌 Cerrando conexión WebSocket');
+      // console.log('🔌 Cerrando conexión WebSocket');
       newSocket.close();
     };
   }, [serverUrl]);

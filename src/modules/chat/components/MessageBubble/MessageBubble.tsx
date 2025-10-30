@@ -9,7 +9,6 @@ interface MessageBubbleProps {
   timestamp: string;
 }
 
-// 👇 SOLO agregar React.memo
 export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({
   content,
   answer,
@@ -55,5 +54,5 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({
   );
 });
 
-// 👇 Agregar displayName
+
 MessageBubble.displayName = 'MessageBubble';

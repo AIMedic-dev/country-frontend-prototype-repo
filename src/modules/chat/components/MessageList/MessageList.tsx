@@ -20,25 +20,21 @@ export const MessageList: React.FC<MessageListProps> = ({
 }) => {
   const messageListRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(messages.length);
+  const prevStreamingRef = useRef(isStreaming);
 
-  // 🔥 SCROLL FORZADO cuando hay un mensaje NUEVO
+  // SCROLL cuando cambia el número de mensajes
   useEffect(() => {
-    // Solo hacer scroll si aumentó el número de mensajes
     if (messages.length > prevMessagesLengthRef.current) {
       prevMessagesLengthRef.current = messages.length;
       
-      // Esperar a que React termine de renderizar + un poco más
       const scrollTimer = setTimeout(() => {
         if (messageListRef.current) {
           const container = messageListRef.current;
-          
-          // FORZAR scroll al final
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth'
           });
           
-          // Por si acaso, hacerlo de nuevo
           setTimeout(() => {
             container.scrollTo({
               top: container.scrollHeight,
@@ -46,13 +42,36 @@ export const MessageList: React.FC<MessageListProps> = ({
             });
           }, 100);
         }
-      }, 300); // Delay más largo para asegurar que el DOM esté listo
+      }, 300);
 
       return () => clearTimeout(scrollTimer);
     }
-  }, [messages.length]); // Solo cuando cambia la cantidad
+  }, [messages.length]);
 
-  // Scroll durante streaming
+  // SCROLL cuando INICIA el streaming (para ver el logo y animación)
+  useEffect(() => {
+    // Detectar cuando isStreaming cambia de false a true
+    if (isStreaming && !prevStreamingRef.current) {
+      prevStreamingRef.current = true;
+      
+      const scrollTimer = setTimeout(() => {
+        if (messageListRef.current) {
+          messageListRef.current.scrollTo({
+            top: messageListRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(scrollTimer);
+    }
+    
+    if (!isStreaming) {
+      prevStreamingRef.current = false;
+    }
+  }, [isStreaming]);
+
+  // SCROLL durante el streaming (mientras escribe)
   useEffect(() => {
     if (isStreaming && streamingResponse && messageListRef.current) {
       messageListRef.current.scrollTo({

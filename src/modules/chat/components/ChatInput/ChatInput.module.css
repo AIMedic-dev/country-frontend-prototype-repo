@@ -177,11 +177,30 @@
   cursor: not-allowed;
 }
 
-/* Responsive */
+
+
+/* ============================================
+   RESPONSIVE - MOBILE (< 768px)
+   ============================================ */
+
 @media (max-width: 768px) {
+  .chatInput {
+    padding: var(--ds-spacing-4) var(--ds-spacing-4);
+    /* Asegurar que esté en la parte inferior */
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    /* Considerar safe-area para iOS (notch, barra inferior) */
+    padding-bottom: calc(var(--ds-spacing-4) + env(safe-area-inset-bottom, 0));
+  }
+
   .inputContainer {
     max-width: 100%;
-    margin: 0 var(--ds-spacing-4);
+    margin: 0;
+  }
+
+  .textarea {
+    font-size: 16px; /* Evita zoom automático en iOS */
   }
 
   .centered .inputContainer {
@@ -189,9 +208,67 @@
   }
 }
 
+/* ============================================
+   RESPONSIVE - MOBILE PEQUEÑO (< 480px)
+   ============================================ */
+
 @media (max-width: 480px) {
+  .chatInput {
+    padding: var(--ds-spacing-3) var(--ds-spacing-3);
+    padding-bottom: calc(var(--ds-spacing-3) + env(safe-area-inset-bottom, 0));
+  }
+
+  .inputContainer {
+    min-height: 44px;
+    padding: var(--ds-spacing-2) var(--ds-spacing-4);
+  }
+
+  .toolsButton,
+  .sendButton {
+    width: 32px;
+    height: 32px;
+  }
+
   .centered .inputContainer {
     min-height: 52px;
     padding: var(--ds-spacing-4) var(--ds-spacing-5);
+  }
+
+  .centered .toolsButton,
+  .centered .sendButton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ============================================
+   FIX ESPECÍFICO PARA iOS
+   ============================================ */
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .chatInput {
+      /* iOS: Mantener visible cuando aparece el teclado */
+      position: sticky;
+      bottom: 0;
+      /* Espacio adicional para el safe area en iOS */
+      padding-bottom: calc(var(--ds-spacing-4) + env(safe-area-inset-bottom, 12px));
+    }
+  }
+}
+
+/* ============================================
+   FIX PARA TECLADO EN ANDROID
+   ============================================ */
+
+@media (max-width: 768px) and (max-height: 600px) {
+  /* Cuando el teclado está visible (viewport height reducido) */
+  .chatInput {
+    padding: var(--ds-spacing-2) var(--ds-spacing-3);
+  }
+
+  .inputContainer {
+    min-height: 40px;
+    padding: var(--ds-spacing-2) var(--ds-spacing-3);
   }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatSidebar } from '../components/ChatSidebar/ChatSidebar';
 import { ChatWindow } from '../components/ChatWindow/ChatWindow';
@@ -19,8 +19,11 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
+  
+  // Cache local de mensajes
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
+  const prevChatIdRef = useRef(chatId);
 
-  // ✅ 1. PRIMERO: Declarar todos los hooks
   const {
     chats,
     isLoading: isLoadingList,
@@ -34,60 +37,81 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     refetch
   } = useChat(chatId);
 
-  const { sendMessage, isSending } = useSendMessage(chatId, async () => {
-    await refetch();
-  });
+  const { sendMessage, isSending } = useSendMessage(chatId);
 
-  // WebSocket para streaming
   const {
     streamingResponse,
     isStreaming,
     isConnected
   } = useWebSocket();
 
-  // ✅ 2. DESPUÉS: useEffect (UN SOLO useEffect, no duplicado)
+  // Sincronizar cache local con mensajes de DB al cargar o cambiar chat
   useEffect(() => {
-    // Cuando el streaming termina y hay un mensaje pendiente
-    if (!isStreaming && pendingUserMessage && messages.length > 0) {
-      // Verificar si el último mensaje ya tiene la pregunta
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage && lastMessage.content === pendingUserMessage) {
-        // Limpiar después de un pequeño delay para transición suave
-        const timer = setTimeout(() => {
-          setPendingUserMessage(null);
-        }, 100);
-
-        return () => clearTimeout(timer);
-      }
+    if (chatId !== prevChatIdRef.current) {
+      // Cambió de chat -> hacer refetch
+      prevChatIdRef.current = chatId;
+      refetch();
     }
-  }, [isStreaming, pendingUserMessage, messages]);
+    
+    // Actualizar cache local con mensajes de la DB
+    setLocalMessages(messages);
+  }, [messages, chatId]);
 
-  // ✅ 3. DESPUÉS: useMemo para displayMessages
+  // Cuando termina el streaming, agregar mensaje al cache local
+  useEffect(() => {
+    if (!isStreaming && pendingUserMessage && streamingResponse) {
+      // Crear mensaje completo con la respuesta del streaming
+      const newMessage: Message = {
+        content: pendingUserMessage,
+        answer: streamingResponse,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Agregar al cache local inmediatamente
+      setLocalMessages(prev => [...prev, newMessage]);
+      
+      // Limpiar estados
+      setPendingUserMessage(null);
+      
+    }
+  }, [isStreaming, pendingUserMessage, streamingResponse]);
+
+  // Mensajes a mostrar: cache local + mensaje pendiente si existe
   const displayMessages: Message[] = React.useMemo(() => {
     if (pendingUserMessage) {
-      // Verificar si el último mensaje ya es este
-      const lastMessage = messages[messages.length - 1];
+      // Verificar si ya existe en el cache
+      const lastMessage = localMessages[localMessages.length - 1];
       const isDuplicate =
         lastMessage &&
         lastMessage.content.trim() === pendingUserMessage.trim();
 
-      // Si ya existe en la DB, no mostrar el temporal
       if (isDuplicate) {
-        return messages;
+        return localMessages;
       }
 
-      // Crear mensaje temporal solo si no está duplicado
+      // Crear mensaje temporal
       const tempMessage: Message = {
         content: pendingUserMessage,
         answer: '',
         timestamp: new Date().toISOString(),
       };
-      return [...messages, tempMessage];
+      return [...localMessages, tempMessage];
     }
-    return messages;
-  }, [messages, pendingUserMessage]);
+    return localMessages;
+  }, [localMessages, pendingUserMessage]);
 
-  // ✅ 4. Handlers
+  // Refetch cuando el usuario navega o vuelve a la pestaña
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refetch();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [refetch]);
+
   const handleChatSelect = (selectedChatId: string) => {
     navigate(`/chat/${selectedChatId}`);
   };
@@ -117,6 +141,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     if (window.confirm('¿Estás seguro de limpiar todos los mensajes?')) {
       try {
         await chatService.clearMessages(chatId);
+        setLocalMessages([]); // Limpiar cache local también
         refetch();
       } catch (error) {
         console.error('Error clearing chat:', error);
@@ -127,16 +152,10 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
   const handleSendMessage = useCallback(
     async (content: string) => {
       try {
-        // 1. Mostrar mensaje del usuario inmediatamente
         setPendingUserMessage(content);
-
-        // 2. Enviar mensaje al backend
         await sendMessage(content);
-
-        // El useEffect limpiará pendingUserMessage cuando termine el streaming
       } catch (error) {
         console.error('Error sending message:', error);
-        // Limpiar mensaje pendiente si hay error
         setPendingUserMessage(null);
       }
     },
@@ -145,7 +164,6 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
 
   return (
     <div className={styles.chatView}>
-      {/* Indicador de conexión WebSocket */}
       {!isConnected && (
         <div className={styles.connectionStatus}>
           <span className={styles.statusDot} />
@@ -153,7 +171,6 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
         </div>
       )}
 
-      {/* Sidebar */}
       <ChatSidebar
         chats={chats}
         activeChat={chatId}
@@ -165,7 +182,6 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Ventana de chat con streaming */}
       <ChatWindow
         messages={displayMessages}
         onSendMessage={handleSendMessage}
