@@ -7,12 +7,14 @@ interface MessageBubbleProps {
   content: string;
   answer: string;
   timestamp: string;
+  isStreaming?: boolean; 
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({
   content,
   answer,
   timestamp,
+  isStreaming = false, 
 }) => {
   return (
     <div className={styles.messageGroup}>
@@ -40,19 +42,22 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({
             <div className={styles.aiBubble}>
               <div className={styles.markdown}>
                 <ReactMarkdown>{answer}</ReactMarkdown>
+                {/* cursor cuando está en streaming */}
+                {isStreaming && <span className={styles.cursor}>▊</span>}
               </div>
             </div>
 
-            {/* Timestamp discreto */}
-            <time className={styles.aiTimestamp}>
-              {formatTime(timestamp)}
-            </time>
+            {/* Timestamp discreto - solo si NO está en streaming */}
+            {!isStreaming && (
+              <time className={styles.aiTimestamp}>
+                {formatTime(timestamp)}
+              </time>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 });
-
 
 MessageBubble.displayName = 'MessageBubble';

@@ -101,11 +101,17 @@ export const MessageList: React.FC<MessageListProps> = ({
       <div className={styles.messagesContainer}>
         {messages.map((message, index) => (
           <MessageBubble
-            key={`${message.timestamp}-${index}`}
-            content={message.content}
-            answer={message.answer}
-            timestamp={message.timestamp}
-          />
+          key={`${message.timestamp}-${index}`}
+          content={message.content}
+          answer={message.answer}
+          timestamp={message.timestamp}
+          isStreaming={
+            isStreaming && 
+            index === messages.length - 1 && 
+            message.answer !== '' &&
+            !message.answer.includes('##')
+          } 
+        />
         ))}
 
         {/* Mostrar indicador de escritura BAJO el último mensaje pendiente (solo dots) */}
