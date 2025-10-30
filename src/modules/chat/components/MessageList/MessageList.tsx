@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
 import type { Message } from '../../types/chat.types';
 import { MessageBubble } from '../MessageBubble/MessageBubble';
 import { Spinner } from '../../../../shared';
@@ -26,19 +25,19 @@ export const MessageList: React.FC<MessageListProps> = ({
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current) {
       prevMessagesLengthRef.current = messages.length;
-      
+
       const scrollTimer = setTimeout(() => {
         if (messageListRef.current) {
           const container = messageListRef.current;
           container.scrollTo({
             top: container.scrollHeight,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
-          
+
           setTimeout(() => {
             container.scrollTo({
               top: container.scrollHeight,
-              behavior: 'smooth'
+              behavior: 'smooth',
             });
           }, 100);
         }
@@ -53,19 +52,19 @@ export const MessageList: React.FC<MessageListProps> = ({
     // Detectar cuando isStreaming cambia de false a true
     if (isStreaming && !prevStreamingRef.current) {
       prevStreamingRef.current = true;
-      
+
       const scrollTimer = setTimeout(() => {
         if (messageListRef.current) {
           messageListRef.current.scrollTo({
             top: messageListRef.current.scrollHeight,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
         }
       }, 100);
 
       return () => clearTimeout(scrollTimer);
     }
-    
+
     if (!isStreaming) {
       prevStreamingRef.current = false;
     }
@@ -76,7 +75,7 @@ export const MessageList: React.FC<MessageListProps> = ({
     if (isStreaming && streamingResponse && messageListRef.current) {
       messageListRef.current.scrollTo({
         top: messageListRef.current.scrollHeight,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   }, [streamingResponse, isStreaming]);
@@ -90,6 +89,13 @@ export const MessageList: React.FC<MessageListProps> = ({
     );
   }
 
+  // Estado del último mensaje para controlar el indicador de escritura
+  const lastMessage = messages[messages.length - 1];
+  const lastHasAnswer = Boolean(lastMessage && lastMessage.answer);
+  const hasPendingWithoutAnswer = Boolean(
+    lastMessage && lastMessage.answer === ''
+  );
+
   return (
     <div ref={messageListRef} className={styles.messageList}>
       <div className={styles.messagesContainer}>
@@ -102,7 +108,30 @@ export const MessageList: React.FC<MessageListProps> = ({
           />
         ))}
 
-        {isStreaming && (
+        {/* Mostrar indicador de escritura BAJO el último mensaje pendiente (solo dots) */}
+        {isStreaming && hasPendingWithoutAnswer && (
+          <div className={styles.streamingContainer}>
+            <div className={styles.aiAvatar}>
+              <img
+                src="/images/logos/country-icono.png"
+                alt="Country"
+                width="24"
+                height="24"
+              />
+            </div>
+
+            <div className={styles.streamingContent}>
+              <div className={styles.thinkingDots}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fallback: si hay streaming pero NO hay mensaje pendiente ni respuesta inline, usar contenedor global */}
+        {isStreaming && !lastHasAnswer && !hasPendingWithoutAnswer && (
           <div className={styles.streamingContainer}>
             <div className={styles.aiAvatar}>
               <img
@@ -115,8 +144,8 @@ export const MessageList: React.FC<MessageListProps> = ({
 
             <div className={styles.streamingContent}>
               {streamingResponse ? (
-                <div className={styles.markdown}>
-                  <ReactMarkdown>{streamingResponse}</ReactMarkdown>
+                <div className={styles.markdownPlain}>
+                  {streamingResponse}
                   <span className={styles.cursor}>▊</span>
                 </div>
               ) : (

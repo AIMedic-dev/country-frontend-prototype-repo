@@ -18,7 +18,8 @@ interface ChatViewProps {
 export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
+  // Índice del mensaje temporal que está recibiendo streaming
+  const pendingIndexRef = useRef<number | null>(null);
   
   // Cache local de mensajes
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
@@ -57,48 +58,31 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
     setLocalMessages(messages);
   }, [messages, chatId]);
 
-  // Cuando termina el streaming, agregar mensaje al cache local
+  // Actualizar mensaje temporal con los chunks de streaming para que se vea en vivo
   useEffect(() => {
-    if (!isStreaming && pendingUserMessage && streamingResponse) {
-      // Crear mensaje completo con la respuesta del streaming
-      const newMessage: Message = {
-        content: pendingUserMessage,
-        answer: streamingResponse,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Agregar al cache local inmediatamente
-      setLocalMessages(prev => [...prev, newMessage]);
-      
-      // Limpiar estados
-      setPendingUserMessage(null);
-      
+    if (pendingIndexRef.current !== null && typeof streamingResponse === 'string') {
+      setLocalMessages(prev => {
+        const next = [...prev];
+        const idx = pendingIndexRef.current as number;
+        if (next[idx]) {
+          next[idx] = { ...next[idx], answer: streamingResponse };
+        }
+        return next;
+      });
     }
-  }, [isStreaming, pendingUserMessage, streamingResponse]);
+  }, [streamingResponse]);
+
+  // Al finalizar el streaming, limpiar estado pendiente
+  useEffect(() => {
+    if (!isStreaming && pendingIndexRef.current !== null) {
+      pendingIndexRef.current = null;
+    }
+  }, [isStreaming]);
 
   // Mensajes a mostrar: cache local + mensaje pendiente si existe
   const displayMessages: Message[] = React.useMemo(() => {
-    if (pendingUserMessage) {
-      // Verificar si ya existe en el cache
-      const lastMessage = localMessages[localMessages.length - 1];
-      const isDuplicate =
-        lastMessage &&
-        lastMessage.content.trim() === pendingUserMessage.trim();
-
-      if (isDuplicate) {
-        return localMessages;
-      }
-
-      // Crear mensaje temporal
-      const tempMessage: Message = {
-        content: pendingUserMessage,
-        answer: '',
-        timestamp: new Date().toISOString(),
-      };
-      return [...localMessages, tempMessage];
-    }
     return localMessages;
-  }, [localMessages, pendingUserMessage]);
+  }, [localMessages]);
 
   // Refetch cuando el usuario navega o vuelve a la pestaña
   useEffect(() => {
@@ -152,11 +136,21 @@ export const ChatView: React.FC<ChatViewProps> = ({ userId, chatId }) => {
   const handleSendMessage = useCallback(
     async (content: string) => {
       try {
-        setPendingUserMessage(content);
+        // Agregar mensaje temporal al cache local y guardar su índice
+        setLocalMessages(prev => {
+          const temp: Message = {
+            content,
+            answer: '',
+            timestamp: new Date().toISOString(),
+          };
+          const next = [...prev, temp];
+          pendingIndexRef.current = next.length - 1;
+          return next;
+        });
         await sendMessage(content);
       } catch (error) {
         console.error('Error sending message:', error);
-        setPendingUserMessage(null);
+        pendingIndexRef.current = null;
       }
     },
     [sendMessage]

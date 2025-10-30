@@ -2,11 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ENV } from '@/shared/config/env';
 
-interface StreamingMessage {
-  chatId: string;
-  content: string;
-}
-
 interface UseWebSocketReturn {
   socket: Socket | null;
   streamingResponse: string;
@@ -51,8 +46,8 @@ export const useWebSocket = (
     });
 
     // Evento: Inicio del streaming
-    newSocket.on('ai-response-start', (data: { chatId: string }) => {
-      // console.log('🚀 Iniciando streaming para chat:', data.chatId);
+    newSocket.on('ai-response-start', () => {
+      // console.log('🚀 Iniciando streaming para chat');
       setIsStreaming(true);
       setStreamingResponse('');
     });
@@ -67,8 +62,8 @@ export const useWebSocket = (
     );
 
     // Evento: Fin del streaming
-    newSocket.on('ai-response-end', (data: StreamingMessage) => {
-      // console.log('✅ Streaming finalizado para chat:', data.chatId);
+    newSocket.on('ai-response-end', () => {
+      // console.log('✅ Streaming finalizado para chat');
 
       // Limpiar inmediatamente para respuestas largas
       setIsStreaming(false);
@@ -80,8 +75,8 @@ export const useWebSocket = (
     });
 
     // Evento: Error
-    newSocket.on('error', (data: { chatId: string; error: string }) => {
-      // console.error('❌ Error en WebSocket:', data.error);
+    newSocket.on('error', () => {
+      // console.error('❌ Error en WebSocket');
       setIsStreaming(false);
       setStreamingResponse('');
     });

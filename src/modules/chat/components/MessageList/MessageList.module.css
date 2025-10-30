@@ -103,7 +103,20 @@
   display: inline;
 }
 
-.streamingContent .markdown .cursor {
+/* Variante ligera para streaming */
+.streamingContent .markdownPlain {
+  color: var(--ds-text-primary, #1f2937);
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  width: 100%;
+  display: inline;
+}
+
+.streamingContent .markdown .cursor,
+.streamingContent .markdownPlain .cursor {
   display: inline;
   margin-left: 2px;
   color: #125894;
@@ -278,7 +291,7 @@
 
 @media (max-width: 768px) {
   .messageList {
-    padding: var(--ds-spacing-3) var(--ds-spacing-4);
+    padding: var(--ds-spacing-3) var(--ds-spacing-6);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
@@ -331,7 +344,7 @@
 
 @media (max-width: 480px) {
   .messageList {
-    padding: var(--ds-spacing-2) var(--ds-spacing-3);
+    padding: var(--ds-spacing-2) var(--ds-spacing-5);
   }
 
   .messagesContainer {
