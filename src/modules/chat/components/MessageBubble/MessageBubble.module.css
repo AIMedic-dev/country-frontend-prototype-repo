@@ -294,6 +294,25 @@
   opacity: 1;
 }
 
+/* Cursor parpadeante */
+.markdown .cursor,
+.cursor {
+  display: inline;
+  margin-left: 2px;
+  color: #125894;
+  animation: blink 1s step-end infinite;
+  font-weight: 600;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
 /* ============================================
    ANIMACIONES
    ============================================ */
