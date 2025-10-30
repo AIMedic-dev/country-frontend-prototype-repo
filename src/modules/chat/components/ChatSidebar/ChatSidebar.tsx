@@ -89,7 +89,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 {user.nombre.charAt(0).toUpperCase()}
               </div>
               <div className={styles.userText}>
-                <p className={styles.userName}>{user.nombre}</p>
+                {/* <p className={styles.userName}>{user.nombre}</p> */}
                 <span className={styles.userRole}>
                   {user.rol === 'paciente' ? 'Paciente' : 'Empleado'}
                 </span>

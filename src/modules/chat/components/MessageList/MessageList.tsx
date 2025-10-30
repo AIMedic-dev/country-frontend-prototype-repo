@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
 import type { Message } from '../../types/chat.types';
 import { MessageBubble } from '../MessageBubble/MessageBubble';
 import { Spinner } from '../../../../shared';
@@ -18,18 +17,69 @@ export const MessageList: React.FC<MessageListProps> = ({
   streamingResponse = '',
   isStreaming = false,
 }) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(messages.length);
+  const prevStreamingRef = useRef(isStreaming);
 
-  // Auto-scroll al último mensaje
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // SCROLL cuando cambia el número de mensajes
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, streamingResponse]);
+    if (messages.length > prevMessagesLengthRef.current) {
+      prevMessagesLengthRef.current = messages.length;
 
-  // Solo mostrar spinner si NO hay mensajes
+      const scrollTimer = setTimeout(() => {
+        if (messageListRef.current) {
+          const container = messageListRef.current;
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          });
+
+          setTimeout(() => {
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'smooth',
+            });
+          }, 100);
+        }
+      }, 300);
+
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [messages.length]);
+
+  // SCROLL cuando INICIA el streaming (para ver el logo y animación)
+  useEffect(() => {
+    // Detectar cuando isStreaming cambia de false a true
+    if (isStreaming && !prevStreamingRef.current) {
+      prevStreamingRef.current = true;
+
+      const scrollTimer = setTimeout(() => {
+        if (messageListRef.current) {
+          messageListRef.current.scrollTo({
+            top: messageListRef.current.scrollHeight,
+            behavior: 'smooth',
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(scrollTimer);
+    }
+
+    if (!isStreaming) {
+      prevStreamingRef.current = false;
+    }
+  }, [isStreaming]);
+
+  // SCROLL durante el streaming (mientras escribe)
+  useEffect(() => {
+    if (isStreaming && streamingResponse && messageListRef.current) {
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [streamingResponse, isStreaming]);
+
   if (isLoading && messages.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -39,10 +89,16 @@ export const MessageList: React.FC<MessageListProps> = ({
     );
   }
 
+  // Estado del último mensaje para controlar el indicador de escritura
+  const lastMessage = messages[messages.length - 1];
+  const lastHasAnswer = Boolean(lastMessage && lastMessage.answer);
+  const hasPendingWithoutAnswer = Boolean(
+    lastMessage && lastMessage.answer === ''
+  );
+
   return (
-    <div className={styles.messageList}>
+    <div ref={messageListRef} className={styles.messageList}>
       <div className={styles.messagesContainer}>
-        {/* Mensajes guardados */}
         {messages.map((message, index) => (
           <MessageBubble
             key={`${message.timestamp}-${index}`}
@@ -52,10 +108,9 @@ export const MessageList: React.FC<MessageListProps> = ({
           />
         ))}
 
-        {/* Mensaje en streaming (tiempo real) */}
-        {isStreaming && (
+        {/* Mostrar indicador de escritura BAJO el último mensaje pendiente (solo dots) */}
+        {isStreaming && hasPendingWithoutAnswer && (
           <div className={styles.streamingContainer}>
-            {/* Avatar de la IA */}
             <div className={styles.aiAvatar}>
               <img
                 src="/images/logos/country-icono.png"
@@ -65,11 +120,32 @@ export const MessageList: React.FC<MessageListProps> = ({
               />
             </div>
 
-            {/* Contenido del streaming con Markdown */}
+            <div className={styles.streamingContent}>
+              <div className={styles.thinkingDots}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fallback: si hay streaming pero NO hay mensaje pendiente ni respuesta inline, usar contenedor global */}
+        {isStreaming && !lastHasAnswer && !hasPendingWithoutAnswer && (
+          <div className={styles.streamingContainer}>
+            <div className={styles.aiAvatar}>
+              <img
+                src="/images/logos/country-icono.png"
+                alt="Country"
+                width="24"
+                height="24"
+              />
+            </div>
+
             <div className={styles.streamingContent}>
               {streamingResponse ? (
-                <div className={styles.markdown}>
-                  <ReactMarkdown>{streamingResponse}</ReactMarkdown>
+                <div className={styles.markdownPlain}>
+                  {streamingResponse}
                   <span className={styles.cursor}>▊</span>
                 </div>
               ) : (
@@ -82,8 +158,6 @@ export const MessageList: React.FC<MessageListProps> = ({
             </div>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
     </div>
   );
