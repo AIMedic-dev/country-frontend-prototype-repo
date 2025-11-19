@@ -33,7 +33,8 @@
    PANEL IZQUIERDO - Imagen completa
    ─────────────────────────────────────────── */
 .left-panel{
-  flex:0 0 48%;
+  /* flex:0 0 48%; */
+  flex:0 0 38%;
   position:relative;
   overflow:hidden;
   background:var(--color-medical-primary);
