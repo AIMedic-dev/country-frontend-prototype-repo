@@ -45,7 +45,7 @@ export default function Login() {
       <section className="left-panel">
         <div className="left-image-container">
           <img
-            src="images/imagen-completa2.jpg"
+            src="images/foto-login-aprobada1.jpg"
             alt="Clínica del Country - Centro de Oncología"
             className="left-background-image"
           />
