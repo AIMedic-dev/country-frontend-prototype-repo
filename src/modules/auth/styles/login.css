@@ -208,6 +208,8 @@
    RESPONSIVE
    ─────────────────────────────────────────── */
 
+
+
 /* Laptops estándar (1200px - 1400px) */
 @media (max-width:1400px) and (min-width:901px){
   .left-panel{
@@ -573,5 +575,36 @@
   
   .brand-logo-footer{
     height:28px;
+  }
+}
+
+/* Rango específico para pantallas de portátiles estándar (1280px, 1366px, 1440px) */
+@media screen and (min-width: 1024px) and (max-width: 1440px) {
+  
+  .left-panel {
+    /* Aumentamos el ancho al 50% para dar más aire a la imagen y evitar recorte excesivo */
+    flex: 0 0 50%;
+  }
+
+  .right-panel {
+    /* Ajustamos el panel derecho para que ocupe el 50% restante */
+    flex: 0 0 50%;
+    padding: 40px 30px; /* Ajuste ligero de padding para portátiles */
+  }
+
+  .left-background-image {
+    /* Garantizamos que cubra el 100% sin deformarse ni dejar bordes */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    /* 'center center' es el estándar, pero si la imagen corta cabezas, 
+       puedes cambiarlo a 'top center' */
+    object-position: center center; 
+  }
+  
+  /* Ajuste preventivo para el formulario en este nuevo ancho */
+  .login-form {
+    max-width: 100%; /* Aprovecha el ancho disponible del panel derecho */
   }
 }
