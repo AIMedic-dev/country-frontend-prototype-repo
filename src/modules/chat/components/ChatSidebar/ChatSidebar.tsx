@@ -2,7 +2,7 @@ import React from 'react';
 import type { Chat } from '../../types/chat.types';
 import { ChatList } from '../ChatList/ChatList';
 import styles from './ChatSidebar.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/modules/auth/context/AuthContext';
 
 
@@ -29,8 +29,11 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
 }) => {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuthContext();
 
+  // Detectar si estamos en la ruta de analytics
+  const isAnalyticsRoute = location.pathname === '/analytics';
 
   const handleChatSelect = (chatId: string) => {
     onChatSelect(chatId);
@@ -45,9 +48,23 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
     navigate('/login', { replace: true });
   };
 
-  // Función para ir a estadísticas
-  const handleGoToStatistics = () => {
-    window.open('/statistics', '_blank', 'noopener,noreferrer');
+  // Función para ir a analytics
+  const handleGoToAnalytics = () => {
+    navigate('/analytics');
+    if (onClose && window.innerWidth < 768) {
+      onClose();
+    }
+  };
+
+  // Función para ir al chat (desde analytics)
+  const handleGoToChat = () => {
+    if (chats.length > 0 && activeChat) {
+      navigate(`/chat/${activeChat}`);
+    } else if (chats.length > 0) {
+      navigate(`/chat/${chats[0].id}`);
+    } else {
+      navigate('/');
+    }
     if (onClose && window.innerWidth < 768) {
       onClose();
     }
@@ -91,29 +108,56 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
               <div className={styles.userText}>
                 {/* <p className={styles.userName}>{user.nombre}</p> */}
                 <span className={styles.userRole}>
-                  {user.rol === 'paciente' ? 'Paciente' : 'Empleado'}
+                  {user.rol === 'paciente' ? 'Paciente' : 'Colaborador'}
                 </span>
               </div>
             </div>
             <div className={styles.userActions}>
-              {/* ✨ AGREGAR: Botón de estadísticas solo para empleados */}
+              {/* Botón dinámico: Analytics si está en chat, Chat si está en analytics */}
               {user.rol === 'empleado' && (
-                <button
-                  className={styles.statsButton}
-                  onClick={handleGoToStatistics}
-                  aria-label="Ver estadísticas"
-                  title="Ver estadísticas"
-                >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path
-                      d="M3 17V10M10 17V3M17 17V7"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
+                <>
+                  {isAnalyticsRoute ? (
+                    <button
+                      className={styles.statsButton}
+                      onClick={handleGoToChat}
+                      aria-label="Ir al chat"
+                      title="Ir al chat"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                          d="M17 3H3C1.89543 3 1 3.89543 1 5V13C1 14.1046 1.89543 15 3 15H6L9 18L12 15H17C18.1046 15 19 14.1046 19 13V5C19 3.89543 18.1046 3 17 3Z"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M6 8H14M6 11H11"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      className={styles.statsButton}
+                      onClick={handleGoToAnalytics}
+                      aria-label="Ver analytics"
+                      title="Ver analytics"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                          d="M3 17V10M10 17V3M17 17V7"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </>
               )}
 
               <button

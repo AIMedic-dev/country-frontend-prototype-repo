@@ -1,0 +1,75 @@
+.analyticsPage {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  min-width: 0;
+}
+
+.menuButton {
+  display: none;
+  position: fixed;
+  top: var(--ds-spacing-4);
+  left: var(--ds-spacing-4);
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-full);
+  background-color: var(--ds-surface);
+  border: var(--ds-border-hairline);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-icon);
+  box-shadow: var(--ds-elevation-2);
+  transition: all var(--ds-duration-base) var(--ds-easing-standard);
+}
+
+.menuButton:hover {
+  background-color: var(--ds-selection);
+  color: var(--ds-primary);
+}
+
+.menuButton:active {
+  transform: scale(var(--ds-press-scale));
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .analyticsPage {
+    height: 100vh;
+    height: 100dvh;
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .menuButton {
+    display: flex;
+  }
+}
+
+/* iOS Safari fix */
+@supports (-webkit-touch-callout: none) {
+  .analyticsPage {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+}
+

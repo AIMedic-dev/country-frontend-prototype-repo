@@ -17,24 +17,22 @@ interface TopicsChartProps {
 }
 
 const COLORS = [
-  '#091621',
-  '#062045',
-  '#0B255B',
-  '#0E3192',
-  '#42A2CA',
-  '#4facfe',
-  '#fee140',
-  '#30cfd0',
-  '#a8edea',
-  '#ff6b6b',
-  '#feca57',
-  '#48dbfb',
+  'var(--ds-blue-900)', // #0B255B
+  'var(--ds-blue-800)', // #091621
+  'var(--ds-blue-700)', // #062045
+  'var(--ds-blue-600)', // #0E3192
+  'var(--ds-blue-500)', // #42A2CA
+  'var(--ds-blue-400)', // #7FBED8
+  'var(--ds-blue-300)', // #8AB4F8
+  'var(--ds-blue-200)', // #AECBFA
+  'var(--ds-blue-100)', // #D2E3FC
+  'var(--ds-blue-50)',  // #E8F0FE
 ];
 
 export const TopicsChart: React.FC<TopicsChartProps> = ({ data }) => {
   return (
     <div className={styles.chartContainer}>
-      <h3 className={styles.chartTitle}>Temas Principales</h3>
+      <h3 className={styles.chartTitle}>Temas Más Comunes en las Conversaciones</h3>
       <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={data}
@@ -60,9 +58,10 @@ export const TopicsChart: React.FC<TopicsChartProps> = ({ data }) => {
           <Tooltip
             contentStyle={{
               backgroundColor: 'white',
-              border: '1px solid #e2e8f0',
+              border: `2px solid var(--ds-blue-600)`,
               borderRadius: '8px',
               padding: '8px 12px',
+              boxShadow: '0 2px 8px rgba(14, 49, 146, 0.15)',
             }}
             formatter={(value: number) => [`${value}%`, 'Frecuencia']}
           />

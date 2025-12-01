@@ -11,13 +11,18 @@ export default function Login() {
   const [accept, setAccept] = useState(false);
 
   const navigate = useNavigate();
-  const { login, isLoading, error, isAuthenticated } = useAuthContext();
+  const { login, isLoading, error, isAuthenticated, user } = useAuthContext();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
+    if (isAuthenticated && user) {
+      // Si es empleado, redirigir a analytics; si es paciente, a dashboard
+      if (user.rol === 'empleado') {
+        navigate('/analytics', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +40,12 @@ export default function Login() {
     const response = await login(code.trim());
 
     if (response) {
-      navigate('/', { replace: true });
+      // Redirigir según el rol del usuario
+      if (response.user.rol === 'empleado') {
+        navigate('/analytics', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
   };
 

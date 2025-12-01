@@ -1,0 +1,626 @@
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--ds-blue-100);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--ds-blue-600);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--ds-blue-300);
+  transform: translateY(-1px);
+  background: var(--ds-blue-50);
+}
+
+.card:hover::before {
+  transform: scaleY(1);
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardLabel {
+  color: var(--ds-gray-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.01em;
+}
+
+.cardValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  margin: 0;
+  line-height: 1;
+}
+
+.cardValueOrange {
+  color: var(--ds-blue-500);
+}
+
+.cardValueGreen {
+  color: var(--ds-blue-700);
+}
+
+.cardValuePurple {
+  color: var(--ds-blue-600);
+  font-size: 1.5rem;
+}
+
+.cardIcon {
+  color: var(--ds-blue-500);
+  flex-shrink: 0;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover .cardIcon {
+  opacity: 1;
+}
+
+.cardIconOrange {
+  color: var(--ds-blue-500);
+}
+
+.cardIconGreen {
+  color: var(--ds-blue-600);
+}
+
+.cardIconPurple {
+  color: var(--ds-blue-400);
+}
+
+@media (max-width: 1200px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Modal Content Styles */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modalDescription {
+  color: var(--ds-gray-700);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modalInfo {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border: 1px solid var(--ds-blue-100);
+}
+
+.modalValue {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  margin: 0;
+  line-height: 1;
+}
+
+.modalLabel {
+  font-size: 0.875rem;
+  color: var(--ds-gray-600);
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+.modalDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modalDetailTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ds-blue-600);
+  margin: 0;
+}
+
+.modalList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modalList li {
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--ds-gray-700);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.modalList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--ds-blue-600);
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.modalNote {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border-left: 4px solid var(--ds-blue-600);
+  color: var(--ds-gray-700);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.modalSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalSectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modalSectionTitle::before {
+  content: '';
+  width: 3px;
+  height: 20px;
+  background: var(--ds-blue-600);
+  border-radius: 2px;
+}
+
+/* Distribution Grid */
+.distributionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.distributionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border: 1px solid var(--ds-blue-100);
+}
+
+.distributionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.distributionCategory {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.9375rem;
+}
+
+.distributionPercentage {
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  font-size: 1.125rem;
+}
+
+.distributionBar {
+  width: 100%;
+  height: 8px;
+  background: var(--ds-blue-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.distributionBarFill {
+  height: 100%;
+  background: var(--ds-blue-600);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.distributionCount {
+  font-size: 0.875rem;
+  color: var(--ds-gray-600);
+}
+
+/* Topics List */
+.topicsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.topicItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border: 1px solid var(--ds-blue-100);
+}
+
+.topicRank {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ds-blue-600);
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.topicContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.topicInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topicName {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.9375rem;
+}
+
+.topicPercentage {
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  font-size: 1rem;
+}
+
+.topicBar {
+  width: 100%;
+  height: 6px;
+  background: var(--ds-blue-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.topicBarFill {
+  height: 100%;
+  background: var(--ds-blue-500);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.topicValue {
+  font-size: 0.8125rem;
+  color: var(--ds-gray-600);
+}
+
+/* Symptoms Grid */
+.symptomsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.symptomCard {
+  padding: 0.875rem;
+  background: var(--ds-blue-50);
+  border-radius: 10px;
+  border: 1px solid var(--ds-blue-100);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.symptomName {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.875rem;
+}
+
+.symptomCount {
+  font-size: 0.75rem;
+  color: var(--ds-blue-600);
+  font-weight: 500;
+}
+
+/* Segmentation Grid */
+.segmentationGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.segmentationCard {
+  padding: 1.25rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border: 1px solid var(--ds-blue-100);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.segmentationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.segmentationLabel {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.9375rem;
+}
+
+.segmentationValue {
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  font-size: 1.25rem;
+}
+
+.segmentationBar {
+  width: 100%;
+  height: 10px;
+  background: var(--ds-blue-100);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.segmentationBarFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.segmentationLeve {
+  background: var(--ds-blue-400);
+}
+
+.segmentationModerado {
+  background: var(--ds-blue-500);
+}
+
+.segmentationIntenso {
+  background: var(--ds-blue-600);
+}
+
+.segmentationCount {
+  font-size: 0.875rem;
+  color: var(--ds-gray-600);
+}
+
+/* Evolution List */
+.evolutionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.evolutionItem {
+  display: grid;
+  grid-template-columns: 100px 1fr 60px 120px;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem;
+  background: var(--ds-blue-50);
+  border-radius: 10px;
+  border: 1px solid var(--ds-blue-100);
+}
+
+.evolutionDate {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.875rem;
+}
+
+.evolutionBar {
+  width: 100%;
+  height: 8px;
+  background: var(--ds-blue-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.evolutionBarFill {
+  height: 100%;
+  background: var(--ds-blue-600);
+  border-radius: 4px;
+}
+
+.evolutionLevel {
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.evolutionMedication {
+  font-size: 0.8125rem;
+  color: var(--ds-gray-600);
+  text-align: right;
+}
+
+/* Date Segmentation */
+.dateSegmentationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.dateCard {
+  padding: 1.25rem;
+  background: var(--ds-blue-50);
+  border-radius: 12px;
+  border: 1px solid var(--ds-blue-100);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dateHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.datePeriod {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.9375rem;
+}
+
+.datePercentage {
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  font-size: 1.125rem;
+}
+
+.dateBar {
+  width: 100%;
+  height: 8px;
+  background: var(--ds-blue-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dateBarFill {
+  height: 100%;
+  background: var(--ds-blue-600);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.dateCount {
+  font-size: 0.875rem;
+  color: var(--ds-gray-600);
+}
+
+/* Activity List */
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activityItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--ds-blue-50);
+  border-radius: 10px;
+  border: 1px solid var(--ds-blue-100);
+}
+
+.activityTime {
+  font-weight: 600;
+  color: var(--ds-blue-600);
+  font-size: 0.875rem;
+}
+
+.activityType {
+  color: var(--ds-gray-700);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .dateSegmentationGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .symptomsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .evolutionItem {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .evolutionDate,
+  .evolutionLevel,
+  .evolutionMedication {
+    text-align: left;
+  }
+
+  .activityItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardValue {
+    font-size: 1.75rem;
+  }
+
+  .cardValuePurple {
+    font-size: 1.25rem;
+  }
+
+  .modalValue {
+    font-size: 2.5rem;
+  }
+}
+

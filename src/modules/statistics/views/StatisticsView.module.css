@@ -1,41 +1,93 @@
 .container {
   width: 100%;
-  min-height: 100vh;
-  background: #f8fafc;
+  height: 100%;
+  background: var(--ds-gray-50);
   padding: 2rem;
   overflow-y: auto;
-  height: 100vh; 
+  flex: 1;
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.titleWrapper {
+  display: inline-block;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: var(--color-medical-primary);
-  margin: 0 0 0.5rem 0;
-  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.titleGradient {
+  color: var(--ds-blue-600);
+  display: inline-block;
+  position: relative;
+}
+
+.titleUnderline {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, var(--ds-blue-400) 50%, transparent 100%);
+  border-radius: 2px;
+  animation: underlineExpand 0.6s ease-out;
+}
+
+@keyframes underlineExpand {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 80px;
+    opacity: 1;
+  }
 }
 
 .subtitle {
-  font-size: 1rem;
-  color: var(--ds-blue-500);
-  margin: 0;
-  text-align: center;
-}
-
-.chartsGrid {
-  display: flex;                    
-  flex-direction: column;            
-  gap: 2rem;
-  max-width: 1200px;                 
-  margin: 0 auto;                    
+  font-size: 1.125rem;
+  color: var(--ds-blue-600);
+  margin: 1.5rem 0 0 0;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .chartItem {
   width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.twoColumnGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .twoColumnGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .twoColumnGrid {
+    gap: 1rem;
+  }
 }
 
 /* Loading */
@@ -44,7 +96,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100%;
   gap: 1rem;
 }
 
@@ -58,7 +110,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100%;
   padding: 2rem;
 }
 
@@ -85,7 +137,7 @@
 }
 
 .retryButton {
-  background: #667eea;
+  background: var(--ds-blue-600);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -97,7 +149,7 @@
 }
 
 .retryButton:hover {
-  background: #5568d3;
+  background: var(--ds-blue-700);
 }
 
 /* Responsive */
@@ -112,12 +164,22 @@
     padding: 1rem;
   }
 
+  .header {
+    margin-bottom: 2rem;
+  }
+
   .title {
-    font-size: 1.5rem;
+    font-size: 2rem;
+  }
+
+  .titleUnderline {
+    width: 60px;
+    height: 3px;
   }
 
   .subtitle {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    margin-top: 1rem;
   }
 
   .chartsGrid {
@@ -130,8 +192,22 @@
     padding: 0.75rem;
   }
 
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
   .title {
-    font-size: 1.25rem;
+    font-size: 1.75rem;
+  }
+
+  .titleUnderline {
+    width: 50px;
+    height: 3px;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    margin-top: 0.875rem;
   }
 
   .chartsGrid {

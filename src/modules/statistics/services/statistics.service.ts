@@ -1,4 +1,10 @@
-import type { StatisticsData, TopicData, WordFrequency } from '../types/statistics.types';
+import type {
+  StatisticsData,
+  TopicData,
+  WordFrequency,
+  PainScaleData,
+  SymptomData,
+} from '../types/statistics.types';
 
 // Datos mock (después puedes conectar con el backend)
 const MOCK_TOPICS = {
@@ -66,7 +72,41 @@ class StatisticsService {
 
         console.log('Words data:', wordsData); // ✨ DEBUG
 
-        return { topicsData, wordsData };
+        // Datos mock para escala de dolor
+        const painScaleData: PainScaleData[] = [
+          { fecha: '20 Nov', nivel: 3, medicamento: 'Ibuprofeno' },
+          { fecha: '21 Nov', nivel: 4, medicamento: 'Ibuprofeno' },
+          { fecha: '22 Nov', nivel: 5, medicamento: 'Tramadol' },
+          { fecha: '23 Nov', nivel: 4, medicamento: 'Tramadol' },
+          { fecha: '24 Nov', nivel: 3, medicamento: 'Tramadol' },
+          { fecha: '25 Nov', nivel: 2, medicamento: 'Paracetamol' },
+          { fecha: '26 Nov', nivel: 2, medicamento: 'Paracetamol' },
+        ];
+
+        // Datos mock para síntomas
+        const symptomsData: SymptomData[] = [
+          { nombre: 'Vómito', menciones: 32 },
+          { nombre: 'Mareos', menciones: 28 },
+          { nombre: 'Catéter - Cuidados', menciones: 24 },
+          { nombre: 'Fatiga', menciones: 19 },
+          { nombre: 'Pérdida de apetito', menciones: 16 },
+        ];
+
+        // Stats cards
+        const stats = {
+          totalConversations: 24,
+          averagePain: 3.4,
+          topicsCount: 6,
+          lastInteraction: 'Hoy',
+        };
+
+        return {
+          topicsData,
+          wordsData,
+          painScaleData,
+          symptomsData,
+          stats,
+        };
     }
 
     /**

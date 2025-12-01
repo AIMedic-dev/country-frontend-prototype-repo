@@ -1,0 +1,242 @@
+.header {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--ds-blue-100);
+  margin-bottom: 1.5rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.headerTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerIcon {
+  color: var(--ds-blue-600);
+  flex-shrink: 0;
+}
+
+.headerSubtitle {
+  font-size: 0.9375rem;
+  color: var(--ds-gray-600);
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.userIcon {
+  color: var(--ds-blue-600);
+  flex-shrink: 0;
+}
+
+.searchContainer {
+  position: relative;
+  min-width: 300px;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--ds-blue-200);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.searchInputWrapper:focus-within {
+  border-color: var(--ds-blue-600);
+  box-shadow: 0 0 0 3px rgba(14, 49, 146, 0.1);
+}
+
+.searchButton {
+  position: absolute;
+  left: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ds-gray-500);
+  transition: all 0.2s ease;
+  z-index: 1;
+  padding: 0;
+}
+
+.searchButton:hover {
+  background: var(--ds-blue-50);
+  color: var(--ds-blue-600);
+}
+
+.searchButton:active {
+  transform: scale(0.95);
+}
+
+.searchIcon {
+  color: inherit;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.625rem 1rem 0.625rem 3rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ds-gray-800);
+  background: transparent;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--ds-gray-400);
+}
+
+.clearButton {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--ds-gray-200);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ds-gray-600);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.clearButton:hover {
+  background: var(--ds-gray-300);
+  color: var(--ds-gray-800);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--ds-blue-100);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.optionsList {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.option {
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.option:hover {
+  background: var(--ds-blue-50);
+}
+
+.option.selected {
+  background: var(--ds-blue-100);
+}
+
+.optionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.optionName {
+  font-weight: 600;
+  color: var(--ds-gray-800);
+  font-size: 0.9375rem;
+}
+
+.optionType {
+  font-size: 0.8125rem;
+  color: var(--ds-gray-600);
+}
+
+.optionBadge {
+  font-size: 0.75rem;
+  color: var(--ds-blue-600);
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  background: var(--ds-blue-50);
+  border-radius: 6px;
+}
+
+.emptyState {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--ds-gray-500);
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .headerTitle {
+    font-size: 1.5rem;
+  }
+
+  .headerRight {
+    width: 100%;
+  }
+
+  .patientSelect {
+    flex: 1;
+    min-width: auto;
+  }
+}
+

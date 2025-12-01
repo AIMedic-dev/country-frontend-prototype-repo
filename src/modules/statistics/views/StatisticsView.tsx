@@ -2,6 +2,11 @@ import React from 'react';
 import { useStatistics } from '../hooks/useStatistics';
 import { TopicsChart } from '../components/TopicsChart/TopicsChart';
 import { WordCloudChart } from '../components/WordCloudChart/WordCloudChart';
+import { PainScaleChart } from '../components/PainScaleChart/PainScaleChart';
+import { SymptomsChart } from '../components/SymptomsChart/SymptomsChart';
+import { StatsCards } from '../components/StatsCards/StatsCards';
+import { SummarySection } from '../components/SummarySection/SummarySection';
+import { AnalyticsHeader } from '../components/AnalyticsHeader/AnalyticsHeader';
 import { Spinner } from '@/shared/components';
 import styles from './StatisticsView.module.css';
 
@@ -37,22 +42,39 @@ export const StatisticsView: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Estadísticas de Conversaciones</h1>
-        <p className={styles.subtitle}>
-          Análisis de los temas y palabras más frecuentes en las consultas
-        </p>
+      {/* Header con selector de pacientes */}
+      <AnalyticsHeader />
+
+      {/* Stats Cards */}
+      <StatsCards
+        stats={data.stats}
+        topicsData={data.topicsData}
+        painScaleData={data.painScaleData}
+        symptomsData={data.symptomsData}
+      />
+
+      {/* Gráfica de Temas Más Comunes */}
+      <div className={styles.chartItem}>
+        <TopicsChart data={data.topicsData} />
       </div>
 
-      <div className={styles.chartsGrid}>
+      {/* Grid de dos columnas: Escala de Dolor y Síntomas */}
+      <div className={styles.twoColumnGrid}>
         <div className={styles.chartItem}>
-          <TopicsChart data={data.topicsData} />
+          <PainScaleChart data={data.painScaleData} />
         </div>
-
         <div className={styles.chartItem}>
-          <WordCloudChart data={data.wordsData} />
+          <SymptomsChart data={data.symptomsData} />
         </div>
       </div>
+
+      {/* Palabras Más Frecuentes (se mantiene como está) */}
+      <div className={styles.chartItem}>
+        <WordCloudChart data={data.wordsData} />
+      </div>
+
+      {/* Resumen General de Interacciones */}
+      <SummarySection />
     </div>
   );
 };

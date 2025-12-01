@@ -5,7 +5,7 @@ export const USER_ROLES = {
 
 export const USER_ROLE_LABELS = {
   paciente: 'Paciente',
-  empleado: 'Empleado',
+  empleado: 'Colaborador',
 } as const;
 
 export const API_ENDPOINTS = {

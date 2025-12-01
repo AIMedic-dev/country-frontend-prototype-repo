@@ -6,7 +6,14 @@ interface WordCloudChartProps {
   data: WordFrequency[];
 }
 
-const COLORS = ['#42A2CA', '#0E3192', '#062045', '#091621', '#0B255B', '#7FBED8'];
+const COLORS = [
+  'var(--ds-blue-500)', // #42A2CA
+  'var(--ds-blue-600)', // #0E3192
+  'var(--ds-blue-700)', // #062045
+  'var(--ds-blue-800)', // #091621
+  'var(--ds-blue-900)', // #0B255B
+  'var(--ds-blue-400)', // #7FBED8
+];
 
 export const WordCloudChart: React.FC<WordCloudChartProps> = ({ data }) => {
   // Calcular tamaño de fuente basado en el valor

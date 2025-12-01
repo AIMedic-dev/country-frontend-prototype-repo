@@ -34,9 +34,9 @@ export const AppRouter = () => {
             }
           />
 
-          {/* Ruta de estadísticas (solo empleados) */}
+          {/* Ruta de analytics (solo empleados) */}
           <Route
-            path="/statistics"
+            path="/analytics"
             element={
               <ProtectedRoute requiredRole="empleado">
                 <StatisticsPage />

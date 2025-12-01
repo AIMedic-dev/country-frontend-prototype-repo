@@ -1,0 +1,71 @@
+.chartContainer {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid var(--ds-blue-100);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--ds-blue-600);
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chartTitle::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--ds-blue-600);
+  border-radius: 2px;
+}
+
+.legend {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--ds-blue-50);
+  border-radius: 10px;
+  gap: 0.75rem;
+  border: 1px solid var(--ds-blue-100);
+  transition: all 0.2s ease;
+}
+
+.legendItem:hover {
+  background: var(--ds-blue-100);
+  border-color: var(--ds-blue-200);
+}
+
+.legendColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendName {
+  font-weight: 500;
+  color: var(--ds-gray-700);
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.legendValue {
+  color: var(--ds-gray-600);
+  font-size: 0.875rem;
+}
+

@@ -1,0 +1,276 @@
+import React, { useState } from 'react';
+import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Activity, MessageSquare, TrendingUp, User, Calendar, AlertCircle } from 'lucide-react';
+
+const Dashboard = () => {
+  const [selectedPatient, setSelectedPatient] = useState('PAC-001');
+  
+  // Datos de ejemplo
+  const patients = [
+    { id: 'PAC-001', name: 'María G.', type: 'Cáncer de Seno' },
+    { id: 'PAC-002', name: 'Carlos R.', type: 'Gastrointestinal' },
+    { id: 'PAC-003', name: 'Ana L.', type: 'Cáncer de Seno' }
+  ];
+
+  const temasComunes = [
+    { tema: 'Efectos secundarios', frecuencia: 45, color: '#ef4444' },
+    { tema: 'Medicación', frecuencia: 38, color: '#3b82f6' },
+    { tema: 'Nutrición', frecuencia: 32, color: '#10b981' },
+    { tema: 'Dolor', frecuencia: 28, color: '#f59e0b' },
+    { tema: 'Tratamiento', frecuencia: 25, color: '#8b5cf6' },
+    { tema: 'Emocional', frecuencia: 20, color: '#ec4899' }
+  ];
+
+  const escalaDolor = [
+    { fecha: '20 Nov', nivel: 3, medicamento: 'Ibuprofeno' },
+    { fecha: '21 Nov', nivel: 4, medicamento: 'Ibuprofeno' },
+    { fecha: '22 Nov', nivel: 5, medicamento: 'Tramadol' },
+    { fecha: '23 Nov', nivel: 4, medicamento: 'Tramadol' },
+    { fecha: '24 Nov', nivel: 3, medicamento: 'Tramadol' },
+    { fecha: '25 Nov', nivel: 2, medicamento: 'Paracetamol' },
+    { fecha: '26 Nov', nivel: 2, medicamento: 'Paracetamol' }
+  ];
+
+  const temasRelacionados = [
+    { nombre: 'Vómito', menciones: 32 },
+    { nombre: 'Mareos', menciones: 28 },
+    { nombre: 'Catéter - Cuidados', menciones: 24 },
+    { nombre: 'Fatiga', menciones: 19 },
+    { nombre: 'Pérdida de apetito', menciones: 16 }
+  ];
+
+  const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#10b981'];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                <Activity className="text-blue-600" size={36} />
+                Dashboard de Análisis Oncológico
+              </h1>
+              <p className="text-gray-600 mt-2">Análisis de conversaciones con bot médico</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <User className="text-blue-600" size={24} />
+              <select 
+                value={selectedPatient}
+                onChange={(e) => setSelectedPatient(e.target.value)}
+                className="px-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 text-gray-700 font-medium"
+              >
+                {patients.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} - {p.type}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Total Conversaciones</p>
+                <p className="text-3xl font-bold text-blue-600">24</p>
+              </div>
+              <MessageSquare className="text-blue-400" size={32} />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Dolor Promedio</p>
+                <p className="text-3xl font-bold text-orange-600">3.4</p>
+              </div>
+              <AlertCircle className="text-orange-400" size={32} />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Temas Consultados</p>
+                <p className="text-3xl font-bold text-green-600">6</p>
+              </div>
+              <TrendingUp className="text-green-400" size={32} />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Última Interacción</p>
+                <p className="text-xl font-bold text-purple-600">Hoy</p>
+              </div>
+              <Calendar className="text-purple-400" size={32} />
+            </div>
+          </div>
+        </div>
+
+        {/* Visual 1: Temas Más Comunes */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <MessageSquare className="text-blue-600" />
+            Temas Más Comunes en las Conversaciones
+          </h2>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={temasComunes} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis dataKey="tema" stroke="#666" />
+              <YAxis stroke="#666" label={{ value: 'Frecuencia', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#fff', border: '2px solid #3b82f6', borderRadius: '8px' }}
+                cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+              />
+              <Bar dataKey="frecuencia" radius={[8, 8, 0, 0]}>
+                {temasComunes.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          {/* Visual 2: Escala de Dolor */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <Activity className="text-red-600" />
+              Evolución de Escala de Dolor (0-10)
+            </h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={escalaDolor} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis dataKey="fecha" stroke="#666" />
+                <YAxis domain={[0, 10]} stroke="#666" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '2px solid #ef4444', borderRadius: '8px' }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-white p-3 border-2 border-red-400 rounded-lg shadow-lg">
+                          <p className="font-semibold text-gray-800">{payload[0].payload.fecha}</p>
+                          <p className="text-red-600">Dolor: {payload[0].value}/10</p>
+                          <p className="text-blue-600 text-sm">{payload[0].payload.medicamento}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="nivel" 
+                  stroke="#ef4444" 
+                  strokeWidth={3}
+                  dot={{ fill: '#ef4444', r: 6 }}
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-4 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+              <p className="text-sm text-gray-700">
+                <strong>Medicamento actual:</strong> Paracetamol<br/>
+                <strong>Tendencia:</strong> Mejoría progresiva en los últimos 3 días
+              </p>
+            </div>
+          </div>
+
+          {/* Visual 3: Síntomas y Efectos Relacionados */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Síntomas y Efectos Consultados
+            </h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={temasRelacionados}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ nombre, percent }) => `${nombre} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="menciones"
+                >
+                  {temasRelacionados.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {temasRelacionados.map((tema, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
+                    <span className="font-medium text-gray-700">{tema.nombre}</span>
+                  </div>
+                  <span className="text-gray-600">{tema.menciones} menciones</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Resumen de Interacciones */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mt-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Resumen General de Interacciones</h2>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-6 rounded-r-lg space-y-4">
+            <div>
+              <p className="text-sm text-gray-500 font-semibold mb-1">PERIODO DE ANÁLISIS</p>
+              <p className="text-gray-800">20 - 26 de Noviembre 2025 (7 días) • 24 conversaciones totales</p>
+            </div>
+            
+            <div className="border-t border-blue-200 pt-4">
+              <p className="text-sm text-gray-500 font-semibold mb-2">SÍNTOMAS Y EFECTOS MÁS CONSULTADOS</p>
+              <p className="text-gray-800 leading-relaxed">
+                La paciente ha manifestado preocupación recurrente sobre episodios de vómito, especialmente durante las primeras horas de la mañana y después de las comidas. Menciona que los vómitos han sido más frecuentes en los últimos 3 días. También reporta mareos constantes que dificultan sus actividades diarias, principalmente al levantarse o cambiar de posición bruscamente. 
+              </p>
+              <p className="text-gray-800 leading-relaxed mt-2">
+                Respecto al catéter, la paciente ha consultado en múltiples ocasiones sobre los cuidados necesarios, expresando dudas sobre la limpieza adecuada y signos de alerta. Menciona leve enrojecimiento en la zona, pero sin dolor significativo. Ha preguntado sobre cuándo puede bañarse y cómo proteger el área durante el aseo personal.
+              </p>
+            </div>
+
+            <div className="border-t border-blue-200 pt-4">
+              <p className="text-sm text-gray-500 font-semibold mb-2">EVOLUCIÓN DEL DOLOR</p>
+              <p className="text-gray-800 leading-relaxed">
+                El nivel de dolor ha mostrado una tendencia descendente durante la semana. Inició con niveles de 3-4/10, alcanzando un pico de 5/10 el día 22 de noviembre. A partir del día 23, el dolor comenzó a disminuir progresivamente hasta estabilizarse en 2/10 en los últimos dos días. La paciente asocia el dolor principalmente con la zona abdominal y menciona que mejora con reposo.
+              </p>
+            </div>
+
+            <div className="border-t border-blue-200 pt-4">
+              <p className="text-sm text-gray-500 font-semibold mb-2">ESTADO GENERAL Y PREOCUPACIONES</p>
+              <p className="text-gray-800 leading-relaxed">
+                La paciente reporta fatiga constante que limita su capacidad para realizar tareas cotidianas. Ha manifestado pérdida de apetito significativa, mencionando que solo logra consumir pequeñas porciones de alimento. Expresó preocupaciones sobre su nutrición y preguntó sobre alimentos recomendados que sean fáciles de digerir y no le provoquen náuseas.
+              </p>
+              <p className="text-gray-800 leading-relaxed mt-2">
+                En las conversaciones más recientes, la paciente ha consultado sobre la duración esperada de estos efectos y si es normal experimentarlos con esta intensidad. También preguntó sobre actividades físicas ligeras que pueda realizar sin afectar su recuperación.
+              </p>
+            </div>
+
+            <div className="border-t border-blue-200 pt-4">
+              <p className="text-sm text-gray-500 font-semibold mb-2">ASPECTOS EMOCIONALES</p>
+              <p className="text-gray-800 leading-relaxed">
+                La paciente ha compartido sentimientos de ansiedad relacionados con el proceso de tratamiento. Ha preguntado sobre grupos de apoyo y experiencias de otras pacientes. Muestra interés en comprender mejor su condición y los cambios que está experimentando en su cuerpo.
+              </p>
+            </div>
+
+            <div className="mt-4 p-4 bg-blue-100 rounded-lg">
+              <p className="text-sm text-blue-800 font-semibold">
+                💡 Nota: Este resumen consolida las 24 interacciones del período. Se recomienda revisar conversaciones específicas para detalles adicionales.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
