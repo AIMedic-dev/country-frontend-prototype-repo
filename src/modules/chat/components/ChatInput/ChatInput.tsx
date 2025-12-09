@@ -1,5 +1,6 @@
 import React, { useState, useRef, type KeyboardEvent } from 'react';
 import styles from './ChatInput.module.css';
+import { VoiceInputButton } from './VoiceInputButton';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -12,7 +13,7 @@ interface ChatInputProps {
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSend,
   disabled = false,
-  placeholder = 'Introduce una petición para la IA',
+  placeholder = 'preguntame algo ...',
   showTools = false,
   variant = 'default',
 }) => {
@@ -43,6 +44,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  const handleVoiceTranscript = (transcript: string) => {
+    setMessage(transcript);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.focus();
     }
   };
 
@@ -78,6 +88,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           disabled={disabled}
           rows={1}
           aria-label="Mensaje"
+        />
+        
+        <VoiceInputButton
+          onTranscript={handleVoiceTranscript}
+          disabled={disabled}
+          variant={variant}
         />
         
         <button

@@ -123,6 +123,8 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    /* Espacio para el input fijo en la parte inferior */
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0));
   }
 }
 

@@ -20,6 +20,7 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.514.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.47.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",

@@ -6,6 +6,8 @@
   border-bottom: var(--ds-border-hairline);
   background-color: var(--ds-surface);
   flex-shrink: 0;
+  gap: var(--ds-spacing-4);
+  flex-wrap: wrap;
 }
 
 .info {

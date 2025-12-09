@@ -15,8 +15,15 @@
 
 .userMessageContainer {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
   animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.userMessageContainer.hovered .userActions {
+  opacity: 1;
+  visibility: visible;
 }
 
 .userBubble {
@@ -61,6 +68,24 @@
   letter-spacing: 0.01em;
   word-wrap: break-word;
   white-space: pre-wrap;
+}
+
+/* Acciones del mensaje del usuario (hora y copiar) */
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  padding-right: 4px;
+  margin-top: 4px;
+}
+
+.userTimestamp {
+  font-size: 11px;
+  color: var(--ds-text-tertiary, #9ca3af);
+  font-weight: 500;
 }
 
 /* ============================================
@@ -279,19 +304,74 @@
   font-weight: 600;
 }
 
+/* Acciones del mensaje de la IA (hora y copiar) */
+.aiActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.aiMessageContainer.hovered .aiActions {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* Timestamp discreto */
 .aiTimestamp {
   font-size: 12px;
   color: var(--ds-text-tertiary, #9ca3af);
   font-weight: 500;
   letter-spacing: 0.02em;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  margin-top: 2px;
 }
 
-.aiMessageContainer:hover .aiTimestamp {
-  opacity: 1;
+/* Botón de copiar */
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.userMessageContainer .copyButton {
+  background: var(--ds-gray-100, #f3f4f6);
+  color: var(--ds-text-secondary, #6b7280);
+}
+
+.userMessageContainer .copyButton:hover {
+  background: var(--ds-gray-200, #e5e7eb);
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.aiMessageContainer .copyButton {
+  background: var(--ds-gray-100, #f3f4f6);
+  color: var(--ds-text-secondary, #6b7280);
+}
+
+.copyButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.aiMessageContainer .copyButton:hover {
+  background: var(--ds-gray-200, #e5e7eb);
+  color: var(--ds-text-primary, #1f2937);
+}
+
+.copyButton:active {
+  transform: scale(0.95);
 }
 
 /* Cursor parpadeante */
@@ -385,6 +465,15 @@
 
   .aiTimestamp {
     font-size: 11px;
+  }
+
+  .userTimestamp {
+    font-size: 10px;
+  }
+
+  .copyButton {
+    width: 24px;
+    height: 24px;
   }
 
   /* Ajustes markdown mobile */

@@ -5,6 +5,10 @@ export const ENV = {
   // WebSocket URL (Socket.IO)
   WEBSOCKET_URL: import.meta.env.VITE_WEBSOCKET_URL || 'http://localhost:3000',
   
+  // Azure Speech to Text
+  AZURE_SPEECH_KEY: import.meta.env.VITE_AZURE_SPEECH_KEY || '',
+  AZURE_SPEECH_REGION: import.meta.env.VITE_AZURE_SPEECH_REGION || '',
+  
   // Otros configs
   NODE_ENV: import.meta.env.MODE || 'development',
   IS_PRODUCTION: import.meta.env.PROD,

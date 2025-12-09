@@ -14,6 +14,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onClear,
   onMenuClick, 
 }) => {
+
   return (
     <header className={styles.header}>
       {/* Botón hamburguesa */}

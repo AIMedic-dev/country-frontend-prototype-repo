@@ -56,7 +56,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 ? 'Generando respuesta...'
                 : isSending
                   ? 'Enviando...'
-                  : 'Escribe tu mensaje...'
+                  : 'preguntame algo ...'
             }
           />
         </>
@@ -73,7 +73,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                   ? 'Generando respuesta...'
                   : isSending
                     ? 'Enviando...'
-                    : 'Introduce una petición...'
+                    : 'preguntame algo ...'
               }
               variant="centered"
             />

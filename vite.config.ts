@@ -15,6 +15,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: '0.0.0.0', // Permite acceso desde otros dispositivos en la red
     open: true,
     allowedHosts: true,
   },

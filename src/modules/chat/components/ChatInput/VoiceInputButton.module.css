@@ -1,0 +1,72 @@
+.voiceButton {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md);
+  background-color: transparent;
+  color: var(--ds-icon);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--ds-duration-fast) var(--ds-easing-standard);
+}
+
+/* Botón más grande para variante centrada */
+.centered {
+  width: 40px;
+  height: 40px;
+}
+
+.voiceButton:hover:not(:disabled) {
+  background-color: var(--ds-selection);
+  color: var(--ds-primary);
+}
+
+.voiceButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Estado de grabación - usando colores de la marca */
+.voiceButton.recording {
+  background-color: var(--ds-blue-500); /* Accent: #42A2CA */
+  color: white;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.voiceButton.recording:hover:not(:disabled) {
+  background-color: var(--ds-blue-600); /* Primary: #0E3192 */
+  filter: brightness(1);
+}
+
+.voiceButton:disabled {
+  opacity: var(--ds-opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Animación de pulso cuando está grabando */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Responsive - Mobile pequeño */
+@media (max-width: 480px) {
+  .voiceButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .centered {
+    width: 36px;
+    height: 36px;
+  }
+}
+

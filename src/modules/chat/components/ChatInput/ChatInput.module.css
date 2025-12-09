@@ -18,7 +18,7 @@
   gap: var(--ds-spacing-3);
   width: 100%;
   max-width: 720px;
-  background-color: var(--ds-elevated);
+  background-color: rgba(127, 190, 216, 0.2); /* brand blue: #7FBED8 al 20% */
   border: var(--ds-border-hairline);
   border-radius: var(--ds-radius-lg);
   padding: var(--ds-spacing-3) var(--ds-spacing-5);
@@ -42,7 +42,7 @@
 .inputContainer:focus-within {
   border-color: var(--ds-primary);
   box-shadow: var(--ds-elevation-2);
-  background-color: var(--ds-surface);
+  background-color: rgba(127, 190, 216, 0.2); /* Mantener brand blue al 20% en focus */
 }
 
 .centered .inputContainer:focus-within {
@@ -187,11 +187,22 @@
   .chatInput {
     padding: var(--ds-spacing-4) var(--ds-spacing-4);
     /* Asegurar que esté en la parte inferior */
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
+    background: var(--ds-surface);
     /* Considerar safe-area para iOS (notch, barra inferior) */
     padding-bottom: calc(var(--ds-spacing-4) + env(safe-area-inset-bottom, 0));
+    /* Sombra sutil para separar del contenido */
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Cuando está centrado (sin mensajes), no usar fixed */
+  .chatInput.centered {
+    position: relative;
+    box-shadow: none;
   }
 
   .inputContainer {

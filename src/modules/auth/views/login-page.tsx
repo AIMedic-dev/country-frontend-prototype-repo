@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Input } from '../components/input/Input';
 import { Button } from '../components/button/Button';
+import { TermsModal } from '../components/TermsModal/TermsModal';
 import '../styles/login.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
@@ -9,6 +10,8 @@ export default function Login() {
   const [code, setCode] = useState('');
   const [remember, setRemember] = useState(false);
   const [accept, setAccept] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [termsModalSection, setTermsModalSection] = useState<string | undefined>(undefined);
 
   const navigate = useNavigate();
   const { login, isLoading, error, isAuthenticated, user } = useAuthContext();
@@ -64,6 +67,15 @@ export default function Login() {
 
       {/* PANEL DERECHO - Formulario */}
       <section className="right-panel">
+        {/* Logo de Country - Solo visible en móviles */}
+        <div className="country-logo-mobile">
+          <img
+            src="images/logos/country-logo (1).png"
+            alt="Clínica del Country"
+            className="country-logo-img"
+          />
+        </div>
+
         {/* Contenido centrado */}
         <div className="right-stack">
           <header className="right-hero">
@@ -112,11 +124,27 @@ export default function Login() {
                 />
                 <span>
                   He leído y acepto los{' '}
-                  <a href="#" onClick={(e) => e.preventDefault()}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTermsModalSection(undefined);
+                      setIsTermsModalOpen(true);
+                    }}
+                    style={{ color: 'var(--ds-blue-600)', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
                     Términos y Condiciones
                   </a>{' '}
                   &{' '}
-                  <a href="#" onClick={(e) => e.preventDefault()}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTermsModalSection('CAPITULO-IV');
+                      setIsTermsModalOpen(true);
+                    }}
+                    style={{ color: 'var(--ds-blue-600)', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
                     Autorización de datos personales
                   </a>
                 </span>
@@ -141,6 +169,13 @@ export default function Login() {
           </div>
         </div>
       </section>
+
+      {/* Modal de Términos y Condiciones */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        scrollToSection={termsModalSection}
+      />
     </div>
   );
 }
