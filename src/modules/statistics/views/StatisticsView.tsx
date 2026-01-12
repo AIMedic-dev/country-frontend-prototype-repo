@@ -2,24 +2,17 @@ import React from 'react';
 import { useStatistics } from '../hooks/useStatistics';
 import { TopicsChart } from '../components/TopicsChart/TopicsChart';
 import { WordCloudChart } from '../components/WordCloudChart/WordCloudChart';
-import { PainScaleChart } from '../components/PainScaleChart/PainScaleChart';
-import { SymptomsChart } from '../components/SymptomsChart/SymptomsChart';
 import { StatsCards } from '../components/StatsCards/StatsCards';
 import { SummarySection } from '../components/SummarySection/SummarySection';
 import { AnalyticsHeader } from '../components/AnalyticsHeader/AnalyticsHeader';
-import { Spinner } from '@/shared/components';
+import { AnalyticsLoading } from '../components/AnalyticsLoading/AnalyticsLoading';
 import styles from './StatisticsView.module.css';
 
 export const StatisticsView: React.FC = () => {
   const { data, isLoading, error, refetch } = useStatistics();
 
   if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <Spinner size="lg" color="primary" />
-        <p className={styles.loadingText}>Cargando estadísticas...</p>
-      </div>
-    );
+    return <AnalyticsLoading />;
   }
 
   if (error) {
@@ -58,23 +51,15 @@ export const StatisticsView: React.FC = () => {
         <TopicsChart data={data.topicsData} />
       </div>
 
-      {/* Grid de dos columnas: Escala de Dolor y Síntomas */}
-      <div className={styles.twoColumnGrid}>
-        <div className={styles.chartItem}>
-          <PainScaleChart data={data.painScaleData} />
-        </div>
-        <div className={styles.chartItem}>
-          <SymptomsChart data={data.symptomsData} />
-        </div>
-      </div>
-
-      {/* Palabras Más Frecuentes (se mantiene como está) */}
+      {/* Palabras Más Frecuentes */}
       <div className={styles.chartItem}>
         <WordCloudChart data={data.wordsData} />
       </div>
 
       {/* Resumen General de Interacciones */}
-      <SummarySection />
+      {data.summaries && data.summaries.length > 0 && (
+        <SummarySection summaries={data.summaries} totalConversations={data.stats.totalConversations} />
+      )}
     </div>
   );
 };

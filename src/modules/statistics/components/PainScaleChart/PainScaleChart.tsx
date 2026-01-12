@@ -62,8 +62,6 @@ export const PainScaleChart: React.FC<PainScaleChartProps> = ({ data }) => {
         <div className={styles.infoBox}>
           <p className={styles.infoText}>
             <strong>Medicamento actual:</strong> {data[data.length - 1].medicamento}
-            <br />
-            <strong>Tendencia:</strong> Mejoría progresiva en los últimos 3 días
           </p>
         </div>
       )}

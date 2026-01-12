@@ -1,7 +1,70 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { Button } from '@/shared/components';
 import styles from './SummarySection.module.css';
 
-export const SummarySection: React.FC = () => {
+interface SummarySectionProps {
+  summaries: Array<{
+    chatId: string;
+    summary: string;
+    topics: string[];
+  }>;
+  totalConversations: number;
+}
+
+const CONVERSATIONS_PER_PAGE = 5;
+const TOPICS_PER_PAGE = 5;
+
+export const SummarySection: React.FC<SummarySectionProps> = ({ summaries, totalConversations }) => {
+  const [displayedCount, setDisplayedCount] = useState(CONVERSATIONS_PER_PAGE);
+  const [displayedTopicsCount, setDisplayedTopicsCount] = useState(TOPICS_PER_PAGE);
+  const [expandedConversations, setExpandedConversations] = useState<Set<string>>(new Set());
+
+  // Obtener los resúmenes a mostrar según el contador
+  const displayedSummaries = useMemo(() => {
+    return summaries.slice(0, displayedCount);
+  }, [summaries, displayedCount]);
+
+  const hasMore = summaries.length > displayedCount;
+  const remainingCount = summaries.length - displayedCount;
+
+  const handleLoadMore = () => {
+    setDisplayedCount((prev) => prev + CONVERSATIONS_PER_PAGE);
+  };
+
+  // Agrupar temas únicos
+  const allTopics = useMemo(() => {
+    const topicsSet = new Set<string>();
+    summaries.forEach((s) => {
+      s.topics.forEach((topic) => topicsSet.add(topic));
+    });
+    return Array.from(topicsSet);
+  }, [summaries]);
+
+  // Obtener los temas a mostrar según el contador
+  const displayedTopics = useMemo(() => {
+    return allTopics.slice(0, displayedTopicsCount);
+  }, [allTopics, displayedTopicsCount]);
+
+  const hasMoreTopics = allTopics.length > displayedTopicsCount;
+  const remainingTopicsCount = allTopics.length - displayedTopicsCount;
+
+  const handleLoadMoreTopics = () => {
+    setDisplayedTopicsCount((prev) => prev + TOPICS_PER_PAGE);
+  };
+
+  const toggleConversationTopics = (chatId: string) => {
+    setExpandedConversations((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(chatId)) {
+        newSet.delete(chatId);
+      } else {
+        newSet.add(chatId);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className={styles.summaryContainer}>
       <h2 className={styles.summaryTitle}>Resumen General de Interacciones</h2>
@@ -9,77 +72,96 @@ export const SummarySection: React.FC = () => {
         <div className={styles.summarySection}>
           <p className={styles.sectionLabel}>PERIODO DE ANÁLISIS</p>
           <p className={styles.sectionText}>
-            20 - 26 de Noviembre 2025 (7 días) • 24 conversaciones totales
+            {totalConversations} {totalConversations === 1 ? 'conversación total' : 'conversaciones totales'}
           </p>
         </div>
 
         <div className={styles.summaryDivider}></div>
 
         <div className={styles.summarySection}>
-          <p className={styles.sectionLabel}>SÍNTOMAS Y EFECTOS MÁS CONSULTADOS</p>
-          <p className={styles.sectionText}>
-            La paciente ha manifestado preocupación recurrente sobre episodios de vómito,
-            especialmente durante las primeras horas de la mañana y después de las comidas.
-            Menciona que los vómitos han sido más frecuentes en los últimos 3 días. También
-            reporta mareos constantes que dificultan sus actividades diarias, principalmente al
-            levantarse o cambiar de posición bruscamente.
-          </p>
-          <p className={styles.sectionText}>
-            Respecto al catéter, la paciente ha consultado en múltiples ocasiones sobre los
-            cuidados necesarios, expresando dudas sobre la limpieza adecuada y signos de alerta.
-            Menciona leve enrojecimiento en la zona, pero sin dolor significativo. Ha preguntado
-            sobre cuándo puede bañarse y cómo proteger el área durante el aseo personal.
-          </p>
+          <p className={styles.sectionLabel}>TEMAS PRINCIPALES</p>
+          <div className={styles.topicsGrid}>
+            {displayedTopics.map((topic, index) => (
+              <span key={index} className={styles.topicTag}>
+                {topic}
+              </span>
+            ))}
+          </div>
+          {hasMoreTopics && (
+            <div className={styles.loadMoreTopicsContainer}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLoadMoreTopics}
+                rightIcon={<ChevronDown size={16} />}
+                className={styles.loadMoreTopicsButton}
+              >
+                Ver {remainingTopicsCount > TOPICS_PER_PAGE
+                  ? `${TOPICS_PER_PAGE} más`
+                  : remainingTopicsCount === 1
+                  ? '1 tema más'
+                  : `${remainingTopicsCount} temas más`}
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className={styles.summaryDivider}></div>
 
         <div className={styles.summarySection}>
-          <p className={styles.sectionLabel}>EVOLUCIÓN DEL DOLOR</p>
-          <p className={styles.sectionText}>
-            El nivel de dolor ha mostrado una tendencia descendente durante la semana. Inició
-            con niveles de 3-4/10, alcanzando un pico de 5/10 el día 22 de noviembre. A partir
-            del día 23, el dolor comenzó a disminuir progresivamente hasta estabilizarse en 2/10
-            en los últimos dos días. La paciente asocia el dolor principalmente con la zona
-            abdominal y menciona que mejora con reposo.
-          </p>
-        </div>
-
-        <div className={styles.summaryDivider}></div>
-
-        <div className={styles.summarySection}>
-          <p className={styles.sectionLabel}>ESTADO GENERAL Y PREOCUPACIONES</p>
-          <p className={styles.sectionText}>
-            La paciente reporta fatiga constante que limita su capacidad para realizar tareas
-            cotidianas. Ha manifestado pérdida de apetito significativa, mencionando que solo
-            logra consumir pequeñas porciones de alimento. Expresó preocupaciones sobre su
-            nutrición y preguntó sobre alimentos recomendados que sean fáciles de digerir y no
-            le provoquen náuseas.
-          </p>
-          <p className={styles.sectionText}>
-            En las conversaciones más recientes, la paciente ha consultado sobre la duración
-            esperada de estos efectos y si es normal experimentarlos con esta intensidad. También
-            preguntó sobre actividades físicas ligeras que pueda realizar sin afectar su
-            recuperación.
-          </p>
-        </div>
-
-        <div className={styles.summaryDivider}></div>
-
-        <div className={styles.summarySection}>
-          <p className={styles.sectionLabel}>ASPECTOS EMOCIONALES</p>
-          <p className={styles.sectionText}>
-            La paciente ha compartido sentimientos de ansiedad relacionados con el proceso de
-            tratamiento. Ha preguntado sobre grupos de apoyo y experiencias de otras pacientes.
-            Muestra interés en comprender mejor su condición y los cambios que está
-            experimentando en su cuerpo.
-          </p>
+          <p className={styles.sectionLabel}>RESÚMENES DE CONVERSACIONES</p>
+          {displayedSummaries.map((item, index) => (
+            <div key={item.chatId} className={styles.conversationSummary}>
+              <p className={styles.conversationNumber}>Conversación {index + 1}</p>
+              <p className={styles.sectionText}>{item.summary}</p>
+              {item.topics.length > 0 && (
+                <div className={styles.conversationTopics}>
+                  <div className={styles.topicsContent}>
+                    <strong>Temas: </strong>
+                    <span className={styles.topicsList}>
+                      {expandedConversations.has(item.chatId)
+                        ? item.topics.join(', ')
+                        : item.topics.slice(0, 5).join(', ')}
+                    </span>
+                  </div>
+                  {item.topics.length > 5 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleConversationTopics(item.chatId)}
+                      className={styles.showAllTopicsButton}
+                    >
+                      {expandedConversations.has(item.chatId)
+                        ? 'Ver menos'
+                        : `Ver todos los temas (${item.topics.length - 5} más)`}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          {hasMore && (
+            <div className={styles.loadMoreContainer}>
+              <Button
+                variant="outline"
+                size="md"
+                onClick={handleLoadMore}
+                rightIcon={<ChevronDown size={18} />}
+                className={styles.loadMoreButton}
+              >
+                Ver {remainingCount > CONVERSATIONS_PER_PAGE
+                  ? `${CONVERSATIONS_PER_PAGE} más`
+                  : remainingCount === 1
+                  ? '1 conversación más'
+                  : `${remainingCount} conversaciones más`}
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className={styles.noteBox}>
           <p className={styles.noteText}>
-            💡 Nota: Este resumen consolida las 24 interacciones del período. Se recomienda
-            revisar conversaciones específicas para detalles adicionales.
+            💡 Nota: Este resumen consolida las {totalConversations} interacciones analizadas. 
+            Se recomienda revisar conversaciones específicas para detalles adicionales.
           </p>
         </div>
       </div>

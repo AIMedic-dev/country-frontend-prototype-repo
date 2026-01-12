@@ -18,12 +18,8 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Si es empleado, redirigir a analytics; si es paciente, a dashboard
-      if (user.rol === 'empleado') {
-        navigate('/analytics', { replace: true });
-      } else {
-        navigate('/', { replace: true });
-      }
+      // Redirigir a dashboard (chat) para todos los usuarios
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -43,12 +39,8 @@ export default function Login() {
     const response = await login(code.trim());
 
     if (response) {
-      // Redirigir según el rol del usuario
-      if (response.user.rol === 'empleado') {
-        navigate('/analytics', { replace: true });
-      } else {
-        navigate('/', { replace: true });
-      }
+      // Redirigir a dashboard (chat) para todos los usuarios
+      navigate('/', { replace: true });
     }
   };
 

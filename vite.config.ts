@@ -18,5 +18,13 @@ export default defineConfig({
     host: '0.0.0.0', // Permite acceso desde otros dispositivos en la red
     open: true,
     allowedHosts: true,
+    proxy: {
+      '/api/analytics': {
+        target: 'https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/analytics/, '/analytics'),
+        secure: true,
+      },
+    },
   },
 });

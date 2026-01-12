@@ -13,13 +13,12 @@ interface AnalyticsHeaderProps {
   onPatientChange?: (patientId: string) => void;
 }
 
-// Datos mock de pacientes (después se puede conectar con el backend)
-const MOCK_PATIENTS: Patient[] = [
-  { id: 'PAC-001', name: 'María G.', type: 'Cáncer de Seno' },
-  { id: 'PAC-002', name: 'Carlos R.', type: 'Gastrointestinal' },
-  { id: 'PAC-003', name: 'Ana L.', type: 'Cáncer de Seno' },
-  { id: 'all', name: 'Todos los pacientes', type: 'Vista general' },
-];
+// Opción por defecto: Todos los pacientes
+const DEFAULT_PATIENT_OPTION: Patient = {
+  id: 'all',
+  name: 'Todos los pacientes',
+  type: 'Vista general',
+};
 
 export const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
   selectedPatient = 'all',
@@ -28,12 +27,9 @@ export const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPatientData, setSelectedPatientData] = useState<Patient | null>(
-    MOCK_PATIENTS.find((p) => p.id === selectedPatient) || null
+    selectedPatient === 'all' ? DEFAULT_PATIENT_OPTION : null
   );
   const searchRef = useRef<HTMLDivElement>(null);
-
-  // Solo mostrar "Todos los pacientes" en el dropdown
-  const allPatientsOption = MOCK_PATIENTS.find((p) => p.id === 'all');
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -67,21 +63,14 @@ export const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
     const value = e.target.value;
     setSearchQuery(value);
     
-    // Si hay un código válido, buscar el paciente
-    if (value.trim()) {
-      const foundPatient = MOCK_PATIENTS.find(
-        (p) => p.id.toLowerCase() === value.trim().toLowerCase()
-      );
-      if (foundPatient && foundPatient.id !== 'all') {
-        setSelectedPatientData(foundPatient);
-        onPatientChange?.(foundPatient.id);
-      } else {
-        setSelectedPatientData(null);
-        onPatientChange?.('all');
-      }
-    } else {
-      setSelectedPatientData(null);
+    // Si el campo está vacío, mostrar "Todos los pacientes"
+    if (!value.trim()) {
+      setSelectedPatientData(DEFAULT_PATIENT_OPTION);
       onPatientChange?.('all');
+    } else {
+      // Por ahora, solo permitir buscar "Todos los pacientes"
+      // En el futuro, esto se conectará con el backend para buscar pacientes reales
+      setSelectedPatientData(null);
     }
     
     setIsOpen(true);
@@ -92,20 +81,13 @@ export const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
   };
 
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      const foundPatient = MOCK_PATIENTS.find(
-        (p) => p.id.toLowerCase() === searchQuery.trim().toLowerCase()
-      );
-      if (foundPatient && foundPatient.id !== 'all') {
-        setSelectedPatientData(foundPatient);
-        onPatientChange?.(foundPatient.id);
-      } else {
-        setSelectedPatientData(null);
-        onPatientChange?.('all');
-      }
-    } else {
-      setSelectedPatientData(null);
+    if (!searchQuery.trim()) {
+      setSelectedPatientData(DEFAULT_PATIENT_OPTION);
       onPatientChange?.('all');
+    } else {
+      // Por ahora, solo permitir buscar "Todos los pacientes"
+      // En el futuro, esto se conectará con el backend para buscar pacientes reales
+      setSelectedPatientData(null);
     }
     setIsOpen(false);
   };
@@ -160,18 +142,18 @@ export const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
                 </button>
               )}
             </div>
-            {isOpen && allPatientsOption && (
+            {isOpen && (
               <div className={styles.dropdown}>
                 <ul className={styles.optionsList}>
                   <li
                     className={`${styles.option} ${
                       !selectedPatientData || selectedPatientData.id === 'all' ? styles.selected : ''
                     }`}
-                    onClick={() => handleSelect(allPatientsOption)}
+                    onClick={() => handleSelect(DEFAULT_PATIENT_OPTION)}
                   >
                     <div className={styles.optionContent}>
-                      <span className={styles.optionName}>{allPatientsOption.name}</span>
-                      <span className={styles.optionType}>{allPatientsOption.type}</span>
+                      <span className={styles.optionName}>{DEFAULT_PATIENT_OPTION.name}</span>
+                      <span className={styles.optionType}>{DEFAULT_PATIENT_OPTION.type}</span>
                     </div>
                     <span className={styles.optionBadge}>Vista general</span>
                   </li>

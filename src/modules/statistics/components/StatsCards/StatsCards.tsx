@@ -66,47 +66,18 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
   }, [symptomsData]);
 
   // Distribución de conversaciones por tema principal
+  // Nota: Estos datos no están disponibles en el API actual, por lo que se oculta esta sección
   const conversationDistribution = useMemo(() => {
-    const total = stats.totalConversations;
-    const sintomas = Math.round(total * 0.35);
-    const medicacion = Math.round(total * 0.28);
-    const cuidados = Math.round(total * 0.20);
-    const emocional = Math.round(total * 0.17);
-
-    return [
-      { categoria: 'Síntomas y efectos', cantidad: sintomas, porcentaje: 35 },
-      { categoria: 'Medicación', cantidad: medicacion, porcentaje: 28 },
-      { categoria: 'Cuidados y procedimientos', cantidad: cuidados, porcentaje: 20 },
-      { categoria: 'Aspectos emocionales', cantidad: emocional, porcentaje: 17 },
-    ];
-  }, [stats.totalConversations]);
+    // Retornar array vacío ya que no tenemos datos reales del API
+    return [];
+  }, []);
 
   // Segmentación de fechas de interacciones
+  // Nota: Estos datos no están disponibles en el API actual, por lo que se oculta esta sección
   const dateSegmentation = useMemo(() => {
-    const hoy = 8;
-    const ayer = 6;
-    const estaSemana = 7;
-    const semanaPasada = 3;
-
-    return [
-      { periodo: 'Hoy', cantidad: hoy, porcentaje: Math.round((hoy / stats.totalConversations) * 100) },
-      {
-        periodo: 'Ayer',
-        cantidad: ayer,
-        porcentaje: Math.round((ayer / stats.totalConversations) * 100),
-      },
-      {
-        periodo: 'Esta semana',
-        cantidad: estaSemana,
-        porcentaje: Math.round((estaSemana / stats.totalConversations) * 100),
-      },
-      {
-        periodo: 'Semana pasada',
-        cantidad: semanaPasada,
-        porcentaje: Math.round((semanaPasada / stats.totalConversations) * 100),
-      },
-    ];
-  }, [stats.totalConversations]);
+    // Retornar array vacío ya que no tenemos datos reales del API
+    return [];
+  }, []);
 
   return (
     <>
@@ -440,37 +411,33 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
             </div>
           </div>
 
-          <div className={styles.modalSection}>
-            <p className={styles.modalSectionTitle}>Actividad Reciente</p>
-            <div className={styles.activityList}>
-              <div className={styles.activityItem}>
-                <span className={styles.activityTime}>Hace 2 horas</span>
-                <span className={styles.activityType}>Consulta sobre medicación</span>
-              </div>
-              <div className={styles.activityItem}>
-                <span className={styles.activityTime}>Hace 5 horas</span>
-                <span className={styles.activityType}>Pregunta sobre efectos secundarios</span>
-              </div>
-              <div className={styles.activityItem}>
-                <span className={styles.activityTime}>Ayer</span>
-                <span className={styles.activityType}>6 conversaciones registradas</span>
-              </div>
-              <div className={styles.activityItem}>
-                <span className={styles.activityTime}>Esta semana</span>
-                <span className={styles.activityType}>7 conversaciones registradas</span>
+          {dateSegmentation.length > 0 && (
+            <div className={styles.modalSection}>
+              <p className={styles.modalSectionTitle}>Actividad Reciente</p>
+              <div className={styles.activityList}>
+                {dateSegmentation.map((item, idx) => (
+                  <div key={idx} className={styles.activityItem}>
+                    <span className={styles.activityTime}>{item.periodo}</span>
+                    <span className={styles.activityType}>
+                      {item.cantidad} {item.cantidad === 1 ? 'conversación registrada' : 'conversaciones registradas'}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
-          <div className={styles.modalNote}>
-            <strong>📅 Patrón de Uso:</strong> La distribución muestra que{' '}
-            {dateSegmentation[0].porcentaje > 30
-              ? 'hay una alta actividad reciente'
-              : 'la actividad se distribuye a lo largo del tiempo'}{' '}
-            con {dateSegmentation[0].cantidad} conversaciones registradas{' '}
-            {dateSegmentation[0].periodo.toLowerCase()}. Esto indica un uso{' '}
-            {dateSegmentation[0].porcentaje > 30 ? 'activo y constante' : 'regular'} del sistema.
-          </div>
+          {dateSegmentation.length > 0 && (
+            <div className={styles.modalNote}>
+              <strong>📅 Patrón de Uso:</strong> La distribución muestra que{' '}
+              {dateSegmentation[0].porcentaje > 30
+                ? 'hay una alta actividad reciente'
+                : 'la actividad se distribuye a lo largo del tiempo'}{' '}
+              con {dateSegmentation[0].cantidad} conversaciones registradas{' '}
+              {dateSegmentation[0].periodo.toLowerCase()}. Esto indica un uso{' '}
+              {dateSegmentation[0].porcentaje > 30 ? 'activo y constante' : 'regular'} del sistema.
+            </div>
+          )}
         </div>
       </Modal>
     </>
