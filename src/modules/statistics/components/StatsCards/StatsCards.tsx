@@ -18,6 +18,18 @@ interface StatsCardsProps {
 
 type ModalType = 'conversations' | 'pain' | 'topics' | 'interaction' | null;
 
+interface ConversationDistributionItem {
+  categoria: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+interface DateSegmentationItem {
+  periodo: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
 export const StatsCards: React.FC<StatsCardsProps> = ({
   stats,
   topicsData,
@@ -67,14 +79,14 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
 
   // Distribución de conversaciones por tema principal
   // Nota: Estos datos no están disponibles en el API actual, por lo que se oculta esta sección
-  const conversationDistribution = useMemo(() => {
+  const conversationDistribution = useMemo<ConversationDistributionItem[]>(() => {
     // Retornar array vacío ya que no tenemos datos reales del API
     return [];
   }, []);
 
   // Segmentación de fechas de interacciones
   // Nota: Estos datos no están disponibles en el API actual, por lo que se oculta esta sección
-  const dateSegmentation = useMemo(() => {
+  const dateSegmentation = useMemo<DateSegmentationItem[]>(() => {
     // Retornar array vacío ya que no tenemos datos reales del API
     return [];
   }, []);
@@ -148,28 +160,30 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
             <p className={styles.modalLabel}>conversaciones totales</p>
           </div>
 
-          <div className={styles.modalSection}>
-            <p className={styles.modalSectionTitle}>Distribución por Categoría</p>
-            <div className={styles.distributionGrid}>
-              {conversationDistribution.map((item, idx) => (
-                <div key={idx} className={styles.distributionItem}>
-                  <div className={styles.distributionHeader}>
-                    <span className={styles.distributionCategory}>{item.categoria}</span>
-                    <span className={styles.distributionPercentage}>{item.porcentaje}%</span>
+          {conversationDistribution.length > 0 && (
+            <div className={styles.modalSection}>
+              <p className={styles.modalSectionTitle}>Distribución por Categoría</p>
+              <div className={styles.distributionGrid}>
+                {conversationDistribution.map((item, idx) => (
+                  <div key={idx} className={styles.distributionItem}>
+                    <div className={styles.distributionHeader}>
+                      <span className={styles.distributionCategory}>{item.categoria}</span>
+                      <span className={styles.distributionPercentage}>{item.porcentaje}%</span>
+                    </div>
+                    <div className={styles.distributionBar}>
+                      <div
+                        className={styles.distributionBarFill}
+                        style={{ width: `${item.porcentaje}%` }}
+                      ></div>
+                    </div>
+                    <span className={styles.distributionCount}>
+                      {item.cantidad} conversaciones
+                    </span>
                   </div>
-                  <div className={styles.distributionBar}>
-                    <div
-                      className={styles.distributionBarFill}
-                      style={{ width: `${item.porcentaje}%` }}
-                    ></div>
-                  </div>
-                  <span className={styles.distributionCount}>
-                    {item.cantidad} conversaciones
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className={styles.modalSection}>
             <p className={styles.modalSectionTitle}>Temas Más Consultados</p>
@@ -388,28 +402,30 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
             <p className={styles.modalLabel}>última conversación registrada</p>
           </div>
 
-          <div className={styles.modalSection}>
-            <p className={styles.modalSectionTitle}>Distribución Temporal</p>
-            <div className={styles.dateSegmentationGrid}>
-              {dateSegmentation.map((item, idx) => (
-                <div key={idx} className={styles.dateCard}>
-                  <div className={styles.dateHeader}>
-                    <span className={styles.datePeriod}>{item.periodo}</span>
-                    <span className={styles.datePercentage}>{item.porcentaje}%</span>
+          {dateSegmentation.length > 0 && (
+            <div className={styles.modalSection}>
+              <p className={styles.modalSectionTitle}>Distribución Temporal</p>
+              <div className={styles.dateSegmentationGrid}>
+                {dateSegmentation.map((item, idx) => (
+                  <div key={idx} className={styles.dateCard}>
+                    <div className={styles.dateHeader}>
+                      <span className={styles.datePeriod}>{item.periodo}</span>
+                      <span className={styles.datePercentage}>{item.porcentaje}%</span>
+                    </div>
+                    <div className={styles.dateBar}>
+                      <div
+                        className={styles.dateBarFill}
+                        style={{ width: `${item.porcentaje}%` }}
+                      ></div>
+                    </div>
+                    <span className={styles.dateCount}>
+                      {item.cantidad} conversaciones
+                    </span>
                   </div>
-                  <div className={styles.dateBar}>
-                    <div
-                      className={styles.dateBarFill}
-                      style={{ width: `${item.porcentaje}%` }}
-                    ></div>
-                  </div>
-                  <span className={styles.dateCount}>
-                    {item.cantidad} conversaciones
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {dateSegmentation.length > 0 && (
             <div className={styles.modalSection}>
@@ -427,17 +443,20 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
             </div>
           )}
 
-          {dateSegmentation.length > 0 && (
-            <div className={styles.modalNote}>
-              <strong>📅 Patrón de Uso:</strong> La distribución muestra que{' '}
-              {dateSegmentation[0].porcentaje > 30
-                ? 'hay una alta actividad reciente'
-                : 'la actividad se distribuye a lo largo del tiempo'}{' '}
-              con {dateSegmentation[0].cantidad} conversaciones registradas{' '}
-              {dateSegmentation[0].periodo.toLowerCase()}. Esto indica un uso{' '}
-              {dateSegmentation[0].porcentaje > 30 ? 'activo y constante' : 'regular'} del sistema.
-            </div>
-          )}
+          {dateSegmentation.length > 0 && (() => {
+            const firstItem = dateSegmentation[0];
+            return (
+              <div className={styles.modalNote}>
+                <strong>📅 Patrón de Uso:</strong> La distribución muestra que{' '}
+                {firstItem.porcentaje > 30
+                  ? 'hay una alta actividad reciente'
+                  : 'la actividad se distribuye a lo largo del tiempo'}{' '}
+                con {firstItem.cantidad} conversaciones registradas{' '}
+                {firstItem.periodo.toLowerCase()}. Esto indica un uso{' '}
+                {firstItem.porcentaje > 30 ? 'activo y constante' : 'regular'} del sistema.
+              </div>
+            );
+          })()}
         </div>
       </Modal>
     </>
