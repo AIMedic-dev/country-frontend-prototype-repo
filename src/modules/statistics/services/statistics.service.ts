@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ENV } from '@/shared/config/env';
+import { apiService } from '@/shared/services/api.service';
 import type {
   StatisticsData,
   TopicData,
@@ -8,6 +9,14 @@ import type {
   SymptomData,
   AnalyticsApiResponse,
 } from '../types/statistics.types';
+
+interface Chat {
+  id: string;
+  userId: string;
+  messages: any[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Constantes configurables
 const ANALYTICS_CONFIG = {
@@ -18,7 +27,23 @@ const ANALYTICS_CONFIG = {
 
 class StatisticsService {
     /**
-     * Obtener datos de estadísticas desde el API real
+     * Obtener chats de un usuario por su código
+     */
+    async getChatsByUserCode(userCode: string): Promise<Chat[]> {
+        try {
+            const chats = await apiService.get<Chat[]>(`/chats/user/codigo/${userCode}`);
+            return chats;
+        } catch (error: any) {
+            console.error('Error fetching chats by user code:', error);
+            if (error.statusCode === 404) {
+                throw new Error(`No se encontraron chats para el código: ${userCode}`);
+            }
+            throw new Error(`Error al obtener los chats del usuario: ${error.message || 'Error desconocido'}`);
+        }
+    }
+
+    /**
+     * Obtener datos de estadísticas desde el API real (sin filtrado)
      */
     async getStatistics(): Promise<StatisticsData> {
         if (!ENV.ANALYTICS_API_URL) {
@@ -162,6 +187,88 @@ class StatisticsService {
             stats,
             summaries: allSummaries,
         };
+    }
+
+    /**
+     * Filtrar datos de estadísticas por código de usuario
+     * @param data - Datos de estadísticas completos
+     * @param userCode - Código del usuario para filtrar
+     */
+    async filterStatisticsByUserCode(data: StatisticsData, userCode: string): Promise<StatisticsData> {
+        try {
+            // Obtener los chats del usuario por código
+            const userChats = await this.getChatsByUserCode(userCode);
+            const userChatIds = new Set(userChats.map(chat => chat.id));
+
+            // Filtrar los resúmenes para incluir solo los chats del usuario
+            const filteredSummaries = data.summaries.filter(summary => 
+                userChatIds.has(summary.chatId)
+            );
+
+            // Recalcular estadísticas basadas en los datos filtrados
+            const totalConversations = filteredSummaries.length;
+
+            // Recalcular temas basados en los resúmenes filtrados
+            const topicsCount: Map<string, number> = new Map();
+            filteredSummaries.forEach((summary) => {
+                summary.topics.forEach((topic) => {
+                    const normalizedTopic = topic.toLowerCase().trim();
+                    topicsCount.set(normalizedTopic, (topicsCount.get(normalizedTopic) || 0) + 1);
+                });
+            });
+
+            // Convertir temas a TopicData ordenados por frecuencia
+            const topicsData: TopicData[] = Array.from(topicsCount.entries())
+                .map(([name, count]) => ({
+                    name: this.formatTopicName(name),
+                    value: totalConversations > 0 ? Math.round((count / totalConversations) * 100) : 0,
+                    percentage: totalConversations > 0 ? `${Math.round((count / totalConversations) * 100)}%` : '0%',
+                }))
+                .sort((a, b) => b.value - a.value)
+                .slice(0, ANALYTICS_CONFIG.TOP_TOPICS_LIMIT);
+
+            // Recalcular palabras más frecuentes
+            const wordsCount: Map<string, number> = new Map();
+            filteredSummaries.forEach((summary) => {
+                summary.topics.forEach((topic) => {
+                    const words = topic.toLowerCase().split(/\s+/);
+                    words.forEach((word) => {
+                        const cleanWord = word.replace(/[^a-záéíóúñü]/g, '');
+                        if (cleanWord.length > ANALYTICS_CONFIG.MIN_WORD_LENGTH) {
+                            wordsCount.set(cleanWord, (wordsCount.get(cleanWord) || 0) + 1);
+                        }
+                    });
+                });
+            });
+
+            const wordsData: WordFrequency[] = Array.from(wordsCount.entries())
+                .map(([text, count]) => ({
+                    text,
+                    value: count,
+                }))
+                .sort((a, b) => b.value - a.value)
+                .slice(0, ANALYTICS_CONFIG.TOP_WORDS_LIMIT);
+
+            // Stats actualizadas
+            const stats = {
+                totalConversations,
+                averagePain: data.stats.averagePain, // Mantener el mismo (no disponible en el API)
+                topicsCount: topicsCount.size,
+                lastInteraction: data.stats.lastInteraction, // Mantener el mismo
+            };
+
+            return {
+                topicsData,
+                wordsData,
+                painScaleData: data.painScaleData, // Mantener el mismo (vacío)
+                symptomsData: data.symptomsData, // Mantener el mismo (vacío)
+                stats,
+                summaries: filteredSummaries,
+            };
+        } catch (error: any) {
+            console.error('Error filtering by user code:', error);
+            throw new Error(`Error al filtrar por código de usuario: ${error.message}`);
+        }
     }
 
     /**

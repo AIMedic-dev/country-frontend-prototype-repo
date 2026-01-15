@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStatistics } from '../hooks/useStatistics';
 import { TopicsChart } from '../components/TopicsChart/TopicsChart';
 import { WordCloudChart } from '../components/WordCloudChart/WordCloudChart';
@@ -9,7 +9,10 @@ import { AnalyticsLoading } from '../components/AnalyticsLoading/AnalyticsLoadin
 import styles from './StatisticsView.module.css';
 
 export const StatisticsView: React.FC = () => {
-  const { data, isLoading, error, refetch } = useStatistics();
+  const [selectedUserCode, setSelectedUserCode] = useState<string>('all');
+  const { data, isLoading, error, refetch } = useStatistics({ 
+    userCode: selectedUserCode === 'all' ? undefined : selectedUserCode 
+  });
 
   if (isLoading) {
     return <AnalyticsLoading />;
@@ -33,10 +36,17 @@ export const StatisticsView: React.FC = () => {
     return null;
   }
 
+  const handleUserCodeChange = (userCode: string) => {
+    setSelectedUserCode(userCode);
+  };
+
   return (
     <div className={styles.container}>
       {/* Header con selector de pacientes */}
-      <AnalyticsHeader />
+      <AnalyticsHeader 
+        selectedPatient={selectedUserCode}
+        onPatientChange={handleUserCodeChange}
+      />
 
       {/* Stats Cards */}
       <StatsCards
