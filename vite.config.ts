@@ -12,6 +12,10 @@ export default defineConfig({
       '@/pages': resolve(__dirname, './src/pages'),
       '@/styles': resolve(__dirname, './src/styles'),
     },
+    dedupe: ['react', 'react-dom'], // Evitar múltiples instancias de React
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'], // Pre-bundling de dependencias críticas
   },
   server: {
     port: 5173,
@@ -33,14 +37,30 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
 
-          // Splits grandes dependencias en chunks separados
-          if (id.includes('react-dom') || id.includes('react/')) return 'react';
+          // React y ReactDOM deben estar juntos para evitar errores
+          if (id.includes('react-dom') || id.includes('react/') || id.includes('/react')) {
+            return 'react-vendor';
+          }
+          
+          // React Router
           if (id.includes('react-router')) return 'router';
+          
+          // Apollo/GraphQL
           if (id.includes('@apollo/client') || id.includes('graphql')) return 'apollo';
+          
+          // Charts
           if (id.includes('recharts') || id.includes('d3-')) return 'charts';
+          
+          // Speech SDK
           if (id.includes('microsoft-cognitiveservices-speech-sdk')) return 'speech';
+          
+          // Socket.IO
           if (id.includes('socket.io-client')) return 'socket';
+          
+          // HTTP client
           if (id.includes('axios')) return 'http';
+          
+          // Hotjar
           if (id.includes('@hotjar/')) return 'hotjar';
 
           // fallback: todo lo demás en vendor
