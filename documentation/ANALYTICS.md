@@ -77,33 +77,23 @@ La ruta está protegida en `AppRouter.tsx`:
 
 ### Variables de Entorno
 
-El sistema requiere la siguiente variable de entorno:
+El sistema ahora usa el endpoint del backend (no requiere configuración adicional):
 
 ```env
-VITE_ANALYTICS_API_URL=https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net/analytics
-VITE_ANALYTICS_API_TIMEOUT=180000
+VITE_API_BASE_URL=http://localhost:3000/api/v1
 ```
 
 **Ubicación:** Archivo `.env` en la raíz del proyecto
 
-### Proxy de Desarrollo
+### Endpoints del Backend
 
-En desarrollo, Vite configura un proxy para evitar problemas de CORS:
+El frontend consume los siguientes endpoints del backend:
 
-```ts
-// vite.config.ts
-proxy: {
-  '/api/analytics': {
-    target: 'https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net',
-    changeOrigin: true,
-    rewrite: (path) => path.replace(/^\/api\/analytics/, '/analytics'),
-    secure: true,
-  },
-}
-```
-
-**Uso en desarrollo:**
-- El frontend puede llamar a `/api/analytics` y Vite lo redirige al servidor externo
+- `GET /analytics?mode=cache` - Analítica desde caché (rápido, por defecto)
+- `GET /analytics?mode=realtime` - Analítica en tiempo real (lento)
+- `GET /analytics/cache/info` - Información de la caché
+- `POST /analytics/cache/update` - Actualizar caché manualmente (solo admin)
+- `PATCH /analytics/cache/interval` - Configurar intervalo de actualización (solo admin)
 
 ---
 
@@ -116,19 +106,22 @@ El hook principal para obtener estadísticas:
 ```tsx
 import { useStatistics } from '@/modules/statistics/hooks/useStatistics';
 
-const { data, isLoading, error, refetch } = useStatistics({ 
-  userCode: 'USER001' // Opcional: filtrar por código de usuario
+const { data, isLoading, error, refetch, refreshRealtime } = useStatistics({ 
+  userCode: 'USER001', // Opcional: filtrar por código de usuario
+  mode: 'cache' // 'cache' (default) o 'realtime'
 });
 ```
 
 **Parámetros:**
 - `userCode` (opcional): Código del usuario para filtrar estadísticas. Si es `undefined` o `'all'`, muestra todas las conversaciones.
+- `mode` (opcional): `'cache'` (default, rápido) o `'realtime'` (lento, datos frescos)
 
 **Retorno:**
 - `data`: Objeto `StatisticsData` con todas las estadísticas
 - `isLoading`: Estado de carga
 - `error`: Mensaje de error si ocurre
-- `refetch`: Función para recargar los datos
+- `refetch`: Función para recargar los datos (acepta `mode` opcional)
+- `refreshRealtime`: Función para actualizar con datos en tiempo real
 
 ### Ejemplo Completo
 
@@ -181,14 +174,60 @@ export const MyAnalyticsComponent = () => {
 
 ---
 
-## 🌐 API Externa
+## 🌐 Endpoints del Backend
 
-### Endpoint
+### Endpoints Disponibles
 
-El sistema consume un API externo de Azure:
+El sistema consume endpoints del backend que actúan como proxy al API externo:
 
+#### 1. Obtener Analytics (con caché por defecto)
+
+```http
+GET /analytics?mode=cache&userCode=USER001
+Authorization: Bearer <JWT>
 ```
-GET https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net/analytics
+
+- **Modo `cache`** (default): Devuelve datos desde MongoDB (rápido). No modifica la caché.
+- **Modo `realtime`**: Consulta directamente el API externo (lento). No modifica la caché.
+- **Parámetro `userCode`** (opcional): Filtra por código de usuario.
+
+#### 2. Información de la Caché
+
+```http
+GET /analytics/cache/info
+Authorization: Bearer <JWT>
+```
+
+Retorna:
+```json
+{
+  "lastUpdated": "2025-01-19T15:30:00.000Z",
+  "updateIntervalMinutes": 60
+}
+```
+
+#### 3. Actualizar Caché Manualmente (Solo Admin)
+
+```http
+POST /analytics/cache/update
+Authorization: Bearer <JWT>
+Content-Type: application/json
+
+{
+  "updateIntervalMinutes": 60
+}
+```
+
+#### 4. Configurar Intervalo (Solo Admin)
+
+```http
+PATCH /analytics/cache/interval
+Authorization: Bearer <JWT>
+Content-Type: application/json
+
+{
+  "minutes": 120
+}
 ```
 
 ### Formato de Respuesta
@@ -223,22 +262,29 @@ El servicio `statistics.service.ts` transforma estos datos en:
 
 ### Cómo Funciona
 
-1. **Sin filtro (`userCode: undefined`):**
+El filtrado ahora se hace **directamente en el backend** mediante el parámetro `userCode`:
+
+1. **Sin filtro (`userCode: undefined` o `'all'`):**
    - Muestra estadísticas de **todas las conversaciones**
+   - Endpoint: `GET /analytics?mode=cache`
 
 2. **Con filtro (`userCode: 'USER001'`):**
-   - Obtiene los chats del usuario mediante: `GET /chats/user/codigo/USER001`
-   - Filtra los resúmenes para incluir solo esos chats
-   - Recalcula estadísticas basadas en los datos filtrados
+   - El backend filtra automáticamente los chats del usuario
+   - Endpoint: `GET /analytics?mode=cache&userCode=USER001`
+   - No requiere procesamiento adicional en el frontend
 
 ### Ejemplo de Uso
 
 ```tsx
-// Mostrar todas las conversaciones
+// Mostrar todas las conversaciones (desde caché)
 const { data } = useStatistics();
 
-// Filtrar por usuario específico
+// Filtrar por usuario específico (desde caché)
 const { data } = useStatistics({ userCode: 'USER001' });
+
+// Obtener datos en tiempo real
+const { data, refreshRealtime } = useStatistics({ mode: 'realtime' });
+await refreshRealtime();
 ```
 
 ---
@@ -257,10 +303,18 @@ import { StatisticsView } from '@/modules/statistics/views/StatisticsView';
 
 **Incluye:**
 - Header con selector de pacientes
+- **Barra de acciones** con botón de tiempo real
+- **Configuración de caché** (solo admin)
 - Tarjetas de estadísticas
 - Gráfica de temas
 - Nube de palabras
 - Resumen de interacciones
+
+**Características:**
+- ✅ Usa **caché por defecto** (rápido)
+- ✅ Botón **"Actualizar en tiempo real"** para obtener datos frescos
+- ✅ Badge indicando que los datos vienen de caché
+- ✅ Componente de configuración para admin
 
 ### 2. `TopicsChart`
 
@@ -323,18 +377,35 @@ import { AnalyticsHeader } from '@/modules/statistics/components/AnalyticsHeader
 />
 ```
 
+### 7. `AnalyticsCacheConfig`
+
+Componente de configuración de caché (solo visible para admin):
+
+```tsx
+import { AnalyticsCacheConfig } from '@/modules/admin/components/AnalyticsCacheConfig/AnalyticsCacheConfig';
+
+<AnalyticsCacheConfig />
+```
+
+**Funcionalidades:**
+- Ver información de la caché (última actualización, intervalo)
+- Configurar intervalo de actualización automática
+- Actualizar caché manualmente
+
 ---
 
 ## 🛠️ Solución de Problemas
 
 ### Error: "La URL del API de analytics no está configurada"
 
-**Causa:** Falta la variable de entorno `VITE_ANALYTICS_API_URL`
+**Causa:** Falta la variable de entorno `VITE_API_BASE_URL`
 
 **Solución:**
 1. Crear archivo `.env` en la raíz del proyecto
-2. Agregar: `VITE_ANALYTICS_API_URL=https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net/analytics`
+2. Agregar: `VITE_API_BASE_URL=http://localhost:3000/api/v1`
 3. Reiniciar el servidor de desarrollo
+
+**Nota:** El sistema ahora usa el endpoint del backend, no el API externo directamente.
 
 ### Error: "No tienes permisos para acceder a las estadísticas"
 
@@ -361,17 +432,33 @@ import { AnalyticsHeader } from '@/modules/statistics/components/AnalyticsHeader
 - Verificar que el código de usuario sea correcto
 - Verificar que el usuario tenga conversaciones en la base de datos
 
-### Timeout en la carga
+### Error al actualizar caché o configurar intervalo
 
-**Causa:** El servidor tarda demasiado en responder
+**Causa:** El usuario no tiene rol `admin`
 
 **Solución:**
-- Aumentar `VITE_ANALYTICS_API_TIMEOUT` (default: 180000ms = 3 minutos)
-- Verificar la carga del servidor de analytics
+- Solo usuarios con rol `admin` pueden modificar la configuración de caché
+- Verificar que el usuario tenga el rol correcto en la base de datos
+
+### Los datos parecen desactualizados
+
+**Causa:** Estás viendo datos desde caché que no se han actualizado
+
+**Solución:**
+- Usar el botón **"Actualizar en tiempo real"** para obtener datos frescos
+- Verificar la última actualización en la configuración de caché (solo admin)
+- Si eres admin, puedes actualizar la caché manualmente desde la configuración
 
 ---
 
 ## 📝 Notas Adicionales
+
+### Sistema de Caché
+
+- **Por defecto**: El sistema usa datos desde caché (rápido)
+- **Actualización automática**: El backend actualiza la caché automáticamente según el intervalo configurado
+- **Tiempo real**: Puedes usar el botón "Actualizar en tiempo real" para obtener datos frescos sin esperar la actualización automática
+- **Configuración**: Solo admin puede modificar el intervalo de actualización
 
 ### Configuración de Límites
 
@@ -393,6 +480,14 @@ Actualmente, el API no proporciona:
 
 Estos campos están preparados para futuras implementaciones.
 
+### Permisos de Admin
+
+Los usuarios con rol `admin` tienen acceso adicional:
+- ✅ Ver analytics (igual que `empleado`)
+- ✅ Configurar intervalo de actualización de caché
+- ✅ Actualizar caché manualmente
+- ✅ Ver información detallada de la caché
+
 ---
 
 ## 🔗 Archivos Relacionados
@@ -404,6 +499,8 @@ Estos campos están preparados para futuras implementaciones.
 - **Servicio:** `src/modules/statistics/services/statistics.service.ts`
 - **Tipos:** `src/modules/statistics/types/statistics.types.ts`
 - **Configuración:** `src/shared/config/env.ts`
+- **Servicio de Caché:** `src/modules/admin/services/analyticsCache.service.ts`
+- **Componente de Config:** `src/modules/admin/components/AnalyticsCacheConfig/AnalyticsCacheConfig.tsx`
 - **Vite Config:** `vite.config.ts`
 
 ---

@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { ENV } from '@/shared/config/env';
 import { apiService } from '@/shared/services/api.service';
 import type {
   StatisticsData,
@@ -16,6 +14,23 @@ interface Chat {
   messages: any[];
   createdAt: string;
   updatedAt: string;
+}
+
+interface CacheInfo {
+  lastUpdated: string;
+  updateIntervalMinutes: number;
+}
+
+interface UpdateCacheResponse {
+  message: string;
+  lastUpdated: string;
+  updateIntervalMinutes: number;
+  totalChats: number;
+}
+
+interface UpdateIntervalResponse {
+  message: string;
+  updateIntervalMinutes: number;
 }
 
 // Constantes configurables
@@ -43,65 +58,81 @@ class StatisticsService {
     }
 
     /**
-     * Obtener datos de estadísticas desde el API real (sin filtrado)
+     * Obtener datos de estadísticas desde el backend (con caché por defecto)
+     * @param mode - 'cache' (default) o 'realtime'
+     * @param userCode - Opcional: código de usuario para filtrar
      */
-    async getStatistics(): Promise<StatisticsData> {
-        if (!ENV.ANALYTICS_API_URL) {
-            throw new Error('La URL del API de analytics no está configurada. Configura VITE_ANALYTICS_API_URL en las variables de entorno.');
-        }
-
+    async getStatistics(mode: 'cache' | 'realtime' = 'cache', userCode?: string): Promise<StatisticsData> {
         try {
-            // Llamada al API de analytics
-            const response = await axios.get<AnalyticsApiResponse>(ENV.ANALYTICS_API_URL, {
-                timeout: ENV.ANALYTICS_API_TIMEOUT,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const params = new URLSearchParams();
+            params.append('mode', mode);
+            if (userCode && userCode !== 'all') {
+                params.append('userCode', userCode);
+            }
 
-            const analyticsData = response.data;
+            const analyticsData = await apiService.get<AnalyticsApiResponse>(`/analytics?${params.toString()}`);
 
             // Transformar los datos del API al formato esperado
             return this.transformAnalyticsData(analyticsData);
         } catch (error: any) {
             console.error('Error fetching analytics:', error);
             
-            // Manejar diferentes tipos de errores
-            if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
-                throw new Error('Error de red: No se pudo conectar con el servidor de analytics. Verifica tu conexión a internet.');
+            const message = error?.message || 'Error desconocido';
+            
+            if (message.includes('401') || message.includes('403')) {
+                throw new Error('No tienes permisos para acceder a las estadísticas');
             }
             
-            if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            if (message.includes('404')) {
+                throw new Error('El endpoint de analytics no fue encontrado');
+            }
+            
+            if (message.includes('timeout') || message.includes('ECONNABORTED')) {
                 throw new Error('El servidor está tardando demasiado en responder. Por favor, intenta de nuevo.');
             }
             
-            if (error.response) {
-                // El servidor respondió con un código de error
-                const status = error.response.status;
-                const message = error.response.data?.message || error.response.data?.error || 'Error desconocido del servidor';
-                
-                if (status === 404) {
-                    throw new Error('El endpoint de analytics no fue encontrado (404)');
-                }
-                
-                if (status === 403 || status === 401) {
-                    throw new Error('No tienes permisos para acceder a las estadísticas');
-                }
-                
-                if (status >= 500) {
-                    throw new Error(`Error del servidor (${status}): ${message}`);
-                }
-                
-                throw new Error(`Error ${status}: ${message}`);
-            }
-            
-            if (error.request) {
-                // La petición se hizo pero no hubo respuesta
-                throw new Error('No se recibió respuesta del servidor. El servidor puede estar caído o hay un problema de red.');
-            }
-            
-            // Error desconocido
-            throw new Error(error.message || 'Error al cargar las estadísticas');
+            throw new Error(message || 'Error al cargar las estadísticas');
+        }
+    }
+
+    /**
+     * Obtener información de la caché
+     */
+    async getCacheInfo(): Promise<CacheInfo> {
+        try {
+            return await apiService.get<CacheInfo>('/analytics/cache/info');
+        } catch (error: any) {
+            console.error('Error fetching cache info:', error);
+            throw new Error(error?.message || 'Error al obtener información de la caché');
+        }
+    }
+
+    /**
+     * Actualizar caché manualmente (solo admin)
+     */
+    async updateCache(updateIntervalMinutes?: number): Promise<UpdateCacheResponse> {
+        try {
+            const body = updateIntervalMinutes ? { updateIntervalMinutes } : {};
+            return await apiService.post<UpdateCacheResponse>('/analytics/cache/update', body);
+        } catch (error: any) {
+            console.error('Error updating cache:', error);
+            throw new Error(error?.message || 'Error al actualizar la caché');
+        }
+    }
+
+    /**
+     * Configurar intervalo de actualización de caché (solo admin)
+     */
+    async setCacheInterval(minutes: number): Promise<UpdateIntervalResponse> {
+        if (minutes < 1) {
+            throw new Error('El intervalo mínimo es de 1 minuto');
+        }
+        
+        try {
+            return await apiService.patch<UpdateIntervalResponse>('/analytics/cache/interval', { minutes });
+        } catch (error: any) {
+            console.error('Error setting cache interval:', error);
+            throw new Error(error?.message || 'Error al configurar el intervalo de actualización');
         }
     }
 

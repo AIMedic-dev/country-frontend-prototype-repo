@@ -7,6 +7,77 @@
   flex: 1;
 }
 
+.actionsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.actionsLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.realtimeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--ds-blue-600);
+  color: white;
+  border: none;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.realtimeButton:hover:not(:disabled) {
+  background: var(--ds-blue-700);
+  transform: translateY(-1px);
+}
+
+.realtimeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cacheBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--ds-blue-700);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .header {
   margin-bottom: 3rem;
   text-align: center;

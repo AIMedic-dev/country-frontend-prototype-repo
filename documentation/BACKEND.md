@@ -929,6 +929,155 @@ DELETE /chats/:id
 
 ---
 
+## 📊 Analytics (Proxy desde este backend)
+
+Este backend expone endpoints para obtener **analítica cacheada** (rápido) o **en tiempo real** (lento) desde el API externo. La analítica se cachea en MongoDB para mejorar el rendimiento.
+
+### Variables de entorno
+
+```env
+ANALYTICS_API_URL=https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net/analytics
+ANALYTICS_API_TIMEOUT_MS=180000
+ANALYTICS_CACHE_UPDATE_INTERVAL_MINUTES=60
+```
+
+### 1. Obtener analítica (con cache)
+
+```http
+GET /analytics?mode=cache
+Authorization: Bearer <JWT>
+```
+
+- **Acceso**: solo roles `empleado` y `admin`.
+- **Modo**: `cache` (default) o `realtime`.
+- **Respuesta**: objeto JSON donde cada clave es un `chatId`:
+
+```json
+{
+  "chatId1": { "summary": "Resumen...", "topics": ["tema1", "tema2"] },
+  "chatId2": { "summary": "Otro...", "topics": ["tema2"] }
+}
+```
+
+**Parámetros de query:**
+- `mode` (opcional): 
+  - `cache` (default): Devuelve analítica cacheada (rápido, desde MongoDB). **No modifica la cache.**
+  - `realtime`: Consulta directamente el API externo (lento). **No modifica la cache.**
+- `userCode` (opcional): código de usuario para filtrar. Si es `all` o no se envía, retorna toda la analítica.
+
+**Importante:** Ambos modos (`cache` y `realtime`) son de **solo lectura** y **no modifican la cache**. La cache solo se actualiza mediante el scheduler automático o llamando manualmente a `POST /analytics/cache/update`.
+
+**Ejemplos:**
+```http
+# Analítica cacheada (rápido)
+GET /analytics?mode=cache
+
+# Analítica en tiempo real (lento)
+GET /analytics?mode=realtime
+
+# Filtrar por usuario (cache)
+GET /analytics?mode=cache&userCode=USER001
+
+# Filtrar por usuario (tiempo real)
+GET /analytics?mode=realtime&userCode=USER001
+```
+
+### 2. Actualizar cache de analítica (Manual)
+
+Este endpoint permite actualizar la cache manualmente. Normalmente el scheduler integrado lo hace automáticamente, pero puedes usarlo si necesitas forzar una actualización.
+
+```http
+POST /analytics/cache/update
+Authorization: Bearer <JWT>
+Content-Type: application/json
+
+{
+  "updateIntervalMinutes": 60
+}
+```
+
+- **Acceso**: solo rol `admin`.
+- **Body** (opcional): `{ "updateIntervalMinutes": number }` - intervalo en minutos para la próxima actualización.
+- **Nota**: Este endpoint **sí modifica** la cache. Si solo quieres consultar datos sin modificar nada, usa `GET /analytics?mode=realtime`.
+
+**Response:**
+```json
+{
+  "message": "Cache actualizada exitosamente",
+  "lastUpdated": "2025-01-19T15:30:00.000Z",
+  "updateIntervalMinutes": 60,
+  "totalChats": 42
+}
+```
+
+### 3. Obtener información de la cache
+
+```http
+GET /analytics/cache/info
+Authorization: Bearer <JWT>
+```
+
+- **Acceso**: roles `empleado` y `admin`.
+- **Respuesta**: información sobre la última actualización y el intervalo configurado.
+
+**Response:**
+```json
+{
+  "lastUpdated": "2025-01-19T15:30:00.000Z",
+  "updateIntervalMinutes": 60
+}
+```
+
+### 4. Configurar intervalo de actualización
+
+```http
+PATCH /analytics/cache/interval
+Authorization: Bearer <JWT>
+Content-Type: application/json
+
+{
+  "minutes": 120
+}
+```
+
+- **Acceso**: solo rol `admin`.
+- **Body**: `{ "minutes": number }` - intervalo mínimo: 1 minuto.
+
+**Response:**
+```json
+{
+  "message": "Intervalo de actualización configurado exitosamente",
+  "updateIntervalMinutes": 120
+}
+```
+
+### Actualización Automática (Scheduler Integrado)
+
+El backend incluye un **scheduler integrado** que actualiza la cache automáticamente cada hora. El scheduler:
+
+- ✅ Se ejecuta automáticamente cuando el backend está corriendo
+- ✅ Verifica si la cache necesita actualizarse según el intervalo configurado
+- ✅ Solo actualiza si han pasado los minutos configurados desde la última actualización
+- ✅ No requiere servicios externos (Azure Function, cron jobs, etc.)
+
+**Cómo funciona:**
+
+1. El scheduler se ejecuta cada hora (cron: `EVERY_HOUR`)
+2. Compara la fecha de última actualización con el intervalo configurado
+3. Si han pasado los minutos suficientes, actualiza la cache automáticamente
+4. Si la cache está fresca, no hace nada (ahorra recursos)
+
+**Ejemplo de logs:**
+```
+[AnalyticsSchedulerService] Intervalo de actualización cargado: 60 minutos
+[AnalyticsSchedulerService] Cache aún fresca (actualizada hace 30 minutos, intervalo: 60 minutos)
+[AnalyticsSchedulerService] Actualizando cache (última actualización hace 65 minutos)
+```
+
+**Nota:** Si necesitas actualizar la cache manualmente, puedes usar el endpoint `POST /analytics/cache/update` (requiere rol `admin`).
+
+---
+
 ## 🗄️ Base de Datos
 
 ### Colección: Users
@@ -950,17 +1099,38 @@ DELETE /chats/:id
 {
   _id: ObjectId,
   userId: ObjectId, // Referencia a User
-  messages: [
-    {
-      content: String,    // Pregunta del usuario
-      answer: String,     // Respuesta de la IA
-      timestamp: Date
-    }
-  ],
+  isActive: Boolean, // Soft delete: false si está eliminado
   createdAt: Date,
   updatedAt: Date
 }
 ```
+
+### Colección: chat_messages
+
+```javascript
+{
+  _id: ObjectId,
+  conversation_id: String, // ID del chat (string)
+  user_message: String,    // Pregunta del usuario
+  assistant_answer: String, // Respuesta de la IA
+  createdAt: Date
+}
+```
+
+### Colección: analytics_cache
+
+```javascript
+{
+  _id: ObjectId,
+  data: Object, // { [chatId: string]: { summary: string; topics: string[] } }
+  lastUpdated: Date, // Última vez que se actualizó la cache
+  updateIntervalMinutes: Number, // Intervalo configurado (minutos)
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Nota:** Solo existe una entrada en esta colección (singleton). Se actualiza periódicamente mediante Azure Function.
 
 ---
 

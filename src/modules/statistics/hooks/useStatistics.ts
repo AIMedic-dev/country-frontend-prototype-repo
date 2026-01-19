@@ -6,29 +6,28 @@ interface UseStatisticsReturn {
   data: StatisticsData | null;
   isLoading: boolean;
   error: string | null;
-  refetch: () => Promise<void>;
+  refetch: (mode?: 'cache' | 'realtime') => Promise<void>;
+  refreshRealtime: () => Promise<void>;
 }
 
 interface UseStatisticsOptions {
   userCode?: string;
+  mode?: 'cache' | 'realtime';
 }
 
 export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsReturn => {
-  const [allData, setAllData] = useState<StatisticsData | null>(null);
-  const [filteredData, setFilteredData] = useState<StatisticsData | null>(null);
+  const [data, setData] = useState<StatisticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { userCode } = options || {};
+  const { userCode, mode = 'cache' } = options || {};
 
-  // Cargar datos completos solo una vez
-  const fetchStatistics = async () => {
+  // Cargar datos
+  const fetchStatistics = async (fetchMode: 'cache' | 'realtime' = mode) => {
     try {
       setIsLoading(true);
       setError(null);
-      const statistics = await statisticsService.getStatistics();
-      setAllData(statistics);
-      setFilteredData(statistics);
+      const statistics = await statisticsService.getStatistics(fetchMode, userCode);
+      setData(statistics);
     } catch (err: any) {
       console.error('Error fetching statistics:', err);
       setError(err.message || 'Error al cargar las estadísticas');
@@ -37,46 +36,21 @@ export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsRetu
     }
   };
 
-  // Filtrar datos cuando cambia el código de usuario
+  // Actualizar en tiempo real
+  const refreshRealtime = async () => {
+    await fetchStatistics('realtime');
+  };
+
+  // Cargar datos cuando cambian las opciones
   useEffect(() => {
-    const filterData = async () => {
-      if (!allData) return;
-
-      if (!userCode || userCode === 'all') {
-        // Mostrar todos los datos
-        setFilteredData(allData);
-        return;
-      }
-
-      try {
-        setIsFiltering(true);
-        setError(null);
-        const filtered = await statisticsService.filterStatisticsByUserCode(allData, userCode);
-        setFilteredData(filtered);
-      } catch (err: any) {
-        console.error('Error filtering statistics:', err);
-        setError(err.message || 'Error al filtrar las estadísticas');
-        // En caso de error, mostrar todos los datos
-        setFilteredData(allData);
-      } finally {
-        setIsFiltering(false);
-      }
-    };
-
-    filterData();
-  }, [userCode, allData]);
-
-  // Cargar datos iniciales solo una vez
-  useEffect(() => {
-    if (!allData) {
-      fetchStatistics();
-    }
-  }, []);
+    fetchStatistics(mode);
+  }, [userCode, mode]);
 
   return {
-    data: filteredData,
-    isLoading: isLoading || isFiltering,
+    data,
+    isLoading,
     error,
     refetch: fetchStatistics,
+    refreshRealtime,
   };
 };
