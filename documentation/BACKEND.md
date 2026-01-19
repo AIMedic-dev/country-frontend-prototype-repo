@@ -605,10 +605,179 @@ Content-Type: application/json
 DELETE /users/:id
 ```
 
+### 6. Crear Múltiples Usuarios
+
+```http
+POST /users/bulk
+Content-Type: application/json
+
+[
+  {
+    "nombre": "Juan Pérez",
+    "rol": "paciente",
+    "codigo": "USER001"
+  },
+  {
+    "nombre": "María García",
+    "rol": "empleado",
+    "codigo": "USER002"
+  }
+]
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "507f1f77bcf86cd799439011",
+    "nombre": "Juan Pérez",
+    "rol": "paciente",
+    "chats": [],
+    "createdAt": "2025-10-02T10:00:00.000Z",
+    "updatedAt": "2025-10-02T10:00:00.000Z"
+  },
+  {
+    "id": "507f1f77bcf86cd799439012",
+    "nombre": "María García",
+    "rol": "empleado",
+    "chats": [],
+    "createdAt": "2025-10-02T10:00:01.000Z",
+    "updatedAt": "2025-10-02T10:00:01.000Z"
+  }
+]
+```
+
+**Validaciones y reglas:**
+- No se permiten códigos duplicados dentro del mismo request.
+- No se permiten códigos que ya existan en la base de datos.
+- Todos los campos (`nombre`, `rol`, `codigo`) son requeridos.
+- `rol` debe ser `"paciente"`, `"empleado"` o `"admin"`.
+
 ### 6. Obtener Chats de un Usuario
 
 ```http
 GET /users/:id/chats
+```
+
+---
+
+## 🔷 GraphQL API
+
+El proyecto incluye soporte para GraphQL además de REST. Puedes acceder al playground de GraphQL en:
+
+```
+http://localhost:3000/graphql
+```
+
+### Mutations
+
+#### Crear Múltiples Usuarios
+
+Permite crear varios usuarios en una sola operación.
+
+**Mutation:**
+```graphql
+mutation CreateUsers($input: CreateUsersInput!) {
+  createUsers(input: $input) {
+    created
+    users {
+      id
+      nombre
+      rol
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+**Variables:**
+```json
+{
+  "input": {
+    "users": [
+      {
+        "nombre": "Juan Pérez",
+        "rol": "paciente",
+        "codigo": "USER001"
+      },
+      {
+        "nombre": "María García",
+        "rol": "empleado",
+        "codigo": "USER002"
+      },
+      {
+        "nombre": "Carlos López",
+        "rol": "paciente",
+        "codigo": "USER003"
+      }
+    ]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "createUsers": {
+      "created": 3,
+      "users": [
+        {
+          "id": "507f1f77bcf86cd799439011",
+          "nombre": "Juan Pérez",
+          "rol": "paciente",
+          "createdAt": "2025-10-02T10:00:00.000Z",
+          "updatedAt": "2025-10-02T10:00:00.000Z"
+        },
+        {
+          "id": "507f1f77bcf86cd799439012",
+          "nombre": "María García",
+          "rol": "empleado",
+          "createdAt": "2025-10-02T10:00:01.000Z",
+          "updatedAt": "2025-10-02T10:00:01.000Z"
+        },
+        {
+          "id": "507f1f77bcf86cd799439013",
+          "nombre": "Carlos López",
+          "rol": "paciente",
+          "createdAt": "2025-10-02T10:00:02.000Z",
+          "updatedAt": "2025-10-02T10:00:02.000Z"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Validaciones:**
+- No se permiten códigos duplicados en el mismo request
+- No se permiten códigos que ya existan en la base de datos
+- Todos los campos son requeridos (`nombre`, `rol`, `codigo`)
+- El `rol` debe ser `"paciente"`, `"empleado"` o `"admin"`
+
+**Errores:**
+- `400 Bad Request`: Si hay códigos duplicados en el input
+- `409 Conflict`: Si alguno de los códigos ya existe en la base de datos
+
+**Ejemplo con cURL:**
+```bash
+curl -X POST http://localhost:3000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation CreateUsers($input: CreateUsersInput!) { createUsers(input: $input) { created users { id nombre rol } } }",
+    "variables": {
+      "input": {
+        "users": [
+          {
+            "nombre": "Juan Pérez",
+            "rol": "paciente",
+            "codigo": "USER001"
+          }
+        ]
+      }
+    }
+  }'
 ```
 
 ---
@@ -768,7 +937,7 @@ DELETE /chats/:id
 {
   _id: ObjectId,
   nombre: String,
-  rol: String, // "paciente" | "empleado"
+  rol: String, // "paciente" | "empleado" | "admin"
   chats: [ObjectId], // Referencias a chats
   createdAt: Date,
   updatedAt: Date

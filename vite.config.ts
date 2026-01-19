@@ -27,4 +27,26 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+
+          // Splits grandes dependencias en chunks separados
+          if (id.includes('react-dom') || id.includes('react/')) return 'react';
+          if (id.includes('react-router')) return 'router';
+          if (id.includes('@apollo/client') || id.includes('graphql')) return 'apollo';
+          if (id.includes('recharts') || id.includes('d3-')) return 'charts';
+          if (id.includes('microsoft-cognitiveservices-speech-sdk')) return 'speech';
+          if (id.includes('socket.io-client')) return 'socket';
+          if (id.includes('axios')) return 'http';
+          if (id.includes('@hotjar/')) return 'hotjar';
+
+          // fallback: todo lo demás en vendor
+          return 'vendor';
+        },
+      },
+    },
+  },
 });

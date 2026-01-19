@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Chat } from '../../types/chat.types';
 import { ChatList } from '../ChatList/ChatList';
 import styles from './ChatSidebar.module.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/modules/auth/context/AuthContext';
+import { USER_ROLE_LABELS } from '@/shared/utils/constants';
+import { AdminUsersModal } from '@/modules/admin/components/AdminUsersModal/AdminUsersModal';
 
 
 interface ChatSidebarProps {
@@ -31,6 +33,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthContext();
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   // Detectar si estamos en la ruta de analytics
   const isAnalyticsRoute = location.pathname === '/analytics';
@@ -56,6 +59,13 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
     }
   };
 
+  const handleOpenAdmin = () => {
+    setIsAdminModalOpen(true);
+    if (onClose && window.innerWidth < 768) {
+      onClose();
+    }
+  };
+
   // Función para ir al chat (desde analytics)
   const handleGoToChat = () => {
     if (chats.length > 0 && activeChat) {
@@ -72,6 +82,8 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
 
   return (
     <>
+      <AdminUsersModal isOpen={isAdminModalOpen} onClose={() => setIsAdminModalOpen(false)} />
+
       {/* Overlay para mobile */}
       {isOpen && onClose && (
         <div
@@ -108,13 +120,13 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
               <div className={styles.userText}>
                 {/* <p className={styles.userName}>{user.nombre}</p> */}
                 <span className={styles.userRole}>
-                  {user.rol === 'paciente' ? 'Paciente' : 'Colaborador'}
+                  {USER_ROLE_LABELS[user.rol as keyof typeof USER_ROLE_LABELS] ?? user.rol}
                 </span>
               </div>
             </div>
             <div className={styles.userActions}>
               {/* Botón dinámico: Analytics si está en chat, Chat si está en analytics */}
-              {user.rol === 'empleado' && (
+              {(user.rol === 'empleado' || user.rol === 'admin') && (
                 <>
                   {isAnalyticsRoute ? (
                     <button
@@ -158,6 +170,33 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                     </button>
                   )}
                 </>
+              )}
+
+              {/* Botón de administración (solo admin) */}
+              {user.rol === 'admin' && (
+                <button
+                  className={styles.statsButton}
+                  onClick={handleOpenAdmin}
+                  aria-label="Administración"
+                  title="Administración"
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path
+                      d="M10 12.5C12.0711 12.5 13.75 10.8211 13.75 8.75C13.75 6.67893 12.0711 5 10 5C7.92893 5 6.25 6.67893 6.25 8.75C6.25 10.8211 7.92893 12.5 10 12.5Z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M16.25 16.25C16.25 14.1789 13.4518 12.5 10 12.5C6.54822 12.5 3.75 14.1789 3.75 16.25"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
               )}
 
               <button

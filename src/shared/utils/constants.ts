@@ -1,11 +1,13 @@
 export const USER_ROLES = {
   PACIENTE: 'paciente',
   EMPLEADO: 'empleado',
+  ADMIN: 'admin',
 } as const;
 
 export const USER_ROLE_LABELS = {
   paciente: 'Paciente',
   empleado: 'Colaborador',
+  admin: 'Administrador',
 } as const;
 
 export const API_ENDPOINTS = {

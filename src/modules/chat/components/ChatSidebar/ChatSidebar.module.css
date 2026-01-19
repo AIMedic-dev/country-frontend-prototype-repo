@@ -102,8 +102,8 @@
 
 .userInfo {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
   padding: var(--ds-spacing-4);
   margin: var(--ds-spacing-4) var(--ds-spacing-4) var(--ds-spacing-4) var(--ds-spacing-4);
   background: var(--ds-blue-900);
@@ -168,6 +168,9 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--ds-spacing-3);
+  flex-wrap: wrap;
 }
 
 /* ✨ AGREGAR: Botón de estadísticas */

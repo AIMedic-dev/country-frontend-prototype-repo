@@ -29,8 +29,8 @@ export const StatisticsPage = () => {
     );
   }
 
-  // Solo empleados pueden ver analytics
-  if (!user || user.rol !== 'empleado') {
+  // Solo empleados o admin pueden ver analytics
+  if (!user || (user.rol !== 'empleado' && user.rol !== 'admin')) {
     return <Navigate to="/" replace />;
   }
 

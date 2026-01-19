@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: 'paciente' | 'empleado';
+  requiredRole?: 'paciente' | 'empleado' | 'admin';
 }
 
 export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
