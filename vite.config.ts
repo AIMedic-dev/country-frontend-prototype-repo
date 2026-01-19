@@ -15,7 +15,13 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'], // Evitar múltiples instancias de React
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react/jsx-runtime', 'react-router-dom'], // Pre-bundling de dependencias críticas
+    include: [
+      'react', 
+      'react-dom', 
+      'react/jsx-runtime', 
+      'react-router-dom',
+      'recharts' // Incluir recharts para pre-bundling con React
+    ],
     esbuildOptions: {
       target: 'esnext',
     },
@@ -35,39 +41,21 @@ export default defineConfig({
     },
   },
   build: {
+    // Deshabilitar chunking manual para evitar problemas con React y recharts
+    // Vite manejará automáticamente la división de chunks de forma segura
     rollupOptions: {
       output: {
+        // Solo separar el Speech SDK que es muy grande y no depende de React
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
-
-          // CRÍTICO: NO tocar React ni ReactDOM - dejar que Vite los maneje automáticamente
-          // Separar React causa el error "Cannot set properties of undefined (setting 'Children')"
-          if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
-            return; // undefined - Vite lo manejará automáticamente
+          
+          // Solo separar Speech SDK (muy grande, ~450KB, no depende de React)
+          if (id.includes('microsoft-cognitiveservices-speech-sdk')) {
+            return 'speech';
           }
           
-          // React Router (puede separarse porque no depende directamente de React internals)
-          if (id.includes('react-router')) return 'router';
-          
-          // Apollo/GraphQL
-          if (id.includes('@apollo/client') || id.includes('graphql')) return 'apollo';
-          
-          // Charts
-          if (id.includes('recharts') || id.includes('d3-')) return 'charts';
-          
-          // Speech SDK (muy grande)
-          if (id.includes('microsoft-cognitiveservices-speech-sdk')) return 'speech';
-          
-          // Socket.IO
-          if (id.includes('socket.io-client')) return 'socket';
-          
-          // HTTP client
-          if (id.includes('axios')) return 'http';
-          
-          // Hotjar
-          if (id.includes('@hotjar/')) return 'hotjar';
-
-          // Todo lo demás en vendor (incluyendo React si no fue capturado antes)
+          // Todo lo demás (incluyendo React, ReactDOM, recharts, etc.) en vendor
+          // Esto asegura que React esté disponible cuando recharts se carga
           return 'vendor';
         },
       },
@@ -76,5 +64,6 @@ export default defineConfig({
       include: [/node_modules/],
       transformMixedEsModules: true,
     },
+    chunkSizeWarningLimit: 1000, // Aumentar límite para evitar warnings
   },
 });

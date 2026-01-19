@@ -21,24 +21,6 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <script>
-    // Verificación de que el DOM está listo
-    if (document.getElementById('root')) {
-      console.log('✅ Root element found');
-    } else {
-      console.error('❌ Root element not found');
-    }
-    
-    // Verificar errores de carga de módulos
-    window.addEventListener('error', (event) => {
-      console.error('❌ Global error:', event.error);
-    });
-    
-    // Verificar errores no capturados
-    window.addEventListener('unhandledrejection', (event) => {
-      console.error('❌ Unhandled promise rejection:', event.reason);
-    });
-  </script>
 </body>
 
 </html>

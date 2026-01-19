@@ -9,22 +9,11 @@ import { ErrorBoundary } from './shared/components/ErrorBoundary/ErrorBoundary';
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  console.error('❌ Root element not found');
   document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h1>Error: Root element not found</h1></div>';
   throw new Error('Root element not found');
 }
 
-// Manejar errores no capturados
-window.addEventListener('error', (event) => {
-  console.error('❌ Global error:', event.error);
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Unhandled promise rejection:', event.reason);
-});
-
 try {
-  console.log('🚀 Starting application...');
   createRoot(rootElement).render(
     <StrictMode>
       <ErrorBoundary>
@@ -33,9 +22,8 @@ try {
       </ErrorBoundary>
     </StrictMode>
   );
-  console.log('✅ Application rendered successfully');
 } catch (error) {
-  console.error('❌ Error rendering application:', error);
+  console.error('Error rendering application:', error);
   rootElement.innerHTML = `
     <div style="padding: 2rem; text-align: center; font-family: system-ui;">
       <h1 style="color: #dc2626;">Error al cargar la aplicación</h1>
