@@ -12,10 +12,13 @@ export default defineConfig({
       '@/pages': resolve(__dirname, './src/pages'),
       '@/styles': resolve(__dirname, './src/styles'),
     },
-    dedupe: ['react', 'react-dom'], // Evitar múltiples instancias de React
+    dedupe: ['react', 'react-dom', 'react/jsx-runtime'], // Evitar múltiples instancias de React
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'], // Pre-bundling de dependencias críticas
+    include: ['react', 'react-dom', 'react/jsx-runtime', 'react-router-dom'], // Pre-bundling de dependencias críticas
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   server: {
     port: 5173,
@@ -37,12 +40,13 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
 
-          // React y ReactDOM deben estar juntos para evitar errores
-          if (id.includes('react-dom') || id.includes('react/') || id.includes('/react')) {
-            return 'react-vendor';
+          // CRÍTICO: NO tocar React ni ReactDOM - dejar que Vite los maneje automáticamente
+          // Separar React causa el error "Cannot set properties of undefined (setting 'Children')"
+          if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+            return; // undefined - Vite lo manejará automáticamente
           }
           
-          // React Router
+          // React Router (puede separarse porque no depende directamente de React internals)
           if (id.includes('react-router')) return 'router';
           
           // Apollo/GraphQL
@@ -51,7 +55,7 @@ export default defineConfig({
           // Charts
           if (id.includes('recharts') || id.includes('d3-')) return 'charts';
           
-          // Speech SDK
+          // Speech SDK (muy grande)
           if (id.includes('microsoft-cognitiveservices-speech-sdk')) return 'speech';
           
           // Socket.IO
@@ -63,10 +67,14 @@ export default defineConfig({
           // Hotjar
           if (id.includes('@hotjar/')) return 'hotjar';
 
-          // fallback: todo lo demás en vendor
+          // Todo lo demás en vendor (incluyendo React si no fue capturado antes)
           return 'vendor';
         },
       },
+    },
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
     },
   },
 });
