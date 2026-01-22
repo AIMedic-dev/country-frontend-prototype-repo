@@ -67,18 +67,6 @@ class ApiService {
           error: error.response?.data?.error,
         };
         
-        // Log para debugging (solo en desarrollo)
-        if (import.meta.env.DEV) {
-          console.error('API Error:', {
-            url: error.config?.url,
-            method: error.config?.method,
-            status: error.response?.status,
-            message: apiError.message,
-            error: apiError.error,
-            data: error.response?.data
-          });
-        }
-        
         return Promise.reject(apiError);
       }
     );

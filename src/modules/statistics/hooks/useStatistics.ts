@@ -25,17 +25,20 @@ export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsRetu
   // Ref para rastrear el userCode actual
   const currentUserCodeRef = useRef(userCode);
   const currentModeRef = useRef(mode);
+  const useIndividualEndpointRef = useRef(useIndividualEndpoint);
 
   // Actualizar los refs cuando cambian
   useEffect(() => {
     currentUserCodeRef.current = userCode;
     currentModeRef.current = mode;
-  }, [userCode, mode]);
+    useIndividualEndpointRef.current = useIndividualEndpoint;
+  }, [userCode, mode, useIndividualEndpoint]);
 
   // Cargar datos (función memoizada en useRef para evitar dependencias circulares)
   const fetchStatistics = useRef(async (customUserCode?: string, customMode?: 'cache' | 'realtime') => {
     const codeToUse = customUserCode !== undefined ? customUserCode : currentUserCodeRef.current;
     const modeToUse = customMode || currentModeRef.current;
+    const useIndividual = useIndividualEndpointRef.current;
     
     try {
       setIsLoading(true);
@@ -44,12 +47,10 @@ export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsRetu
       let statistics: StatisticsData;
       
       // Si hay un código de usuario Y useIndividualEndpoint es true, usar endpoint individual
-      if (codeToUse && useIndividualEndpoint) {
-        console.log(`🎯 Using individual analytics endpoint for user: ${codeToUse}`);
+      if (codeToUse && useIndividual) {
         statistics = await statisticsService.getUserAnalytics(codeToUse);
       } else {
         // De lo contrario, usar endpoint general con filtro opcional
-        console.log(`📊 Using general analytics endpoint (mode: ${modeToUse}, filter: ${codeToUse || 'all'})`);
         statistics = await statisticsService.getStatistics(modeToUse, codeToUse);
       }
       

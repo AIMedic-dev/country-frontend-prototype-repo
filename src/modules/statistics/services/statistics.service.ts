@@ -53,41 +53,13 @@ class StatisticsService {
                 { timeout }
             );
 
-            // Log para debugging
-            console.log('📊 Analytics data received:', {
-                mode,
-                userCode,
-                chatCount: Object.keys(analyticsData || {}).length,
-                sampleChatIds: Object.keys(analyticsData || {}).slice(0, 3),
-                rawData: analyticsData
-            });
-
             // Transformar los datos del API al formato esperado
-            const transformedData = this.transformAnalyticsData(analyticsData);
-            
-            console.log('✅ Analytics data transformed:', {
-                totalConversations: transformedData.stats.totalConversations,
-                topicsCount: transformedData.topicsData.length,
-                wordsCount: transformedData.wordsData.length,
-                summariesCount: transformedData.summaries.length
-            });
-            
-            return transformedData;
+            return this.transformAnalyticsData(analyticsData);
         } catch (error: any) {
-            console.error('Error fetching analytics:', error);
-            
             // Extraer información del error
             const statusCode = error?.statusCode || error?.status || 0;
             const message = error?.message || 'Error desconocido';
             const backendError = error?.error;
-            
-            // Log detallado para debugging
-            console.error('Analytics error details:', {
-                statusCode,
-                message,
-                backendError,
-                fullError: error
-            });
             
             // Manejar errores específicos
             if (statusCode === 401 || statusCode === 403) {
@@ -133,50 +105,19 @@ class StatisticsService {
      */
     async getUserAnalytics(userCode: string): Promise<StatisticsData> {
         try {
-            console.log(`📊 Fetching individual analytics for user: ${userCode}`);
-            
             // Timeout extendido para consulta individual (siempre es realtime)
             const analyticsData = await apiService.get<AnalyticsApiResponse>(
                 `/analytics/user/${userCode}`,
                 { timeout: 180000 } // 3 minutos
             );
 
-            // Log para debugging
-            console.log('📊 Individual analytics data received:', {
-                userCode,
-                chatCount: Object.keys(analyticsData || {}).length,
-                sampleChatIds: Object.keys(analyticsData || {}).slice(0, 3),
-                rawData: analyticsData
-            });
-
             // Transformar los datos del API al formato esperado
-            const transformedData = this.transformAnalyticsData(analyticsData);
-            
-            console.log('✅ Individual analytics data transformed:', {
-                userCode,
-                totalConversations: transformedData.stats.totalConversations,
-                topicsCount: transformedData.topicsData.length,
-                wordsCount: transformedData.wordsData.length,
-                summariesCount: transformedData.summaries.length
-            });
-            
-            return transformedData;
+            return this.transformAnalyticsData(analyticsData);
         } catch (error: any) {
-            console.error('Error fetching individual analytics:', error);
-            
             // Extraer información del error
             const statusCode = error?.statusCode || error?.status || 0;
             const message = error?.message || 'Error desconocido';
             const backendError = error?.error;
-            
-            // Log detallado para debugging
-            console.error('Individual analytics error details:', {
-                userCode,
-                statusCode,
-                message,
-                backendError,
-                fullError: error
-            });
             
             // Manejar errores específicos
             if (statusCode === 404) {
@@ -234,7 +175,6 @@ class StatisticsService {
     private transformAnalyticsData(analyticsData: AnalyticsApiResponse): StatisticsData {
         // Validar que existan datos
         if (!analyticsData || typeof analyticsData !== 'object') {
-            console.warn('⚠️ Analytics data is empty or invalid:', analyticsData);
             return this.getEmptyStatistics();
         }
 
@@ -242,7 +182,6 @@ class StatisticsService {
         const totalConversations = chatIds.length;
 
         if (totalConversations === 0) {
-            console.warn('⚠️ No conversations found in analytics data');
             return this.getEmptyStatistics();
         }
 
@@ -255,7 +194,6 @@ class StatisticsService {
             
             // Validar que el chat tenga los campos necesarios
             if (!chatData || !chatData.summary || !Array.isArray(chatData.topics)) {
-                console.warn(`⚠️ Invalid chat data for chatId ${chatId}:`, chatData);
                 return;
             }
 
