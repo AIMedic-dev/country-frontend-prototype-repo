@@ -78,6 +78,83 @@
   }
 }
 
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.errorText {
+  color: var(--ds-red-700, #b91c1c);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.noDataContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.noDataCard {
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.noDataIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.noDataTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ds-gray-900, #111827);
+  margin: 0 0 1rem 0;
+}
+
+.noDataMessage {
+  font-size: 1rem;
+  color: var(--ds-gray-600, #4b5563);
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.viewAllButton {
+  background: var(--ds-blue-600);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewAllButton:hover {
+  background: var(--ds-blue-700);
+  transform: translateY(-1px);
+}
+
 .header {
   margin-bottom: 3rem;
   text-align: center;

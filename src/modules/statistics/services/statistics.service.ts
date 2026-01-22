@@ -8,14 +8,6 @@ import type {
   AnalyticsApiResponse,
 } from '../types/statistics.types';
 
-interface Chat {
-  id: string;
-  userId: string;
-  messages: any[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface CacheInfo {
   lastUpdated: string;
   updateIntervalMinutes: number;
@@ -42,22 +34,6 @@ const ANALYTICS_CONFIG = {
 
 class StatisticsService {
     /**
-     * Obtener chats de un usuario por su código
-     */
-    async getChatsByUserCode(userCode: string): Promise<Chat[]> {
-        try {
-            const chats = await apiService.get<Chat[]>(`/chats/user/codigo/${userCode}`);
-            return chats;
-        } catch (error: any) {
-            console.error('Error fetching chats by user code:', error);
-            if (error.statusCode === 404) {
-                throw new Error(`No se encontraron chats para el código: ${userCode}`);
-            }
-            throw new Error(`Error al obtener los chats del usuario: ${error.message || 'Error desconocido'}`);
-        }
-    }
-
-    /**
      * Obtener datos de estadísticas desde el backend (con caché por defecto)
      * @param mode - 'cache' (default) o 'realtime'
      * @param userCode - Opcional: código de usuario para filtrar
@@ -70,25 +46,68 @@ class StatisticsService {
                 params.append('userCode', userCode);
             }
 
-            const analyticsData = await apiService.get<AnalyticsApiResponse>(`/analytics?${params.toString()}`);
+            // Usar timeout extendido para analytics (especialmente en modo realtime)
+            const timeout = mode === 'realtime' ? 180000 : 30000; // 3 min para realtime, 30 seg para cache
+            const analyticsData = await apiService.get<AnalyticsApiResponse>(
+                `/analytics?${params.toString()}`,
+                { timeout }
+            );
+
+            // Log para debugging
+            console.log('📊 Analytics data received:', {
+                mode,
+                userCode,
+                chatCount: Object.keys(analyticsData || {}).length,
+                sampleChatIds: Object.keys(analyticsData || {}).slice(0, 3),
+                rawData: analyticsData
+            });
 
             // Transformar los datos del API al formato esperado
-            return this.transformAnalyticsData(analyticsData);
+            const transformedData = this.transformAnalyticsData(analyticsData);
+            
+            console.log('✅ Analytics data transformed:', {
+                totalConversations: transformedData.stats.totalConversations,
+                topicsCount: transformedData.topicsData.length,
+                wordsCount: transformedData.wordsData.length,
+                summariesCount: transformedData.summaries.length
+            });
+            
+            return transformedData;
         } catch (error: any) {
             console.error('Error fetching analytics:', error);
             
+            // Extraer información del error
+            const statusCode = error?.statusCode || error?.status || 0;
             const message = error?.message || 'Error desconocido';
+            const backendError = error?.error;
             
-            if (message.includes('401') || message.includes('403')) {
+            // Log detallado para debugging
+            console.error('Analytics error details:', {
+                statusCode,
+                message,
+                backendError,
+                fullError: error
+            });
+            
+            // Manejar errores específicos
+            if (statusCode === 401 || statusCode === 403) {
                 throw new Error('No tienes permisos para acceder a las estadísticas');
             }
             
-            if (message.includes('404')) {
-                throw new Error('El endpoint de analytics no fue encontrado');
+            if (statusCode === 404) {
+                throw new Error('El endpoint de analytics no fue encontrado. Verifica la configuración del backend.');
             }
             
-            if (message.includes('timeout') || message.includes('ECONNABORTED')) {
-                throw new Error('El servidor está tardando demasiado en responder. Por favor, intenta de nuevo.');
+            if (message.includes('timeout') || message.includes('ECONNABORTED') || error?.code === 'ECONNABORTED') {
+                throw new Error('La consulta de analítica está tardando más de lo esperado. El servidor puede estar procesando muchos datos.');
+            }
+            
+            if (statusCode === 500) {
+                throw new Error(`Error interno del servidor: ${backendError || message}. Verifica que el backend esté funcionando correctamente.`);
+            }
+            
+            if (message.includes('Network Error') || message.includes('ERR_NETWORK')) {
+                throw new Error('Error de red. Verifica tu conexión o que el backend esté disponible.');
             }
             
             throw new Error(message || 'Error al cargar las estadísticas');
@@ -104,6 +123,79 @@ class StatisticsService {
         } catch (error: any) {
             console.error('Error fetching cache info:', error);
             throw new Error(error?.message || 'Error al obtener información de la caché');
+        }
+    }
+
+    /**
+     * Obtener analítica individual de un usuario específico
+     * Este endpoint siempre consulta en tiempo real desde la API externa
+     * @param userCode - Código del usuario
+     */
+    async getUserAnalytics(userCode: string): Promise<StatisticsData> {
+        try {
+            console.log(`📊 Fetching individual analytics for user: ${userCode}`);
+            
+            // Timeout extendido para consulta individual (siempre es realtime)
+            const analyticsData = await apiService.get<AnalyticsApiResponse>(
+                `/analytics/user/${userCode}`,
+                { timeout: 180000 } // 3 minutos
+            );
+
+            // Log para debugging
+            console.log('📊 Individual analytics data received:', {
+                userCode,
+                chatCount: Object.keys(analyticsData || {}).length,
+                sampleChatIds: Object.keys(analyticsData || {}).slice(0, 3),
+                rawData: analyticsData
+            });
+
+            // Transformar los datos del API al formato esperado
+            const transformedData = this.transformAnalyticsData(analyticsData);
+            
+            console.log('✅ Individual analytics data transformed:', {
+                userCode,
+                totalConversations: transformedData.stats.totalConversations,
+                topicsCount: transformedData.topicsData.length,
+                wordsCount: transformedData.wordsData.length,
+                summariesCount: transformedData.summaries.length
+            });
+            
+            return transformedData;
+        } catch (error: any) {
+            console.error('Error fetching individual analytics:', error);
+            
+            // Extraer información del error
+            const statusCode = error?.statusCode || error?.status || 0;
+            const message = error?.message || 'Error desconocido';
+            const backendError = error?.error;
+            
+            // Log detallado para debugging
+            console.error('Individual analytics error details:', {
+                userCode,
+                statusCode,
+                message,
+                backendError,
+                fullError: error
+            });
+            
+            // Manejar errores específicos
+            if (statusCode === 404) {
+                throw new Error(`No se encontró el usuario con código: ${userCode}`);
+            }
+            
+            if (statusCode === 502) {
+                throw new Error(`El usuario "${userCode}" no tiene datos en el sistema de analytics.`);
+            }
+            
+            if (statusCode === 503 || message.includes('timeout') || message.includes('ECONNABORTED')) {
+                throw new Error('La consulta de analítica está tardando más de lo esperado. Intenta de nuevo en unos momentos.');
+            }
+            
+            if (statusCode === 500) {
+                throw new Error(`Error interno del servidor al consultar analítica de "${userCode}": ${backendError || message}`);
+            }
+            
+            throw new Error(message || `Error al cargar la analítica del usuario ${userCode}`);
         }
     }
 
@@ -140,8 +232,19 @@ class StatisticsService {
      * Transformar datos del API al formato esperado por los componentes
      */
     private transformAnalyticsData(analyticsData: AnalyticsApiResponse): StatisticsData {
+        // Validar que existan datos
+        if (!analyticsData || typeof analyticsData !== 'object') {
+            console.warn('⚠️ Analytics data is empty or invalid:', analyticsData);
+            return this.getEmptyStatistics();
+        }
+
         const chatIds = Object.keys(analyticsData);
         const totalConversations = chatIds.length;
+
+        if (totalConversations === 0) {
+            console.warn('⚠️ No conversations found in analytics data');
+            return this.getEmptyStatistics();
+        }
 
         // Extraer todos los temas y contar frecuencias
         const topicsCount: Map<string, number> = new Map();
@@ -149,6 +252,13 @@ class StatisticsService {
 
         chatIds.forEach((chatId) => {
             const chatData = analyticsData[chatId];
+            
+            // Validar que el chat tenga los campos necesarios
+            if (!chatData || !chatData.summary || !Array.isArray(chatData.topics)) {
+                console.warn(`⚠️ Invalid chat data for chatId ${chatId}:`, chatData);
+                return;
+            }
+
             allSummaries.push({
                 chatId,
                 summary: chatData.summary,
@@ -157,8 +267,10 @@ class StatisticsService {
 
             // Contar frecuencia de cada tema
             chatData.topics.forEach((topic) => {
-                const normalizedTopic = topic.toLowerCase().trim();
-                topicsCount.set(normalizedTopic, (topicsCount.get(normalizedTopic) || 0) + 1);
+                if (typeof topic === 'string' && topic.trim()) {
+                    const normalizedTopic = topic.toLowerCase().trim();
+                    topicsCount.set(normalizedTopic, (topicsCount.get(normalizedTopic) || 0) + 1);
+                }
             });
         });
 
@@ -166,8 +278,8 @@ class StatisticsService {
         const topicsData: TopicData[] = Array.from(topicsCount.entries())
             .map(([name, count]) => ({
                 name: this.formatTopicName(name),
-                value: Math.round((count / totalConversations) * 100),
-                percentage: `${Math.round((count / totalConversations) * 100)}%`,
+                value: totalConversations > 0 ? Math.round((count / totalConversations) * 100) : 0,
+                percentage: totalConversations > 0 ? `${Math.round((count / totalConversations) * 100)}%` : '0%',
             }))
             .sort((a, b) => b.value - a.value)
             .slice(0, ANALYTICS_CONFIG.TOP_TOPICS_LIMIT);
@@ -221,88 +333,6 @@ class StatisticsService {
     }
 
     /**
-     * Filtrar datos de estadísticas por código de usuario
-     * @param data - Datos de estadísticas completos
-     * @param userCode - Código del usuario para filtrar
-     */
-    async filterStatisticsByUserCode(data: StatisticsData, userCode: string): Promise<StatisticsData> {
-        try {
-            // Obtener los chats del usuario por código
-            const userChats = await this.getChatsByUserCode(userCode);
-            const userChatIds = new Set(userChats.map(chat => chat.id));
-
-            // Filtrar los resúmenes para incluir solo los chats del usuario
-            const filteredSummaries = data.summaries.filter(summary => 
-                userChatIds.has(summary.chatId)
-            );
-
-            // Recalcular estadísticas basadas en los datos filtrados
-            const totalConversations = filteredSummaries.length;
-
-            // Recalcular temas basados en los resúmenes filtrados
-            const topicsCount: Map<string, number> = new Map();
-            filteredSummaries.forEach((summary) => {
-                summary.topics.forEach((topic) => {
-                    const normalizedTopic = topic.toLowerCase().trim();
-                    topicsCount.set(normalizedTopic, (topicsCount.get(normalizedTopic) || 0) + 1);
-                });
-            });
-
-            // Convertir temas a TopicData ordenados por frecuencia
-            const topicsData: TopicData[] = Array.from(topicsCount.entries())
-                .map(([name, count]) => ({
-                    name: this.formatTopicName(name),
-                    value: totalConversations > 0 ? Math.round((count / totalConversations) * 100) : 0,
-                    percentage: totalConversations > 0 ? `${Math.round((count / totalConversations) * 100)}%` : '0%',
-                }))
-                .sort((a, b) => b.value - a.value)
-                .slice(0, ANALYTICS_CONFIG.TOP_TOPICS_LIMIT);
-
-            // Recalcular palabras más frecuentes
-            const wordsCount: Map<string, number> = new Map();
-            filteredSummaries.forEach((summary) => {
-                summary.topics.forEach((topic) => {
-                    const words = topic.toLowerCase().split(/\s+/);
-                    words.forEach((word) => {
-                        const cleanWord = word.replace(/[^a-záéíóúñü]/g, '');
-                        if (cleanWord.length > ANALYTICS_CONFIG.MIN_WORD_LENGTH) {
-                            wordsCount.set(cleanWord, (wordsCount.get(cleanWord) || 0) + 1);
-                        }
-                    });
-                });
-            });
-
-            const wordsData: WordFrequency[] = Array.from(wordsCount.entries())
-                .map(([text, count]) => ({
-                    text,
-                    value: count,
-                }))
-                .sort((a, b) => b.value - a.value)
-                .slice(0, ANALYTICS_CONFIG.TOP_WORDS_LIMIT);
-
-            // Stats actualizadas
-            const stats = {
-                totalConversations,
-                averagePain: data.stats.averagePain, // Mantener el mismo (no disponible en el API)
-                topicsCount: topicsCount.size,
-                lastInteraction: data.stats.lastInteraction, // Mantener el mismo
-            };
-
-            return {
-                topicsData,
-                wordsData,
-                painScaleData: data.painScaleData, // Mantener el mismo (vacío)
-                symptomsData: data.symptomsData, // Mantener el mismo (vacío)
-                stats,
-                summaries: filteredSummaries,
-            };
-        } catch (error: any) {
-            console.error('Error filtering by user code:', error);
-            throw new Error(`Error al filtrar por código de usuario: ${error.message}`);
-        }
-    }
-
-    /**
      * Formatear nombre del tema para mejor visualización
      */
     private formatTopicName(name: string): string {
@@ -310,6 +340,25 @@ class StatisticsService {
             .split(/\s+/)
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
+    }
+
+    /**
+     * Retornar estadísticas vacías cuando no hay datos
+     */
+    private getEmptyStatistics(): StatisticsData {
+        return {
+            topicsData: [],
+            wordsData: [],
+            painScaleData: [],
+            symptomsData: [],
+            stats: {
+                totalConversations: 0,
+                averagePain: 0,
+                topicsCount: 0,
+                lastInteraction: 'N/A',
+            },
+            summaries: [],
+        };
     }
 }
 

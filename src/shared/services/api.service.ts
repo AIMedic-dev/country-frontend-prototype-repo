@@ -42,7 +42,17 @@ class ApiService {
     this.axiosInstance.interceptors.response.use(
       (response: any) => response,
       (error: AxiosError<ApiError>) => {
-        // ✨ AGREGAR: Manejar error 401 (no autorizado)
+        // Manejar errores de timeout
+        if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+          const timeoutError: ApiError = {
+            message: 'La petición ha excedido el tiempo límite',
+            statusCode: 408,
+            error: 'Request Timeout',
+          };
+          return Promise.reject(timeoutError);
+        }
+
+        // Manejar error 401 (no autorizado)
         if (error.response?.status === 401) {
           // Limpiar autenticación y redirigir al login
           localStorage.removeItem('auth_token');
@@ -50,11 +60,25 @@ class ApiService {
           window.location.href = '/login';
         }
 
+        // Construir error detallado
         const apiError: ApiError = {
-          message: error.response?.data?.message || 'Error en la petición',
+          message: error.response?.data?.message || error.message || 'Error en la petición',
           statusCode: error.response?.status || 500,
           error: error.response?.data?.error,
         };
+        
+        // Log para debugging (solo en desarrollo)
+        if (import.meta.env.DEV) {
+          console.error('API Error:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            message: apiError.message,
+            error: apiError.error,
+            data: error.response?.data
+          });
+        }
+        
         return Promise.reject(apiError);
       }
     );

@@ -1,228 +1,431 @@
-# 📊 Sistema de Analytics - Documentación
+# 📊 API de Analytics - Backend Country
+
+Documentación completa de los endpoints de analytics del backend. Estos endpoints permiten obtener estadísticas y análisis de las conversaciones de los usuarios con la IA.
 
 ## 📋 Tabla de Contenidos
 
-- [Descripción General](#-descripción-general)
-- [Acceso y Permisos](#-acceso-y-permisos)
-- [Configuración](#️-configuración)
-- [Uso desde el Frontend](#-uso-desde-el-frontend)
-- [API Externa](#-api-externa)
-- [Filtrado por Usuario](#-filtrado-por-usuario)
-- [Componentes Disponibles](#-componentes-disponibles)
-- [Solución de Problemas](#-solución-de-problemas)
+- [Introducción](#introducción)
+- [Autenticación](#autenticación)
+- [Variables de Entorno](#variables-de-entorno)
+- [Endpoints](#endpoints)
+  - [1. Obtener Analítica General](#1-obtener-analítica-general)
+  - [2. Obtener Analítica Individual por Usuario](#2-obtener-analítica-individual-por-usuario)
+  - [3. Actualizar Cache Manualmente](#3-actualizar-cache-manualmente)
+  - [4. Obtener Información de la Cache](#4-obtener-información-de-la-cache)
+  - [5. Configurar Intervalo de Actualización](#5-configurar-intervalo-de-actualización)
+- [Estructura de Respuestas](#estructura-de-respuestas)
+- [Códigos de Estado HTTP](#códigos-de-estado-http)
+- [Ejemplos Prácticos](#ejemplos-prácticos)
+- [Permisos y Roles](#permisos-y-roles)
 
 ---
 
-## 🎯 Descripción General
+## Introducción
 
-El sistema de **Analytics** permite visualizar estadísticas y análisis de las conversaciones de los usuarios con el asistente de IA. Proporciona:
+El backend expone endpoints para consultar analítica de conversaciones de dos formas:
 
-- **Temas más comunes** discutidos en las conversaciones
-- **Palabras más frecuentes** en los temas
-- **Resúmenes** de cada conversación
-- **Estadísticas generales** (total de conversaciones, temas únicos, etc.)
-- **Filtrado por usuario** para ver estadísticas específicas
+1. **Analítica General**: Estadísticas de todas las conversaciones (o filtradas por usuario)
+2. **Analítica Individual**: Estadísticas específicas de un usuario individual
 
----
-
-## 🔐 Acceso y Permisos
-
-### Roles con Acceso
-
-Solo los siguientes roles pueden acceder a la página de analytics:
-
-- ✅ **`empleado`** (Colaborador)
-- ✅ **`admin`** (Administrador)
-- ❌ **`paciente`** (sin acceso)
-
-### Cómo Acceder
-
-1. **Desde el Sidebar del Chat:**
-   - Los usuarios con rol `empleado` o `admin` verán un botón de **analytics** (ícono de gráfico) en la tarjeta de usuario
-   - Al hacer clic, navegarán a `/analytics`
-
-2. **URL Directa:**
-   ```
-   http://localhost:5173/analytics
-   ```
-
-3. **Navegación Programática:**
-   ```tsx
-   import { useNavigate } from 'react-router-dom';
-   
-   const navigate = useNavigate();
-   navigate('/analytics');
-   ```
-
-### Protección de Rutas
-
-La ruta está protegida en `AppRouter.tsx`:
-
-```tsx
-<Route
-  path="/analytics"
-  element={
-    <ProtectedRoute requiredRole="empleado">
-      <StatisticsPage />
-    </ProtectedRoute>
-  }
-/>
-```
-
-**Nota:** Aunque el `ProtectedRoute` solo requiere `empleado`, la página `StatisticsPage` también permite acceso a `admin` mediante validación adicional.
+Los datos provienen de una API externa de analytics y se cachean en MongoDB para mejorar el rendimiento.
 
 ---
 
-## ⚙️ Configuración
+## Autenticación
 
-### Variables de Entorno
-
-El sistema ahora usa el endpoint del backend (no requiere configuración adicional):
-
-```env
-VITE_API_BASE_URL=http://localhost:3000/api/v1
-```
-
-**Ubicación:** Archivo `.env` en la raíz del proyecto
-
-### Endpoints del Backend
-
-El frontend consume los siguientes endpoints del backend:
-
-- `GET /analytics?mode=cache` - Analítica desde caché (rápido, por defecto)
-- `GET /analytics?mode=realtime` - Analítica en tiempo real (lento)
-- `GET /analytics/cache/info` - Información de la caché
-- `POST /analytics/cache/update` - Actualizar caché manualmente (solo admin)
-- `PATCH /analytics/cache/interval` - Configurar intervalo de actualización (solo admin)
-
----
-
-## 💻 Uso desde el Frontend
-
-### Hook `useStatistics`
-
-El hook principal para obtener estadísticas:
-
-```tsx
-import { useStatistics } from '@/modules/statistics/hooks/useStatistics';
-
-const { data, isLoading, error, refetch, refreshRealtime } = useStatistics({ 
-  userCode: 'USER001', // Opcional: filtrar por código de usuario
-  mode: 'cache' // 'cache' (default) o 'realtime'
-});
-```
-
-**Parámetros:**
-- `userCode` (opcional): Código del usuario para filtrar estadísticas. Si es `undefined` o `'all'`, muestra todas las conversaciones.
-- `mode` (opcional): `'cache'` (default, rápido) o `'realtime'` (lento, datos frescos)
-
-**Retorno:**
-- `data`: Objeto `StatisticsData` con todas las estadísticas
-- `isLoading`: Estado de carga
-- `error`: Mensaje de error si ocurre
-- `refetch`: Función para recargar los datos (acepta `mode` opcional)
-- `refreshRealtime`: Función para actualizar con datos en tiempo real
-
-### Ejemplo Completo
-
-```tsx
-import { useState } from 'react';
-import { useStatistics } from '@/modules/statistics/hooks/useStatistics';
-import { TopicsChart } from '@/modules/statistics/components/TopicsChart/TopicsChart';
-
-export const MyAnalyticsComponent = () => {
-  const [selectedUserCode, setSelectedUserCode] = useState<string>('all');
-  
-  const { data, isLoading, error, refetch } = useStatistics({ 
-    userCode: selectedUserCode === 'all' ? undefined : selectedUserCode 
-  });
-
-  if (isLoading) {
-    return <div>Cargando estadísticas...</div>;
-  }
-
-  if (error) {
-    return (
-      <div>
-        <p>Error: {error}</p>
-        <button onClick={refetch}>Reintentar</button>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <select 
-        value={selectedUserCode} 
-        onChange={(e) => setSelectedUserCode(e.target.value)}
-      >
-        <option value="all">Todos los usuarios</option>
-        <option value="USER001">Usuario 001</option>
-        <option value="USER002">Usuario 002</option>
-      </select>
-
-      {data && (
-        <>
-          <p>Total de conversaciones: {data.stats.totalConversations}</p>
-          <TopicsChart data={data.topicsData} />
-        </>
-      )}
-    </div>
-  );
-};
-```
-
----
-
-## 🌐 Endpoints del Backend
-
-### Endpoints Disponibles
-
-El sistema consume endpoints del backend que actúan como proxy al API externo:
-
-#### 1. Obtener Analytics (con caché por defecto)
+Todos los endpoints requieren un **JWT Token** en el header `Authorization`:
 
 ```http
-GET /analytics?mode=cache&userCode=USER001
-Authorization: Bearer <JWT>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-- **Modo `cache`** (default): Devuelve datos desde MongoDB (rápido). No modifica la caché.
-- **Modo `realtime`**: Consulta directamente el API externo (lento). No modifica la caché.
-- **Parámetro `userCode`** (opcional): Filtra por código de usuario.
+Obtén el token haciendo login:
 
-#### 2. Información de la Caché
-
-```http
-GET /analytics/cache/info
-Authorization: Bearer <JWT>
+```bash
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"codigo": "USER001"}'
 ```
 
-Retorna:
+Response:
 ```json
 {
-  "lastUpdated": "2025-01-19T15:30:00.000Z",
-  "updateIntervalMinutes": 60
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "nombre": "Juan García",
+    "rol": "empleado",
+    "codigo": "USER001"
+  }
 }
 ```
 
-#### 3. Actualizar Caché Manualmente (Solo Admin)
+---
+
+## Variables de Entorno
+
+Asegúrate de tener estas variables en tu archivo `.env`:
+
+```env
+# URL base de la API externa de analytics
+ANALYTICS_API_URL=https://country-analytics-dceee2bhafg3d7bb.eastus-01.azurewebsites.net/analytics
+
+# Timeout para consultas al API externo (en milisegundos)
+ANALYTICS_API_TIMEOUT_MS=180000
+
+# Intervalo de actualización automática de la cache (en minutos)
+ANALYTICS_CACHE_UPDATE_INTERVAL_MINUTES=60
+```
+
+---
+
+## Endpoints
+
+### 1. Obtener Analítica General
+
+Obtiene las estadísticas de conversaciones de todos los usuarios (o filtradas por un usuario específico).
+
+#### Syntax
 
 ```http
-POST /analytics/cache/update
-Authorization: Bearer <JWT>
+GET /api/v1/analytics?mode=<cache|realtime>&userCode=<codigo>
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Parámetros Query
+
+| Parámetro | Tipo | Requerido | Default | Descripción |
+|-----------|------|-----------|---------|-------------|
+| `mode` | string | No | `cache` | Modo de consulta: `cache` (rápido, desde DB) o `realtime` (lento, API externa) |
+| `userCode` | string | No | `all` | Código del usuario para filtrar. Si es `all` o no se envía, retorna todos |
+
+#### Respuesta Exitosa (200 OK)
+
+```json
+{
+  "chatId1": {
+    "summary": "Conversación sobre síntomas de migraña, causas, tratamientos disponibles...",
+    "topics": ["Migraña", "Cefalea", "Neurología", "Medicamentos"]
+  },
+  "chatId2": {
+    "summary": "Discusión sobre diabetes tipo 2, control de glucosa, dieta...",
+    "topics": ["Diabetes", "Glucosa", "Insulina", "Endocrinología"]
+  }
+}
+```
+
+#### Errores Posibles
+
+**404 Not Found** - No hay datos disponibles:
+```json
+{
+  "statusCode": 404,
+  "message": "No hay analítica cacheada disponible. Use mode=realtime o ejecute la actualización de cache.",
+  "error": "Not Found"
+}
+```
+
+**400 Bad Request** - Usuario no encontrado:
+```json
+{
+  "statusCode": 400,
+  "message": "No se encontraron chats para el usuario con código: USER001",
+  "error": "Bad Request"
+}
+```
+
+#### Ejemplos
+
+**Obtener analítica de todos (desde cache):**
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=cache" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Obtener analítica en tiempo real:**
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=realtime" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Filtrar por usuario (desde cache):**
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=cache&userCode=USER001" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Filtrar por usuario (tiempo real):**
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=realtime&userCode=PATIENT123" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Notas Importantes
+
+- **Mode `cache`**: Devuelve datos de MongoDB (rápido, ~100ms)
+- **Mode `realtime`**: Consulta la API externa (lento, ~3 minutos de timeout)
+- **Ambos modos son de solo lectura**: No modifican la cache
+- La cache se actualiza automáticamente según el intervalo configurado o manualmente con `POST /api/v1/analytics/cache/update`
+
+---
+
+### 2. Obtener Analítica Individual por Usuario
+
+Obtiene las estadísticas específicas de un usuario individual consultando directamente la API externa.
+
+#### Syntax
+
+```http
+GET /api/v1/analytics/user/:codigo
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Parámetros Path
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `codigo` | string | Código único del usuario (ej: `USER001`, `PATIENT123`) |
+
+#### Respuesta Exitosa (200 OK)
+
+**A) Usuario con conversaciones:**
+```json
+{
+  "696111ae36372edcb67bb7f7": {
+    "summary": "La conversación giró en torno al cáncer de mama HER2 positivo (triple positivo), abarcando resonancia magnética, estadificación, tratamiento...",
+    "topics": [
+      "Cáncer de mama HER2 positivo",
+      "Triple positivo",
+      "Mastectomía",
+      "Quimioterapia",
+      "Terapia anti-HER2",
+      "Tamoxifeno"
+    ]
+  }
+}
+```
+
+**B) Usuario sin conversaciones:**
+```json
+{
+  "696111c736372edcb67bb7fd": {
+    "summary": "No hay conversaciones para este usuario.",
+    "topics": []
+  }
+}
+```
+
+#### Errores Posibles
+
+**404 Not Found** - Usuario no encontrado en el sistema:
+```json
+{
+  "statusCode": 404,
+  "message": "Usuario con código USER001 no encontrado",
+  "error": "Not Found"
+}
+```
+
+**502 Bad Gateway** - Usuario no encontrado en la API de analytics:
+```json
+{
+  "detail": "User not found"
+}
+```
+
+**503 Service Unavailable** - Timeout o error en la API de analytics:
+```json
+{
+  "statusCode": 503,
+  "message": "Timeout consultando analytics (180000ms)",
+  "error": "Service Unavailable"
+}
+```
+
+#### Ejemplos
+
+**Obtener analítica de usuario:**
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics/user/USER001" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**En JavaScript/TypeScript:**
+```typescript
+async function getUserAnalytics(codigo: string, token: string) {
+  const response = await fetch(
+    `http://localhost:3000/api/v1/analytics/user/${codigo}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
+  }
+
+  return response.json();
+}
+
+// Uso
+const analytics = await getUserAnalytics('USER001', myToken);
+console.log(analytics);
+```
+
+#### Casos de Uso
+
+- Dashboard individual de paciente
+- Reportes personalizados por usuario
+- Seguimiento específico de temas tratados con un paciente
+- Análisis detallado de conversaciones de un usuario
+
+---
+
+### 3. Actualizar Cache Manualmente
+
+Fuerza una actualización de la cache desde la API externa. Normalmente el scheduler automático lo hace cada 60 minutos, pero este endpoint permite hacerlo manualmente.
+
+#### Syntax
+
+```http
+POST /api/v1/analytics/cache/update
+Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
 {
+  "updateIntervalMinutes": 120
+}
+```
+
+#### Body (Opcional)
+
+```json
+{
+  "updateIntervalMinutes": 120
+}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `updateIntervalMinutes` | number | Intervalo en minutos para la próxima actualización automática |
+
+#### Respuesta Exitosa (200 OK)
+
+```json
+{
+  "message": "Cache actualizada exitosamente",
+  "lastUpdated": "2025-01-22T15:30:45.123Z",
+  "updateIntervalMinutes": 60,
+  "totalChats": 42
+}
+```
+
+#### Errores Posibles
+
+**401 Unauthorized** - No autenticado:
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized",
+  "error": "Unauthorized"
+}
+```
+
+**403 Forbidden** - Sin permisos (solo admin puede actualizar):
+```json
+{
+  "statusCode": 403,
+  "message": "Forbidden",
+  "error": "Forbidden"
+}
+```
+
+**503 Service Unavailable** - Error consultando API de analytics:
+```json
+{
+  "statusCode": 503,
+  "message": "No se pudo obtener analytics (status 500)",
+  "error": "Service Unavailable"
+}
+```
+
+#### Ejemplos
+
+**Actualizar cache con intervalo por defecto:**
+```bash
+curl -X POST "http://localhost:3000/api/v1/analytics/cache/update" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+**Actualizar cache y cambiar intervalo a 120 minutos:**
+```bash
+curl -X POST "http://localhost:3000/api/v1/analytics/cache/update" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"updateIntervalMinutes": 120}'
+```
+
+#### Notas Importantes
+
+- **Requiere rol `admin`**: Solo administradores pueden forzar actualización
+- **Modifica la cache**: A diferencia de los endpoints GET, este SÍ modifica los datos en MongoDB
+- **Puede ser lento**: El timeout es de 180 segundos, la operación puede tomar un tiempo
+
+---
+
+### 4. Obtener Información de la Cache
+
+Obtiene metadatos sobre la cache: cuándo se actualizó por última vez y cada cuánto se actualiza automáticamente.
+
+#### Syntax
+
+```http
+GET /api/v1/analytics/cache/info
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Respuesta Exitosa (200 OK)
+
+```json
+{
+  "lastUpdated": "2025-01-22T14:30:00.000Z",
   "updateIntervalMinutes": 60
 }
 ```
 
-#### 4. Configurar Intervalo (Solo Admin)
+#### Errores Posibles
+
+**404 Not Found** - No hay información de cache:
+```json
+{
+  "statusCode": 404,
+  "message": "No hay información de cache disponible",
+  "error": "Not Found"
+}
+```
+
+#### Ejemplo
+
+```bash
+curl -X GET "http://localhost:3000/api/v1/analytics/cache/info" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+### 5. Configurar Intervalo de Actualización
+
+Cambia el intervalo de actualización automática de la cache sin forzar una actualización inmediata.
+
+#### Syntax
 
 ```http
-PATCH /analytics/cache/interval
-Authorization: Bearer <JWT>
+PATCH /api/v1/analytics/cache/interval
+Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
 {
@@ -230,280 +433,306 @@ Content-Type: application/json
 }
 ```
 
-### Formato de Respuesta
-
-El API retorna un objeto donde cada clave es un `chatId`:
+#### Body (Requerido)
 
 ```json
 {
-  "chatId1": {
-    "summary": "Resumen de la conversación...",
-    "topics": ["tema1", "tema2", "tema3"]
-  },
-  "chatId2": {
-    "summary": "Otra conversación...",
-    "topics": ["tema2", "tema4"]
+  "minutes": 120
+}
+```
+
+| Campo | Tipo | Requerido | Validación |
+|-------|------|-----------|-----------|
+| `minutes` | number | Sí | Mínimo: 1, Máximo: sin límite |
+
+#### Respuesta Exitosa (200 OK)
+
+```json
+{
+  "message": "Intervalo de actualización configurado exitosamente",
+  "updateIntervalMinutes": 120
+}
+```
+
+#### Errores Posibles
+
+**400 Bad Request** - Intervalo inválido:
+```json
+{
+  "statusCode": 400,
+  "message": "El intervalo debe ser al menos 1 minuto",
+  "error": "Bad Request"
+}
+```
+
+**403 Forbidden** - Sin permisos (solo admin):
+```json
+{
+  "statusCode": 403,
+  "message": "Forbidden",
+  "error": "Forbidden"
+}
+```
+
+#### Ejemplo
+
+```bash
+curl -X PATCH "http://localhost:3000/api/v1/analytics/cache/interval" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"minutes": 30}'
+```
+
+---
+
+## Estructura de Respuestas
+
+### Formato de Analytics
+
+Cada entrada en la respuesta tiene este formato:
+
+```typescript
+{
+  [chatId: string]: {
+    summary: string;      // Resumen textual de la conversación
+    topics: string[];     // Array de temas/tópicos tratados
   }
 }
 ```
 
-### Transformación de Datos
+### Ejemplo Real
 
-El servicio `statistics.service.ts` transforma estos datos en:
-
-- **Temas ordenados por frecuencia** (top 20)
-- **Palabras más frecuentes** (top 30)
-- **Estadísticas generales** (total conversaciones, temas únicos, etc.)
-- **Resúmenes** de cada conversación
-
----
-
-## 🔍 Filtrado por Usuario
-
-### Cómo Funciona
-
-El filtrado ahora se hace **directamente en el backend** mediante el parámetro `userCode`:
-
-1. **Sin filtro (`userCode: undefined` o `'all'`):**
-   - Muestra estadísticas de **todas las conversaciones**
-   - Endpoint: `GET /analytics?mode=cache`
-
-2. **Con filtro (`userCode: 'USER001'`):**
-   - El backend filtra automáticamente los chats del usuario
-   - Endpoint: `GET /analytics?mode=cache&userCode=USER001`
-   - No requiere procesamiento adicional en el frontend
-
-### Ejemplo de Uso
-
-```tsx
-// Mostrar todas las conversaciones (desde caché)
-const { data } = useStatistics();
-
-// Filtrar por usuario específico (desde caché)
-const { data } = useStatistics({ userCode: 'USER001' });
-
-// Obtener datos en tiempo real
-const { data, refreshRealtime } = useStatistics({ mode: 'realtime' });
-await refreshRealtime();
+```json
+{
+  "507f1f77bcf86cd799439011": {
+    "summary": "Conversación sobre síntomas de depresión, opciones de tratamiento, medicamentos antidepresivos, terapia psicológica...",
+    "topics": [
+      "Depresión",
+      "Salud mental",
+      "Antidepresivos",
+      "Psicoterapia",
+      "Ansiedad",
+      "Medicamentos"
+    ]
+  },
+  "507f1f77bcf86cd799439012": {
+    "summary": "Discusión sobre nutrición, dieta balanceada, vitaminas, suplementos...",
+    "topics": [
+      "Nutrición",
+      "Dieta",
+      "Vitaminas",
+      "Suplementos",
+      "Alimentos saludables"
+    ]
+  }
+}
 ```
 
 ---
 
-## 🧩 Componentes Disponibles
+## Códigos de Estado HTTP
 
-### 1. `StatisticsView`
-
-Componente principal que renderiza toda la vista de analytics:
-
-```tsx
-import { StatisticsView } from '@/modules/statistics/views/StatisticsView';
-
-<StatisticsView />
-```
-
-**Incluye:**
-- Header con selector de pacientes
-- **Barra de acciones** con botón de tiempo real
-- **Configuración de caché** (solo admin)
-- Tarjetas de estadísticas
-- Gráfica de temas
-- Nube de palabras
-- Resumen de interacciones
-
-**Características:**
-- ✅ Usa **caché por defecto** (rápido)
-- ✅ Botón **"Actualizar en tiempo real"** para obtener datos frescos
-- ✅ Badge indicando que los datos vienen de caché
-- ✅ Componente de configuración para admin
-
-### 2. `TopicsChart`
-
-Gráfica de barras con los temas más comunes:
-
-```tsx
-import { TopicsChart } from '@/modules/statistics/components/TopicsChart/TopicsChart';
-
-<TopicsChart data={data.topicsData} />
-```
-
-### 3. `WordCloudChart`
-
-Nube de palabras con las palabras más frecuentes:
-
-```tsx
-import { WordCloudChart } from '@/modules/statistics/components/WordCloudChart/WordCloudChart';
-
-<WordCloudChart data={data.wordsData} />
-```
-
-### 4. `StatsCards`
-
-Tarjetas con estadísticas generales:
-
-```tsx
-import { StatsCards } from '@/modules/statistics/components/StatsCards/StatsCards';
-
-<StatsCards
-  stats={data.stats}
-  topicsData={data.topicsData}
-  painScaleData={data.painScaleData}
-  symptomsData={data.symptomsData}
-/>
-```
-
-### 5. `SummarySection`
-
-Sección con resúmenes de conversaciones:
-
-```tsx
-import { SummarySection } from '@/modules/statistics/components/SummarySection/SummarySection';
-
-<SummarySection 
-  summaries={data.summaries} 
-  totalConversations={data.stats.totalConversations} 
-/>
-```
-
-### 6. `AnalyticsHeader`
-
-Header con selector de pacientes:
-
-```tsx
-import { AnalyticsHeader } from '@/modules/statistics/components/AnalyticsHeader/AnalyticsHeader';
-
-<AnalyticsHeader 
-  selectedPatient={selectedUserCode}
-  onPatientChange={handleUserCodeChange}
-/>
-```
-
-### 7. `AnalyticsCacheConfig`
-
-Componente de configuración de caché (solo visible para admin):
-
-```tsx
-import { AnalyticsCacheConfig } from '@/modules/admin/components/AnalyticsCacheConfig/AnalyticsCacheConfig';
-
-<AnalyticsCacheConfig />
-```
-
-**Funcionalidades:**
-- Ver información de la caché (última actualización, intervalo)
-- Configurar intervalo de actualización automática
-- Actualizar caché manualmente
+| Código | Significado | Cuándo Ocurre |
+|--------|------------|---------------|
+| **200** | OK | Solicitud exitosa |
+| **400** | Bad Request | Parámetros inválidos o usuario no encontrado |
+| **401** | Unauthorized | Falta token JWT o token inválido |
+| **403** | Forbidden | Usuario sin permisos (ej: rol requerido es admin) |
+| **404** | Not Found | Usuario o recurso no encontrado |
+| **502** | Bad Gateway | API externa retorna error |
+| **503** | Service Unavailable | API externa caída, timeout o configuración faltante |
 
 ---
 
-## 🛠️ Solución de Problemas
+## Ejemplos Prácticos
 
-### Error: "La URL del API de analytics no está configurada"
+### Ejemplo 1: Obtener Analítica Completa desde Cache
 
-**Causa:** Falta la variable de entorno `VITE_API_BASE_URL`
+**Escenario**: Administrador quiere ver todas las conversaciones de forma rápida
 
-**Solución:**
-1. Crear archivo `.env` en la raíz del proyecto
-2. Agregar: `VITE_API_BASE_URL=http://localhost:3000/api/v1`
-3. Reiniciar el servidor de desarrollo
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-**Nota:** El sistema ahora usa el endpoint del backend, no el API externo directamente.
-
-### Error: "No tienes permisos para acceder a las estadísticas"
-
-**Causa:** El usuario no tiene rol `empleado` o `admin`
-
-**Solución:**
-- Verificar que el usuario tenga el rol correcto en la base de datos
-- Solo usuarios con rol `empleado` o `admin` pueden acceder
-
-### Error: "Error de red: No se pudo conectar con el servidor de analytics"
-
-**Causa:** Problema de conexión o el servidor está caído
-
-**Solución:**
-1. Verificar conexión a internet
-2. Verificar que el servidor de analytics esté disponible
-3. Revisar la URL en `VITE_ANALYTICS_API_URL`
-
-### Error: "No se encontraron chats para el código: USER001"
-
-**Causa:** El código de usuario no existe o no tiene chats
-
-**Solución:**
-- Verificar que el código de usuario sea correcto
-- Verificar que el usuario tenga conversaciones en la base de datos
-
-### Error al actualizar caché o configurar intervalo
-
-**Causa:** El usuario no tiene rol `admin`
-
-**Solución:**
-- Solo usuarios con rol `admin` pueden modificar la configuración de caché
-- Verificar que el usuario tenga el rol correcto en la base de datos
-
-### Los datos parecen desactualizados
-
-**Causa:** Estás viendo datos desde caché que no se han actualizado
-
-**Solución:**
-- Usar el botón **"Actualizar en tiempo real"** para obtener datos frescos
-- Verificar la última actualización en la configuración de caché (solo admin)
-- Si eres admin, puedes actualizar la caché manualmente desde la configuración
-
----
-
-## 📝 Notas Adicionales
-
-### Sistema de Caché
-
-- **Por defecto**: El sistema usa datos desde caché (rápido)
-- **Actualización automática**: El backend actualiza la caché automáticamente según el intervalo configurado
-- **Tiempo real**: Puedes usar el botón "Actualizar en tiempo real" para obtener datos frescos sin esperar la actualización automática
-- **Configuración**: Solo admin puede modificar el intervalo de actualización
-
-### Configuración de Límites
-
-Los límites de datos se pueden ajustar en `statistics.service.ts`:
-
-```ts
-const ANALYTICS_CONFIG = {
-  TOP_TOPICS_LIMIT: 20,      // Top 20 temas
-  TOP_WORDS_LIMIT: 30,       // Top 30 palabras
-  MIN_WORD_LENGTH: 3,        // Longitud mínima de palabras
-};
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=cache" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
-### Datos No Disponibles
+**Respuesta:**
+```json
+{
+  "507f1f77bcf86cd799439011": {
+    "summary": "Síntomas de diabetes...",
+    "topics": ["Diabetes", "Insulina", "Glucosa"]
+  },
+  "507f1f77bcf86cd799439012": {
+    "summary": "Dolor de cabeza crónico...",
+    "topics": ["Migraña", "Cefalea", "Analgésicos"]
+  }
+}
+```
 
-Actualmente, el API no proporciona:
-- **Escala de dolor** (`painScaleData`): Array vacío
-- **Síntomas** (`symptomsData`): Array vacío
+### Ejemplo 2: Ver Analítica de un Paciente Específico
 
-Estos campos están preparados para futuras implementaciones.
+**Escenario**: Empleado quiere ver todas las conversaciones que ha tenido un paciente
 
-### Permisos de Admin
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-Los usuarios con rol `admin` tienen acceso adicional:
-- ✅ Ver analytics (igual que `empleado`)
-- ✅ Configurar intervalo de actualización de caché
-- ✅ Actualizar caché manualmente
-- ✅ Ver información detallada de la caché
+curl -X GET "http://localhost:3000/api/v1/analytics/user/PATIENT_001" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Respuesta:**
+```json
+{
+  "696111ae36372edcb67bb7f7": {
+    "summary": "Cáncer de mama HER2 positivo...",
+    "topics": ["Oncología", "Cáncer de mama", "Tratamiento"]
+  }
+}
+```
+
+### Ejemplo 3: Actualizar Cache Después de Cambio de Datos
+
+**Escenario**: Admin detecta que la cache está desactualizada y la fuerza a actualizar
+
+```bash
+ADMIN_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+curl -X POST "http://localhost:3000/api/v1/analytics/cache/update" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"updateIntervalMinutes": 60}'
+```
+
+**Respuesta:**
+```json
+{
+  "message": "Cache actualizada exitosamente",
+  "lastUpdated": "2025-01-22T15:45:30.123Z",
+  "updateIntervalMinutes": 60,
+  "totalChats": 42
+}
+```
+
+### Ejemplo 4: Verificar Cuándo Se Actualizó la Cache
+
+**Escenario**: Empleado quiere saber si los datos son recientes
+
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+curl -X GET "http://localhost:3000/api/v1/analytics/cache/info" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Respuesta:**
+```json
+{
+  "lastUpdated": "2025-01-22T14:30:00.000Z",
+  "updateIntervalMinutes": 60
+}
+```
 
 ---
 
-## 🔗 Archivos Relacionados
+## Permisos y Roles
 
-- **Ruta:** `src/router/AppRouter.tsx`
-- **Página:** `src/pages/StatisticsPage.tsx`
-- **Vista:** `src/modules/statistics/views/StatisticsView.tsx`
-- **Hook:** `src/modules/statistics/hooks/useStatistics.ts`
-- **Servicio:** `src/modules/statistics/services/statistics.service.ts`
-- **Tipos:** `src/modules/statistics/types/statistics.types.ts`
-- **Configuración:** `src/shared/config/env.ts`
-- **Servicio de Caché:** `src/modules/admin/services/analyticsCache.service.ts`
-- **Componente de Config:** `src/modules/admin/components/AnalyticsCacheConfig/AnalyticsCacheConfig.tsx`
-- **Vite Config:** `vite.config.ts`
+### Matriz de Acceso
+
+| Endpoint | GET /analytics | GET /analytics/user/:codigo | POST /cache/update | GET /cache/info | PATCH /cache/interval |
+|----------|:-:|:-:|:-:|:-:|:-:|
+| **paciente** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **empleado** | ✅ | ✅ | ❌ | ✅ | ❌ |
+| **admin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+**Leyenda:**
+- ✅ Permitido
+- ❌ Denegado (retorna 403 Forbidden)
 
 ---
 
-**Última actualización:** Enero 2026  
-**Versión:** 1.0.0
+## Flujos Típicos
+
+### Flujo 1: Ver Analítica General
+
+```
+1. User hace login → obtiene JWT
+2. User llama GET /api/v1/analytics?mode=cache
+3. Backend busca cache en MongoDB
+4. Retorna datos cacheados (rápido ~100ms)
+```
+
+### Flujo 2: Ver Analítica de Usuario Individual
+
+```
+1. User autenticado hace llamada GET /api/v1/analytics/user/USER001
+2. Backend busca usuario por código en MongoDB
+3. Obtiene userId del usuario
+4. Consulta API externa con userId
+5. Retorna analítica específica del usuario
+```
+
+### Flujo 3: Actualizar Cache Automática
+
+```
+1. Scheduler automático se ejecuta cada 60 minutos
+2. Consulta API externa
+3. Actualiza MongoDB con nuevos datos
+4. Próxima actualización en 60 minutos
+```
+
+### Flujo 4: Forzar Actualización Manual
+
+```
+1. Admin hace llamada POST /api/v1/analytics/cache/update
+2. Backend consulta API externa
+3. Actualiza MongoDB
+4. Retorna confirmación con fecha y número de chats
+```
+
+---
+
+## Troubleshooting
+
+### Problema: "No hay analítica cacheada disponible"
+
+**Causa**: La cache nunca ha sido inicializada
+
+**Solución**:
+```bash
+# Opción 1: Esperar a que el scheduler automático actualice (puede tomar hasta 60 min)
+# Opción 2: Forzar actualización manual
+curl -X POST "http://localhost:3000/api/v1/analytics/cache/update" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+# Opción 3: Usar mode=realtime en lugar de cache
+curl -X GET "http://localhost:3000/api/v1/analytics?mode=realtime" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Problema: "Timeout consultando analytics"
+
+**Causa**: API externa está lenta o caída
+
+**Solución**:
+1. Verificar si la API externa está disponible
+2. Aumentar `ANALYTICS_API_TIMEOUT_MS` en `.env`
+3. Intentar más tarde
+4. Usar cache si está disponible
+
+### Problema: "Usuario con código XXX no encontrado"
+
+**Causa**: El código de usuario no existe en MongoDB
+
+**Solución**:
+1. Verificar que el código sea correcto (case-sensitive)
+2. Verificar que el usuario exista en la base de datos
+3. Usar endpoint `/api/v1/users` para listar usuarios disponibles
+
+---
+
+**Última actualización**: 22 de Enero, 2026  
+**Versión**: 1.0.0  
+**Backend**: NestJS v10  
+**Base de Datos**: MongoDB

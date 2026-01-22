@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { statisticsService } from '../services/statistics.service';
 import type { StatisticsData } from '../types/statistics.types';
 
@@ -6,27 +6,53 @@ interface UseStatisticsReturn {
   data: StatisticsData | null;
   isLoading: boolean;
   error: string | null;
-  refetch: (mode?: 'cache' | 'realtime') => Promise<void>;
+  refetch: () => Promise<void>;
   refreshRealtime: () => Promise<void>;
 }
 
 interface UseStatisticsOptions {
   userCode?: string;
   mode?: 'cache' | 'realtime';
+  useIndividualEndpoint?: boolean; // Nuevo: para forzar uso del endpoint individual
 }
 
 export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsReturn => {
   const [data, setData] = useState<StatisticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { userCode, mode = 'cache' } = options || {};
+  const { userCode, mode = 'cache', useIndividualEndpoint = true } = options || {};
+  
+  // Ref para rastrear el userCode actual
+  const currentUserCodeRef = useRef(userCode);
+  const currentModeRef = useRef(mode);
 
-  // Cargar datos
-  const fetchStatistics = async (fetchMode: 'cache' | 'realtime' = mode) => {
+  // Actualizar los refs cuando cambian
+  useEffect(() => {
+    currentUserCodeRef.current = userCode;
+    currentModeRef.current = mode;
+  }, [userCode, mode]);
+
+  // Cargar datos (función memoizada en useRef para evitar dependencias circulares)
+  const fetchStatistics = useRef(async (customUserCode?: string, customMode?: 'cache' | 'realtime') => {
+    const codeToUse = customUserCode !== undefined ? customUserCode : currentUserCodeRef.current;
+    const modeToUse = customMode || currentModeRef.current;
+    
     try {
       setIsLoading(true);
       setError(null);
-      const statistics = await statisticsService.getStatistics(fetchMode, userCode);
+      
+      let statistics: StatisticsData;
+      
+      // Si hay un código de usuario Y useIndividualEndpoint es true, usar endpoint individual
+      if (codeToUse && useIndividualEndpoint) {
+        console.log(`🎯 Using individual analytics endpoint for user: ${codeToUse}`);
+        statistics = await statisticsService.getUserAnalytics(codeToUse);
+      } else {
+        // De lo contrario, usar endpoint general con filtro opcional
+        console.log(`📊 Using general analytics endpoint (mode: ${modeToUse}, filter: ${codeToUse || 'all'})`);
+        statistics = await statisticsService.getStatistics(modeToUse, codeToUse);
+      }
+      
       setData(statistics);
     } catch (err: any) {
       console.error('Error fetching statistics:', err);
@@ -34,23 +60,28 @@ export const useStatistics = (options?: UseStatisticsOptions): UseStatisticsRetu
     } finally {
       setIsLoading(false);
     }
+  });
+
+  // Actualizar en tiempo real con el userCode actual
+  const refreshRealtime = async () => {
+    await fetchStatistics.current(currentUserCodeRef.current, 'realtime');
   };
 
-  // Actualizar en tiempo real
-  const refreshRealtime = async () => {
-    await fetchStatistics('realtime');
+  // Wrapper para refetch que usa la ref
+  const refetch = async () => {
+    await fetchStatistics.current(currentUserCodeRef.current, currentModeRef.current);
   };
 
   // Cargar datos cuando cambian las opciones
   useEffect(() => {
-    fetchStatistics(mode);
-  }, [userCode, mode]);
+    fetchStatistics.current(userCode, mode);
+  }, [userCode, mode, useIndividualEndpoint]);
 
   return {
     data,
     isLoading,
     error,
-    refetch: fetchStatistics,
+    refetch,
     refreshRealtime,
   };
 };
