@@ -9,6 +9,8 @@ interface MessageListProps {
   isLoading?: boolean;
   streamingResponse?: string;
   isStreaming?: boolean;
+  // Clave para forzar scroll cuando cambia el chat o se recarga
+  scrollKey?: string;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -16,10 +18,12 @@ export const MessageList: React.FC<MessageListProps> = ({
   isLoading = false,
   streamingResponse = '',
   isStreaming = false,
+  scrollKey,
 }) => {
   const messageListRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(messages.length);
   const prevStreamingRef = useRef(isStreaming);
+  const didAutoScrolledOnMountRef = useRef(false);
 
   // SCROLL cuando cambia el número de mensajes
   useEffect(() => {
@@ -79,6 +83,36 @@ export const MessageList: React.FC<MessageListProps> = ({
       });
     }
   }, [streamingResponse, isStreaming]);
+
+  // Scroll al fondo cuando cambia el chat (scrollKey), o en recarga
+  useEffect(() => {
+    if (!messageListRef.current) return;
+
+    const timer = setTimeout(() => {
+      messageListRef.current?.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [scrollKey]);
+
+  // Scroll inicial al montar si ya hay mensajes (por recarga con datos en caché)
+  useEffect(() => {
+    if (didAutoScrolledOnMountRef.current) return;
+    if (!messageListRef.current) return;
+    if (messages.length === 0) return;
+
+    didAutoScrolledOnMountRef.current = true;
+    const timer = setTimeout(() => {
+      messageListRef.current?.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [messages.length]);
 
   if (isLoading && messages.length === 0) {
     return (
