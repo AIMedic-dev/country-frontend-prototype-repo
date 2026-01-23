@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ENV } from '@/shared/config/env';
+import type {
+  AiResponseChunkEvent,
+} from '../types/chat.types';
 
 interface UseWebSocketReturn {
   socket: Socket | null;
@@ -53,22 +56,14 @@ export const useWebSocket = (
     });
 
     // Evento: Chunk de respuesta en tiempo real
-    newSocket.on(
-      'ai-response-chunk',
-      (data: { chatId: string; chunk: string }) => {
-        // console.log('📝 Chunk recibido:', data.chunk);
-        setStreamingResponse(prev => prev + data.chunk);
-      }
-    );
+    newSocket.on('ai-response-chunk', (data: AiResponseChunkEvent) => {
+      setStreamingResponse(prev => prev + data.chunk);
+    });
 
     // Evento: Fin del streaming
     newSocket.on('ai-response-end', () => {
-      // console.log('✅ Streaming finalizado para chat');
-
-      // Limpiar inmediatamente para respuestas largas
       setIsStreaming(false);
 
-      // Limpiar el texto después de un momento
       setTimeout(() => {
         setStreamingResponse('');
       }, 1500);

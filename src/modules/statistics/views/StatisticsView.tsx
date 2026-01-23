@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useStatistics } from '../hooks/useStatistics';
 import { TopicsChart } from '../components/TopicsChart/TopicsChart';
-import { WordCloudChart } from '../components/WordCloudChart/WordCloudChart';
 import { StatsCards } from '../components/StatsCards/StatsCards';
 import { SummarySection } from '../components/SummarySection/SummarySection';
 import { AnalyticsHeader } from '../components/AnalyticsHeader/AnalyticsHeader';
@@ -142,10 +141,11 @@ export const StatisticsView: React.FC = () => {
             <TopicsChart data={data.topicsData} />
           </div>
 
-          {/* Palabras Más Frecuentes */}
+          {/* Palabras Más Frecuentes - Comentado temporalmente
           <div className={styles.chartItem}>
             <WordCloudChart data={data.wordsData} />
           </div>
+          */}
 
           {/* Resumen General de Interacciones */}
           {data.summaries && data.summaries.length > 0 && (

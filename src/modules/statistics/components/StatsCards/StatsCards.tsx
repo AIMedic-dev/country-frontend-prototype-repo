@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MessageSquare, AlertCircle, TrendingUp, Calendar } from 'lucide-react';
+import { MessageSquare, TrendingUp, Calendar } from 'lucide-react';
 import { Modal } from '@/shared/components';
 import type { TopicData, PainScaleData, SymptomData } from '../../types/statistics.types';
 import styles from './StatsCards.module.css';
@@ -101,18 +101,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
               <p className={styles.cardValue}>{stats.totalConversations}</p>
             </div>
             <MessageSquare className={styles.cardIcon} size={32} />
-          </div>
-        </div>
-
-        <div className={styles.card} onClick={() => handleCardClick('pain')}>
-          <div className={styles.cardContent}>
-            <div>
-              <p className={styles.cardLabel}>Dolor Promedio</p>
-              <p className={`${styles.cardValue} ${styles.cardValueOrange}`}>
-                {stats.averagePain.toFixed(1)}
-              </p>
-            </div>
-            <AlertCircle className={`${styles.cardIcon} ${styles.cardIconOrange}`} size={32} />
           </div>
         </div>
 

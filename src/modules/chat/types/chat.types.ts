@@ -33,11 +33,14 @@ export interface AiResponseStartEvent {
 export interface AiResponseChunkEvent {
   chatId: string;
   chunk: string;
+  chunkIndex?: number;
 }
 
 export interface AiResponseEndEvent {
   chatId: string;
   message: Message;
+  completedSuccessfully?: boolean;
+  totalCharacters?: number;
 }
 
 export interface ChatCreatedEvent {
