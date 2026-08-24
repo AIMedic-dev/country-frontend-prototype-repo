@@ -1,0 +1,56 @@
+# Despliegue del frontend de country (Vite) a S3 + CloudFront.
+# Reemplaza el pipeline viejo de Azure. Migrado a estático (2026).
+# Las URLs del backend (API + WebSocket) se leen del .env del repo (ya apuntan a AWS).
+#
+#   push a `main`         -> build + s3 sync + invalidación de CloudFront
+#   pull_request a `main` -> solo build de verificación
+#
+# Auth: OIDC (sin llaves guardadas) — asume el rol aimedic-gha-deploy.
+
+name: Deploy country frontend (S3 + CloudFront)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-2
+  BUCKET: aimedic-country-frontend
+  DISTRIBUTION_ID: E1Y4CK7KN6F86T
+  DEPLOY_ROLE: arn:aws:iam::724937262054:role/aimedic-gha-deploy
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install & build (Vite -> ./dist)
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync a S3 + invalidar CloudFront
+        if: github.event_name != 'pull_request'
+        run: |
+          aws s3 sync ./dist "s3://$BUCKET/" --delete
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
