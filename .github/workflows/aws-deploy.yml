@@ -12,6 +12,10 @@ name: Deploy country frontend (S3 + CloudFront)
 on:
   push:
     branches: [main]
+    # Cambios solo de docs/agents no redespliegan (no van en dist/).
+    paths-ignore:
+      - '**.md'
+      - '.claude/**'
   pull_request:
     branches: [main]
   workflow_dispatch:
