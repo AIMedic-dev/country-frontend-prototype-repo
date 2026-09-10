@@ -46,8 +46,11 @@ class StatisticsService {
                 params.append('userCode', userCode);
             }
 
-            // Usar timeout extendido para analytics (especialmente en modo realtime)
-            const timeout = mode === 'realtime' ? 180000 : 30000; // 3 min para realtime, 30 seg para cache
+            // El ALB corta a los 60 s (idle_timeout) y el backend se rinde a los 45,
+            // asi que esperar 3 minutos solo significaba tener al usuario mirando un
+            // spinner 60 s para acabar en un error de red. 50 s deja margen para que
+            // llegue el error REAL del backend (que si trae CORS) y poder mostrarlo.
+            const timeout = mode === 'realtime' ? 50000 : 30000;
             const analyticsData = await apiService.get<AnalyticsApiResponse>(
                 `/analytics?${params.toString()}`,
                 { timeout }
@@ -105,10 +108,10 @@ class StatisticsService {
      */
     async getUserAnalytics(userCode: string): Promise<StatisticsData> {
         try {
-            // Timeout extendido para consulta individual (siempre es realtime)
+            // Mismo limite que el resto: por encima de 60 s manda el ALB, no nosotros.
             const analyticsData = await apiService.get<AnalyticsApiResponse>(
                 `/analytics/user/${userCode}`,
-                { timeout: 180000 } // 3 minutos
+                { timeout: 50000 }
             );
 
             // Transformar los datos del API al formato esperado
